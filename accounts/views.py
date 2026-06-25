@@ -1102,80 +1102,537 @@ def update_ticket_status_view(request, ticket_id):
 # REPORTS VIEW
 # ============================================
 
+# ============================================================
+# COMPLETE FIXED billing_reports VIEW — paste into accounts/views.py
+# replacing the existing billing_reports, export_invoices_csv,
+# export_invoices_pdf functions
+# ============================================================
+
+from django.db.models import (
+    Sum, Count, Avg, Q, F,
+    Case, When, Value, DecimalField
+)
+from django.db.models.functions import TruncMonth, Coalesce
+from django.utils import timezone
+from datetime import datetime, timedelta, date
+from decimal import Decimal
+import json
+
+
+# ── shared helper so Dashboard and Reports always use identical numbers ──
+
+def get_invoice_stats(user, invoices_qs=None):
+    """
+    Reusable helper. Pass a filtered queryset or None for all invoices.
+    Returns a dict of consistent metrics used by both Dashboard and Reports.
+    """
+    if invoices_qs is None:
+        from accounts.models import Invoice
+        invoices_qs = Invoice.objects.filter(user=user)
+
+    agg = invoices_qs.aggregate(
+        total_revenue   = Coalesce(Sum('total'),       Decimal('0.00')),
+        paid_revenue    = Coalesce(Sum('total', filter=Q(status='paid')),    Decimal('0.00')),
+        pending_revenue = Coalesce(Sum('total', filter=Q(status__in=['issued','pending','draft'])), Decimal('0.00')),
+        overdue_revenue = Coalesce(Sum('total', filter=Q(status='overdue')), Decimal('0.00')),
+        total_gst       = Coalesce(Sum('gst_amount'),  Decimal('0.00')),
+        total_cgst      = Coalesce(Sum('cgst_amount'), Decimal('0.00')),
+        total_sgst      = Coalesce(Sum('sgst_amount'), Decimal('0.00')),
+        total_igst      = Coalesce(Sum('igst_amount'), Decimal('0.00')),
+        total_subtotal  = Coalesce(Sum('subtotal'),    Decimal('0.00')),
+        avg_invoice     = Avg('total'),
+        total_count     = Count('id'),
+        paid_count      = Count('id', filter=Q(status='paid')),
+        pending_count   = Count('id', filter=Q(status__in=['issued','pending','draft'])),
+        overdue_count   = Count('id', filter=Q(status='overdue')),
+        draft_count     = Count('id', filter=Q(status='draft')),
+        cancelled_count = Count('id', filter=Q(status='cancelled')),
+    )
+
+    total = agg['total_count'] or 1  # avoid div-by-zero
+    agg['paid_pct']      = round((agg['paid_count']      / total) * 100, 1)
+    agg['pending_pct']   = round((agg['pending_count']   / total) * 100, 1)
+    agg['overdue_pct']   = round((agg['overdue_count']   / total) * 100, 1)
+    agg['draft_pct']     = round((agg['draft_count']     / total) * 100, 1)
+    agg['cancelled_pct'] = round((agg['cancelled_count'] / total) * 100, 1)
+    agg['outstanding']   = agg['pending_revenue'] + agg['overdue_revenue']
+    agg['avg_invoice']   = agg['avg_invoice'] or Decimal('0.00')
+    return agg
+
+
 @login_required(login_url='accounts:login')
 def billing_reports(request):
-    user = request.user
+    from accounts.models import Invoice, Customer, SupportTicket
 
-    from_date_str = request.GET.get('from_date')
-    to_date_str   = request.GET.get('to_date')
-    status_filter = request.GET.get('status')
+    user  = request.user
+    today = timezone.now().date()
 
-    from_date = datetime.strptime(from_date_str, '%Y-%m-%d').date() if from_date_str else datetime.now().date() - timedelta(days=30)
-    to_date   = datetime.strptime(to_date_str,   '%Y-%m-%d').date() if to_date_str   else datetime.now().date()
+    # ── 1. DATE RANGE PRESETS ────────────────────────────────────────────
+    preset = request.GET.get('preset', '')
+    from_date_str = request.GET.get('from_date', '')
+    to_date_str   = request.GET.get('to_date', '')
 
-    query_filter = Q(user=user, issued_date__gte=from_date, issued_date__lte=to_date)
+    # Financial year helpers (India: Apr 1 – Mar 31)
+    fy_start_year = today.year if today.month >= 4 else today.year - 1
+    this_fy_start = date(fy_start_year, 4, 1)
+    this_fy_end   = date(fy_start_year + 1, 3, 31)
+    prev_fy_start = date(fy_start_year - 1, 4, 1)
+    prev_fy_end   = date(fy_start_year,     3, 31)
+
+    preset_map = {
+        'today':       (today,                         today),
+        'yesterday':   (today - timedelta(days=1),     today - timedelta(days=1)),
+        'this_week':   (today - timedelta(days=today.weekday()), today),
+        'this_month':  (today.replace(day=1),          today),
+        'last_month':  (
+            (today.replace(day=1) - timedelta(days=1)).replace(day=1),
+            today.replace(day=1) - timedelta(days=1),
+        ),
+        'last_3m':     (today - timedelta(days=90),    today),
+        'last_6m':     (today - timedelta(days=180),   today),
+        'this_fy':     (this_fy_start,                 this_fy_end),
+        'prev_fy':     (prev_fy_start,                 prev_fy_end),
+        'all':         (None, None),   # no date filter → matches invoices page
+    }
+
+    if preset in preset_map:
+        from_date, to_date = preset_map[preset]
+    elif from_date_str and to_date_str:
+        try:
+            from_date = datetime.strptime(from_date_str, '%Y-%m-%d').date()
+            to_date   = datetime.strptime(to_date_str,   '%Y-%m-%d').date()
+        except ValueError:
+            from_date = to_date = None
+    else:
+        # ── FIX #1: Default = ALL TIME (matches Invoices page) ──────────
+        from_date = None
+        to_date   = None
+
+    # ── 2. BUILD QUERYSETS ───────────────────────────────────────────────
+    status_filter   = request.GET.get('status', '')
+    customer_filter = request.GET.get('customer', '')
+    gst_type_filter = request.GET.get('gst_type', '')   # 'cgst','igst'
+
+    # All invoices for this user — matches what the Invoices page shows
+    all_invoices = Invoice.objects.filter(user=user).select_related('customer')
+
+    # Filtered queryset starts from all_invoices
+    filtered = all_invoices
+
+    if from_date and to_date:
+        filtered = filtered.filter(issued_date__gte=from_date, issued_date__lte=to_date)
+
     if status_filter:
-        query_filter &= Q(status=status_filter)
+        filtered = filtered.filter(status=status_filter)
 
-    invoices = Invoice.objects.filter(query_filter).order_by('-issued_date')
-    stats    = invoices.aggregate(total_revenue=Sum('total'), total_count=Count('id'), average_invoice=Avg('total'))
-    pending_amount = invoices.exclude(status='paid').aggregate(total=Sum('total'))['total'] or 0
+    if customer_filter:
+        filtered = filtered.filter(customer_id=customer_filter)
 
-    export_format = request.GET.get('export')
+    if gst_type_filter == 'cgst':
+        filtered = filtered.filter(cgst_amount__gt=0)
+    elif gst_type_filter == 'igst':
+        filtered = filtered.filter(igst_amount__gt=0)
+
+    filtered = filtered.order_by('-issued_date')
+
+    # ── 3. STATS ─────────────────────────────────────────────────────────
+    stats = get_invoice_stats(user, filtered)
+
+    # ── 4. MONTHLY ANALYTICS (last 12 months) ────────────────────────────
+    twelve_months_ago = today - timedelta(days=365)
+    monthly_data = (
+        all_invoices
+        .filter(issued_date__gte=twelve_months_ago)
+        .annotate(month=TruncMonth('issued_date'))
+        .values('month')
+        .annotate(
+            revenue        = Coalesce(Sum('total'),                                  Decimal('0')),
+            paid_revenue   = Coalesce(Sum('total', filter=Q(status='paid')),         Decimal('0')),
+            pending_rev    = Coalesce(Sum('total', filter=Q(status__in=['issued','pending','draft'])), Decimal('0')),
+            overdue_rev    = Coalesce(Sum('total', filter=Q(status='overdue')),      Decimal('0')),
+            invoice_count  = Count('id'),
+            paid_count     = Count('id', filter=Q(status='paid')),
+            pending_count  = Count('id', filter=Q(status__in=['issued','pending','draft'])),
+            overdue_count  = Count('id', filter=Q(status='overdue')),
+            new_customers  = Count('customer', distinct=True),
+        )
+        .order_by('month')
+    )
+
+    monthly_labels        = []
+    monthly_revenue       = []
+    monthly_paid          = []
+    monthly_pending       = []
+    monthly_overdue       = []
+    monthly_invoice_count = []
+
+    for m in monthly_data:
+        if m['month']:
+            monthly_labels.append(m['month'].strftime('%b %Y'))
+            monthly_revenue.append(float(m['revenue'] or 0))
+            monthly_paid.append(float(m['paid_revenue'] or 0))
+            monthly_pending.append(float(m['pending_rev'] or 0))
+            monthly_overdue.append(float(m['overdue_rev'] or 0))
+            monthly_invoice_count.append(m['invoice_count'])
+
+    # ── 5. CUSTOMER REPORTS ───────────────────────────────────────────────
+    top_customers = (
+        Customer.objects.filter(user=user)
+        .annotate(
+            total_revenue  = Coalesce(Sum('invoice__total'),                                            Decimal('0')),
+            paid_revenue   = Coalesce(Sum('invoice__total', filter=Q(invoice__status='paid')),          Decimal('0')),
+            pending_rev    = Coalesce(Sum('invoice__total', filter=Q(invoice__status__in=['issued','pending','draft'])), Decimal('0')),
+            overdue_rev    = Coalesce(Sum('invoice__total', filter=Q(invoice__status='overdue')),       Decimal('0')),
+            invoice_count  = Count('invoice'),
+        )
+        .filter(invoice_count__gt=0)
+        .order_by('-total_revenue')[:10]
+    )
+
+    customers_with_pending = (
+        Customer.objects.filter(user=user)
+        .annotate(
+            pending_amount = Coalesce(
+                Sum('invoice__total', filter=Q(invoice__status__in=['issued','pending','draft'])),
+                Decimal('0')
+            ),
+            pending_count = Count('invoice', filter=Q(invoice__status__in=['issued','pending','draft'])),
+        )
+        .filter(pending_count__gt=0)
+        .order_by('-pending_amount')[:10]
+    )
+
+    customers_with_overdue = (
+        Customer.objects.filter(user=user)
+        .annotate(
+            overdue_amount = Coalesce(
+                Sum('invoice__total', filter=Q(invoice__status='overdue')),
+                Decimal('0')
+            ),
+            overdue_count = Count('invoice', filter=Q(invoice__status='overdue')),
+        )
+        .filter(overdue_count__gt=0)
+        .order_by('-overdue_amount')[:10]
+    )
+
+    # ── 6. GST ANALYTICS ─────────────────────────────────────────────────
+    gst_stats = filtered.aggregate(
+        total_cgst     = Coalesce(Sum('cgst_amount'), Decimal('0')),
+        total_sgst     = Coalesce(Sum('sgst_amount'), Decimal('0')),
+        total_igst     = Coalesce(Sum('igst_amount'), Decimal('0')),
+        total_gst      = Coalesce(Sum('gst_amount'),  Decimal('0')),
+        taxable_amount = Coalesce(Sum('subtotal'),     Decimal('0')),
+        grand_total    = Coalesce(Sum('total'),        Decimal('0')),
+    )
+
+    gst_monthly = (
+        all_invoices
+        .filter(issued_date__gte=twelve_months_ago)
+        .annotate(month=TruncMonth('issued_date'))
+        .values('month')
+        .annotate(
+            cgst = Coalesce(Sum('cgst_amount'), Decimal('0')),
+            sgst = Coalesce(Sum('sgst_amount'), Decimal('0')),
+            igst = Coalesce(Sum('igst_amount'), Decimal('0')),
+            gst  = Coalesce(Sum('gst_amount'),  Decimal('0')),
+        )
+        .order_by('month')
+    )
+
+    gst_labels = [m['month'].strftime('%b %Y') for m in gst_monthly if m['month']]
+    gst_cgst   = [float(m['cgst'] or 0) for m in gst_monthly if m['month']]
+    gst_sgst   = [float(m['sgst'] or 0) for m in gst_monthly if m['month']]
+    gst_igst   = [float(m['igst'] or 0) for m in gst_monthly if m['month']]
+    gst_total  = [float(m['gst']  or 0) for m in gst_monthly if m['month']]
+
+    # Customer list for filter dropdown
+    all_customers = Customer.objects.filter(user=user).order_by('name')
+
+    # ── 7. EXPORTS ───────────────────────────────────────────────────────
+    export_format = request.GET.get('export', '')
     if export_format == 'csv':
-        return export_invoices_csv(invoices)
+        return _export_csv(filtered)
     elif export_format == 'pdf':
-        return export_invoices_pdf(invoices)
+        return _export_pdf(filtered, user, from_date, to_date)
+    elif export_format == 'gst_csv':
+        return _export_gst_csv(filtered)
 
+    # ── 8. CONTEXT ───────────────────────────────────────────────────────
     context = {
-        'invoices': invoices,
-        'total_revenue':  stats['total_revenue'] or 0,
-        'pending_amount': pending_amount,
-        'total_invoices': stats['total_count'] or 0,
-        'average_invoice': stats['average_invoice'] or 0,
-        'page_title': 'Billing Reports',
+        'page_title': 'Reports',
+
+        # date range
+        'from_date':    from_date.strftime('%Y-%m-%d') if from_date else '',
+        'to_date':      to_date.strftime('%Y-%m-%d')   if to_date   else '',
+        'preset':       preset,
+        'today':        today.strftime('%Y-%m-%d'),
+
+        # filters
+        'status_filter':   status_filter,
+        'customer_filter': customer_filter,
+        'all_customers':   all_customers,
+
+        # invoice data
+        'invoices': filtered,
+
+        # ── FIX #1: total_invoices now matches filtered (or all) ──
+        'total_invoices':   stats['total_count'],
+        'total_revenue':    stats['total_revenue'],
+        'paid_revenue':     stats['paid_revenue'],
+        'pending_revenue':  stats['pending_revenue'],
+        'overdue_revenue':  stats['overdue_revenue'],
+        'outstanding':      stats['outstanding'],
+        'average_invoice':  stats['avg_invoice'],
+        'pending_amount':   stats['pending_revenue'],
+
+        # status breakdown
+        'paid_count':      stats['paid_count'],
+        'pending_count':   stats['pending_count'],
+        'overdue_count':   stats['overdue_count'],
+        'draft_count':     stats['draft_count'],
+        'cancelled_count': stats['cancelled_count'],
+        'paid_pct':        stats['paid_pct'],
+        'pending_pct':     stats['pending_pct'],
+        'overdue_pct':     stats['overdue_pct'],
+        'draft_pct':       stats['draft_pct'],
+        'cancelled_pct':   stats['cancelled_pct'],
+
+        # monthly chart data (JSON for Chart.js)
+        'monthly_labels':        json.dumps(monthly_labels),
+        'monthly_revenue':       json.dumps(monthly_revenue),
+        'monthly_paid':          json.dumps(monthly_paid),
+        'monthly_pending':       json.dumps(monthly_pending),
+        'monthly_overdue':       json.dumps(monthly_overdue),
+        'monthly_invoice_count': json.dumps(monthly_invoice_count),
+
+        # customer reports
+        'top_customers':           top_customers,
+        'customers_with_pending':  customers_with_pending,
+        'customers_with_overdue':  customers_with_overdue,
+
+        # GST
+        'gst_stats':   gst_stats,
+        'gst_labels':  json.dumps(gst_labels),
+        'gst_cgst':    json.dumps(gst_cgst),
+        'gst_sgst':    json.dumps(gst_sgst),
+        'gst_igst':    json.dumps(gst_igst),
+        'gst_total':   json.dumps(gst_total),
     }
     return render(request, 'accounts/reports.html', context)
 
 
-def export_invoices_csv(invoices):
+# ── EXPORT HELPERS ────────────────────────────────────────────────────────
+
+def _export_csv(invoices):
     import csv
+    from django.http import HttpResponse
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="invoices_report.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Invoice Number', 'Customer', 'Amount', 'GST', 'Total', 'Status', 'Date'])
-    for invoice in invoices:
-        writer.writerow([invoice.invoice_number, invoice.customer.name if invoice.customer else 'N/A', invoice.subtotal, invoice.gst_amount, invoice.total, invoice.get_status_display(), invoice.issued_date.strftime('%d-%m-%Y')])
+    writer.writerow([
+        'Invoice #', 'Customer', 'Date', 'Due Date',
+        'Subtotal', 'GST Rate', 'CGST', 'SGST', 'IGST',
+        'GST Amount', 'Total', 'Status'
+    ])
+    for inv in invoices:
+        writer.writerow([
+            inv.invoice_number,
+            inv.customer.name if inv.customer else 'N/A',
+            inv.issued_date.strftime('%d-%m-%Y'),
+            inv.due_date.strftime('%d-%m-%Y') if inv.due_date else '',
+            inv.subtotal,
+            f"{inv.gst_rate}%",
+            inv.cgst_amount,
+            inv.sgst_amount,
+            inv.igst_amount,
+            inv.gst_amount,
+            inv.total,
+            inv.get_status_display(),
+        ])
     return response
 
 
-def export_invoices_pdf(invoices):
+def _export_gst_csv(invoices):
+    import csv
+    from django.http import HttpResponse
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="gst_report.csv"'
+    writer = csv.writer(response)
+    writer.writerow([
+        'Invoice #', 'Customer', 'GSTIN', 'Date',
+        'Taxable Amount', 'GST Rate', 'CGST', 'SGST', 'IGST',
+        'Total GST', 'Grand Total'
+    ])
+    for inv in invoices:
+        writer.writerow([
+            inv.invoice_number,
+            inv.customer.name    if inv.customer else 'N/A',
+            inv.customer.gstin   if inv.customer else '',
+            inv.issued_date.strftime('%d-%m-%Y'),
+            inv.subtotal,
+            f"{inv.gst_rate}%",
+            inv.cgst_amount,
+            inv.sgst_amount,
+            inv.igst_amount,
+            inv.gst_amount,
+            inv.total,
+        ])
+    return response
+
+
+def _export_pdf(invoices, user, from_date, to_date):
     from reportlab.lib.pagesizes import A4
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib import colors
-    from reportlab.lib.units import inch
+    from reportlab.lib.units import mm, inch
+    from reportlab.platypus import (
+        SimpleDocTemplate, Table, TableStyle,
+        Paragraph, Spacer, HRFlowable
+    )
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
+    from django.http import HttpResponse
     from io import BytesIO
 
     buffer = BytesIO()
-    doc    = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        leftMargin=15*mm, rightMargin=15*mm,
+        topMargin=12*mm, bottomMargin=15*mm,
+    )
+
+    BRAND = colors.HexColor('#0D1B4B')
+    GRAY  = colors.HexColor('#6B7280')
+    LGRAY = colors.HexColor('#F3F4F6')
+    BLACK = colors.HexColor('#111827')
+    WHITE = colors.white
+    GREEN = colors.HexColor('#059669')
+    RED   = colors.HexColor('#DC2626')
+    AMBER = colors.HexColor('#D97706')
+
     styles = getSampleStyleSheet()
-    elements = [Paragraph("Billing Report - iSaral", ParagraphStyle('T', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor('#1a73e8'), spaceAfter=20)), Spacer(1, 0.3*inch)]
+    USABLE = A4[0] - 30*mm
 
-    data = [['Invoice #', 'Customer', 'Amount', 'GST', 'Total', 'Status']]
-    for invoice in invoices:
-        data.append([invoice.invoice_number, invoice.customer.name if invoice.customer else 'N/A', f"Rs.{invoice.subtotal}", f"Rs.{invoice.gst_amount}", f"Rs.{invoice.total}", invoice.get_status_display()])
+    def P(text, size=9, color=BLACK, bold=False, align=TA_LEFT):
+        font = 'Helvetica-Bold' if bold else 'Helvetica'
+        return Paragraph(str(text), ParagraphStyle(
+            'x', parent=styles['Normal'],
+            fontSize=size, textColor=color,
+            fontName=font, alignment=align, leading=size+4,
+        ))
 
-    table = Table(data, colWidths=[1.2*inch, 1.8*inch, 1*inch, 0.8*inch, 1*inch, 0.9*inch])
-    table.setStyle(TableStyle([('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1a73e8')), ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke), ('ALIGN', (0,0), (-1,-1), 'CENTER'), ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'), ('FONTSIZE', (0,0), (-1,0), 10), ('BOTTOMPADDING', (0,0), (-1,0), 12), ('BACKGROUND', (0,1), (-1,-1), colors.beige), ('GRID', (0,0), (-1,-1), 1, colors.black), ('FONTSIZE', (0,1), (-1,-1), 9)]))
-    elements.append(table)
-    doc.build(elements)
+    story = []
+
+    # Header
+    date_range = ''
+    if from_date and to_date:
+        date_range = f"{from_date.strftime('%d %b %Y')} – {to_date.strftime('%d %b %Y')}"
+    else:
+        date_range = 'All Time'
+
+    company = user.company_name or 'iSaral Business Solutions'
+    hdr = Table(
+        [[
+            [P('iSaral', 16, WHITE, True), Spacer(1,2), P(company, 9, WHITE), P(f'Generated: {timezone.now().strftime("%d %b %Y")}', 8, WHITE)],
+            [P('BILLING REPORT', 13, colors.HexColor('#F4A61D'), True, TA_RIGHT), Spacer(1,4), P(f'Period: {date_range}', 9, WHITE, align=TA_RIGHT), P(f'Generated by: {user.email}', 8, WHITE, align=TA_RIGHT)],
+        ]],
+        colWidths=[USABLE*0.55, USABLE*0.45],
+        style=TableStyle([
+            ('BACKGROUND', (0,0), (-1,-1), BRAND),
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('LEFTPADDING', (0,0), (-1,-1), 12),
+            ('RIGHTPADDING', (0,0), (-1,-1), 12),
+            ('TOPPADDING', (0,0), (-1,-1), 14),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 14),
+        ])
+    )
+    story.append(hdr)
+    story.append(Spacer(1, 6*mm))
+
+    # Invoice table
+    col_w = [USABLE*0.16, USABLE*0.22, USABLE*0.12, USABLE*0.14, USABLE*0.12, USABLE*0.12, USABLE*0.12]
+    rows = [[
+        P('Invoice #', 8, WHITE, True, TA_CENTER),
+        P('Customer',  8, WHITE, True, TA_CENTER),
+        P('Date',      8, WHITE, True, TA_CENTER),
+        P('Subtotal',  8, WHITE, True, TA_RIGHT),
+        P('GST',       8, WHITE, True, TA_RIGHT),
+        P('Total',     8, WHITE, True, TA_RIGHT),
+        P('Status',    8, WHITE, True, TA_CENTER),
+    ]]
+
+    status_colors = {
+        'paid': GREEN, 'pending': AMBER, 'issued': AMBER,
+        'overdue': RED, 'draft': GRAY, 'cancelled': GRAY,
+    }
+
+    for inv in invoices:
+        sc = status_colors.get(inv.status, GRAY)
+        rows.append([
+            P(inv.invoice_number, 8, colors.HexColor('#1d4ed8')),
+            P(inv.customer.name if inv.customer else 'N/A', 8, BLACK),
+            P(inv.issued_date.strftime('%d %b %Y'), 8, GRAY),
+            P(f'Rs.{inv.subtotal:,.2f}', 8, BLACK, align=TA_RIGHT),
+            P(f'Rs.{inv.gst_amount:,.2f}', 8, BLACK, align=TA_RIGHT),
+            P(f'Rs.{inv.total:,.2f}', 8, BLACK, True, TA_RIGHT),
+            P(inv.get_status_display(), 8, sc, True, TA_CENTER),
+        ])
+
+    tbl_style = TableStyle([
+        ('BACKGROUND',    (0,0), (-1,0),  BRAND),
+        ('BACKGROUND',    (0,1), (-1,-1), LGRAY),
+        ('ROWBACKGROUNDS',(0,1), (-1,-1), [WHITE, LGRAY]),
+        ('GRID',          (0,0), (-1,-1), 0.3, colors.HexColor('#E5E7EB')),
+        ('TOPPADDING',    (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
+        ('LEFTPADDING',   (0,0), (-1,-1), 6),
+        ('RIGHTPADDING',  (0,0), (-1,-1), 6),
+        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+    ])
+
+    story.append(Table(rows, colWidths=col_w, style=tbl_style, repeatRows=1))
+    story.append(Spacer(1, 5*mm))
+
+    # Totals row
+    inv_list = list(invoices)
+    grand_total    = sum(i.total      for i in inv_list)
+    grand_subtotal = sum(i.subtotal   for i in inv_list)
+    grand_gst      = sum(i.gst_amount for i in inv_list)
+
+    summary = Table(
+        [[
+            P(f'Total Invoices: {len(inv_list)}', 9, BRAND, True),
+            P(f'Subtotal: Rs.{grand_subtotal:,.2f}', 9, BRAND, True, TA_RIGHT),
+            P(f'Total GST: Rs.{grand_gst:,.2f}', 9, BRAND, True, TA_RIGHT),
+            P(f'Grand Total: Rs.{grand_total:,.2f}', 11, WHITE, True, TA_RIGHT),
+        ]],
+        colWidths=[USABLE*0.25, USABLE*0.25, USABLE*0.25, USABLE*0.25],
+        style=TableStyle([
+            ('BACKGROUND',    (3,0), (3,0), BRAND),
+            ('BACKGROUND',    (0,0), (2,0), LGRAY),
+            ('TOPPADDING',    (0,0), (-1,-1), 8),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+            ('LEFTPADDING',   (0,0), (-1,-1), 8),
+            ('RIGHTPADDING',  (0,0), (-1,-1), 8),
+            ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+        ])
+    )
+    story.append(summary)
+    story.append(Spacer(1, 4*mm))
+    story.append(HRFlowable(width='100%', thickness=0.8, color=BRAND))
+
+    doc.build(story)
     buffer.seek(0)
-
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="invoices_report.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="billing_report.pdf"'
     return response
 
+
+# Alias so the old export functions still resolve
+def export_invoices_csv(invoices):
+    return _export_csv(invoices)
+
+def export_invoices_pdf(invoices):
+    return _export_pdf(invoices, None, None, None)
 
 # ============================================
 # PLANS VIEW

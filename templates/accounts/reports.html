@@ -2,175 +2,466 @@
 {% load static %}
 
 {% block content %}
-<div style="background: #f5f7fa; min-height: 100vh; padding: 30px 0;">
-    <div class="container-fluid px-4">
-        
-        <!-- Header Section -->
-        <div style="margin-bottom: 30px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0;">Billing Reports</h1>
-                    <p style="color: #666; font-size: 14px; margin-top: 4px;">Manage and analyze your invoice data</p>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="exportData('csv')" style="padding: 10px 16px; border: 1px solid #ddd; background: white; border-radius: 6px; font-weight: 500; color: #333; cursor: pointer; font-size: 13px;">Export CSV</button>
-                    <button onclick="exportData('pdf')" style="padding: 10px 16px; background: #0066cc; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 13px;">Export PDF</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Linear Filter Bar (Zoho Style) -->
-        <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 24px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <form id="filterForm" method="GET" action="{% url 'accounts:reports' %}" style="display: flex; gap: 16px; align-items: flex-end;">
-                <!-- From Date -->
-                <div style="flex: 1; min-width: 200px;">
-                    <label style="display: block; font-weight: 600; color: #1a1a1a; font-size: 13px; margin-bottom: 6px;">From Date</label>
-                    <input 
-                        type="date" 
-                        id="from_date" 
-                        name="from_date" 
-                        value="{{ request.GET.from_date }}"
-                        style="width: 100%; padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; box-sizing: border-box;"
-                    >
-                </div>
-
-                <!-- To Date -->
-                <div style="flex: 1; min-width: 200px;">
-                    <label style="display: block; font-weight: 600; color: #1a1a1a; font-size: 13px; margin-bottom: 6px;">To Date</label>
-                    <input 
-                        type="date" 
-                        id="to_date" 
-                        name="to_date" 
-                        value="{{ request.GET.to_date }}"
-                        style="width: 100%; padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; box-sizing: border-box;"
-                    >
-                </div>
-
-                <!-- Status -->
-                <div style="flex: 1; min-width: 180px;">
-                    <label style="display: block; font-weight: 600; color: #1a1a1a; font-size: 13px; margin-bottom: 6px;">Status</label>
-                    <select 
-                        id="status" 
-                        name="status"
-                        style="width: 100%; padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; box-sizing: border-box;"
-                    >
-                        <option value="">All Statuses</option>
-                        <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
-                        <option value="issued" {% if request.GET.status == 'issued' %}selected{% endif %}>Issued</option>
-                        <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Paid</option>
-                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
-                        <option value="overdue" {% if request.GET.status == 'overdue' %}selected{% endif %}>Overdue</option>
-                    </select>
-                </div>
-
-                <!-- Apply Button -->
-                <button type="submit" style="padding: 8px 20px; background: #0066cc; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; white-space: nowrap;">Apply Filters</button>
-            </form>
-        </div>
-
-        <!-- KPI Cards (Linear Row) -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <!-- Total Revenue -->
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <p style="color: #888; font-size: 12px; font-weight: 600; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Revenue</p>
-                <h3 style="color: #0066cc; font-size: 26px; font-weight: 700; margin: 0;">₹{{ total_revenue|floatformat:0 }}</h3>
-            </div>
-
-            <!-- Pending Amount -->
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <p style="color: #888; font-size: 12px; font-weight: 600; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Pending Amount</p>
-                <h3 style="color: #f59e0b; font-size: 26px; font-weight: 700; margin: 0;">₹{{ pending_amount|floatformat:0 }}</h3>
-            </div>
-
-            <!-- Total Invoices -->
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <p style="color: #888; font-size: 12px; font-weight: 600; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Invoices</p>
-                <h3 style="color: #16a34a; font-size: 26px; font-weight: 700; margin: 0;">{{ total_invoices }}</h3>
-            </div>
-
-            <!-- Average Value -->
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <p style="color: #888; font-size: 12px; font-weight: 600; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Avg Value</p>
-                <h3 style="color: #a855f7; font-size: 26px; font-weight: 700; margin: 0;">₹{{ average_invoice|floatformat:0 }}</h3>
-            </div>
-        </div>
-
-        <!-- Invoices Table (Clean Linear Design) -->
-        <div style="background: white; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
-            <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
-                <h3 style="font-size: 16px; font-weight: 700; color: #1a1a1a; margin: 0;">Invoice Details</h3>
-            </div>
-
-            {% if invoices %}
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f9f9f9; border-bottom: 1px solid #e5e7eb;">
-                                <th style="padding: 12px 20px; text-align: left; color: #666; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Invoice #</th>
-                                <th style="padding: 12px 20px; text-align: left; color: #666; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Customer</th>
-                                <th style="padding: 12px 20px; text-align: right; color: #666; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Amount</th>
-                                <th style="padding: 12px 20px; text-align: left; color: #666; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
-                                <th style="padding: 12px 20px; text-align: left; color: #666; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Date</th>
-                                <th style="padding: 12px 20px; text-align: center; color: #666; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for invoice in invoices %}
-                                <tr style="border-bottom: 1px solid #f0f0f0; transition: background 0.2s;">
-                                    <td style="padding: 14px 20px; color: #0066cc; font-weight: 600; font-size: 14px;">{{ invoice.invoice_number }}</td>
-                                    <td style="padding: 14px 20px; color: #1a1a1a; font-size: 14px;">{{ invoice.customer.name|default:"N/A" }}</td>
-                                    <td style="padding: 14px 20px; text-align: right; color: #0066cc; font-weight: 600; font-size: 14px;">₹{{ invoice.total|floatformat:2 }}</td>
-                                    <td style="padding: 14px 20px;">
-                                        {% if invoice.status == 'paid' %}
-                                            <span style="background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">✓ Paid</span>
-                                        {% elif invoice.status == 'overdue' %}
-                                            <span style="background: #fee2e2; color: #7f1d1d; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">Overdue</span>
-                                        {% elif invoice.status == 'issued' %}
-                                            <span style="background: #dbeafe; color: #0c2d6b; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">Issued</span>
-                                        {% elif invoice.status == 'pending' %}
-                                            <span style="background: #fef3c7; color: #78350f; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">Pending</span>
-                                        {% else %}
-                                            <span style="background: #f3f4f6; color: #374151; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ invoice.get_status_display }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="padding: 14px 20px; color: #666; font-size: 14px;">{{ invoice.issued_date|date:"d M Y" }}</td>
-                                    <td style="padding: 14px 20px; text-align: center;">
-                                       <a href="{% url 'accounts:invoice_pdf' invoice.id %}" style="color: #0066cc; text-decoration: none; font-weight: 600; font-size: 13px;">PDF</a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div style="padding: 60px 20px; text-align: center; color: #999;">
-                    <p style="font-size: 15px; margin: 0; font-weight: 500;">No invoices found for the selected period</p>
-                    <p style="font-size: 13px; color: #bbb; margin-top: 6px;">Try adjusting your filters or date range</p>
-                </div>
-            {% endif %}
-        </div>
-
-    </div>
-</div>
-
-<script>
-function exportData(format) {
-    const from_date = document.getElementById('from_date').value;
-    const to_date = document.getElementById('to_date').value;
-    const status = document.getElementById('status').value;
-    
-    let url = '{% url "accounts:reports" %}?export=' + format;
-    if (from_date) url += '&from_date=' + from_date;
-    if (to_date) url += '&to_date=' + to_date;
-    if (status) url += '&status=' + status;
-    
-    window.location.href = url;
-}
-</script>
-
 <style>
-    table tbody tr:hover {
-        background-color: #f9f9f9;
-    }
+:root {
+  --brand: #0D1B4B;
+  --blue:  #1d4ed8;
+  --green: #059669;
+  --amber: #d97706;
+  --red:   #dc2626;
+  --gray:  #6b7280;
+}
+.rpt-card {
+  background: white; border-radius: 10px; border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.kpi-val { font-size: 26px; font-weight: 700; line-height: 1.1; }
+.badge { display:inline-block; padding:3px 9px; border-radius:5px; font-size:11px; font-weight:600; }
+.badge-paid     { background:#d1fae5; color:#065f46; }
+.badge-pending  { background:#fef3c7; color:#78350f; }
+.badge-overdue  { background:#fee2e2; color:#7f1d1d; }
+.badge-draft    { background:#f3f4f6; color:#374151; }
+.badge-issued   { background:#dbeafe; color:#1e3a8a; }
+.badge-cancelled{ background:#fce7f3; color:#831843; }
+.section-title  { font-size:15px; font-weight:700; color:#111827; margin:0 0 14px 0; }
+table           { width:100%; border-collapse:collapse; font-size:13px; }
+th              { padding:10px 14px; background:#f8fafc; color:#6b7280; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid #e5e7eb; }
+td              { padding:11px 14px; border-bottom:1px solid #f0f0f0; color:#1f2937; }
+tr:hover td     { background:#f9fafb; }
+.preset-btn {
+  padding:5px 11px; border:1px solid #e5e7eb; border-radius:5px;
+  font-size:12px; font-weight:500; background:white; cursor:pointer; color:#374151;
+  text-decoration:none; white-space:nowrap;
+}
+.preset-btn.active, .preset-btn:hover { background:var(--brand); color:white; border-color:var(--brand); }
+.tab-btn {
+  padding:8px 16px; border:none; background:transparent;
+  font-size:13px; font-weight:600; color:#6b7280; cursor:pointer;
+  border-bottom:2px solid transparent;
+}
+.tab-btn.active { color:var(--brand); border-bottom-color:var(--brand); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+canvas { max-height:300px !important; }
 </style>
+
+<div style="background:#f5f7fa; min-height:100vh; padding:28px 20px;">
+<div style="max-width:1400px; margin:0 auto;">
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════════════ -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:12px;">
+    <div>
+      <h1 style="font-size:26px; font-weight:800; color:#111827; margin:0;">Reports</h1>
+      <p style="color:#6b7280; font-size:13px; margin:2px 0 0;">
+        Showing {% if from_date and to_date %}{{ from_date }} – {{ to_date }}{% else %}all time{% endif %}
+        &nbsp;·&nbsp; <strong>{{ total_invoices }}</strong> invoices
+      </p>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a href="{% url 'accounts:reports' %}?export=csv{% if from_date %}&from_date={{ from_date }}{% endif %}{% if to_date %}&to_date={{ to_date }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+         style="padding:8px 14px; border:1px solid #d1d5db; border-radius:6px; font-size:13px; font-weight:600; color:#374151; background:white; text-decoration:none;">
+        ⬇ CSV
+      </a>
+      <a href="{% url 'accounts:reports' %}?export=gst_csv{% if from_date %}&from_date={{ from_date }}{% endif %}{% if to_date %}&to_date={{ to_date }}{% endif %}"
+         style="padding:8px 14px; border:1px solid #d1d5db; border-radius:6px; font-size:13px; font-weight:600; color:#374151; background:white; text-decoration:none;">
+        ⬇ GST CSV
+      </a>
+      <a href="{% url 'accounts:reports' %}?export=pdf{% if from_date %}&from_date={{ from_date }}{% endif %}{% if to_date %}&to_date={{ to_date }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+         style="padding:8px 16px; background:var(--brand); color:white; border:none; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none;">
+        ⬇ PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ FILTER BAR ═══════════════════════════════════════════════════ -->
+  <div class="rpt-card" style="padding:16px 20px; margin-bottom:20px;">
+
+    <!-- Date Presets -->
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+      {% for key,label in presets %}
+      <a href="{% url 'accounts:reports' %}?preset={{ key }}" class="preset-btn {% if preset == key %}active{% endif %}">{{ label }}</a>
+      {% empty %}
+      <a href="{% url 'accounts:reports' %}?preset=all"       class="preset-btn {% if preset == 'all' or not preset %}active{% endif %}">All Time</a>
+      <a href="{% url 'accounts:reports' %}?preset=today"     class="preset-btn {% if preset == 'today' %}active{% endif %}">Today</a>
+      <a href="{% url 'accounts:reports' %}?preset=yesterday" class="preset-btn {% if preset == 'yesterday' %}active{% endif %}">Yesterday</a>
+      <a href="{% url 'accounts:reports' %}?preset=this_week" class="preset-btn {% if preset == 'this_week' %}active{% endif %}">This Week</a>
+      <a href="{% url 'accounts:reports' %}?preset=this_month"class="preset-btn {% if preset == 'this_month' %}active{% endif %}">This Month</a>
+      <a href="{% url 'accounts:reports' %}?preset=last_month"class="preset-btn {% if preset == 'last_month' %}active{% endif %}">Last Month</a>
+      <a href="{% url 'accounts:reports' %}?preset=last_3m"   class="preset-btn {% if preset == 'last_3m' %}active{% endif %}">Last 3 Months</a>
+      <a href="{% url 'accounts:reports' %}?preset=last_6m"   class="preset-btn {% if preset == 'last_6m' %}active{% endif %}">Last 6 Months</a>
+      <a href="{% url 'accounts:reports' %}?preset=this_fy"   class="preset-btn {% if preset == 'this_fy' %}active{% endif %}">This FY</a>
+      <a href="{% url 'accounts:reports' %}?preset=prev_fy"   class="preset-btn {% if preset == 'prev_fy' %}active{% endif %}">Prev FY</a>
+      {% endfor %}
+    </div>
+
+    <!-- Custom Range + Filters -->
+    <form method="GET" action="{% url 'accounts:reports' %}" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#6b7280; display:block; margin-bottom:4px;">FROM DATE</label>
+        <input type="date" name="from_date" value="{{ from_date }}"
+          style="padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:13px;" />
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#6b7280; display:block; margin-bottom:4px;">TO DATE</label>
+        <input type="date" name="to_date" value="{{ to_date }}"
+          style="padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:13px;" />
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#6b7280; display:block; margin-bottom:4px;">STATUS</label>
+        <select name="status" style="padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:13px;">
+          <option value="">All Statuses</option>
+          {% for val,label in statuses %}
+          <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+          {% empty %}
+          <option value="paid"      {% if status_filter == 'paid'      %}selected{% endif %}>Paid</option>
+          <option value="pending"   {% if status_filter == 'pending'   %}selected{% endif %}>Pending</option>
+          <option value="issued"    {% if status_filter == 'issued'    %}selected{% endif %}>Issued</option>
+          <option value="overdue"   {% if status_filter == 'overdue'   %}selected{% endif %}>Overdue</option>
+          <option value="draft"     {% if status_filter == 'draft'     %}selected{% endif %}>Draft</option>
+          <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:600; color:#6b7280; display:block; margin-bottom:4px;">CUSTOMER</label>
+        <select name="customer" style="padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:13px; min-width:160px;">
+          <option value="">All Customers</option>
+          {% for c in all_customers %}
+          <option value="{{ c.id }}" {% if customer_filter == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" style="padding:7px 18px; background:var(--brand); color:white; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;">Apply</button>
+      <a href="{% url 'accounts:reports' %}" style="padding:7px 14px; border:1px solid #d1d5db; border-radius:6px; font-size:13px; color:#6b7280; background:white; text-decoration:none;">Clear</a>
+    </form>
+  </div>
+
+  <!-- ═══ KPI CARDS ════════════════════════════════════════════════════ -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:20px;">
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Total Invoices</p>
+      <div class="kpi-val" style="color:#111827;">{{ total_invoices }}</div>
+    </div>
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Total Revenue</p>
+      <div class="kpi-val" style="color:var(--blue);">₹{{ total_revenue|floatformat:2 }}</div>
+    </div>
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Paid Revenue</p>
+      <div class="kpi-val" style="color:var(--green);">₹{{ paid_revenue|floatformat:2 }}</div>
+      <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">{{ paid_count }} invoices</p>
+    </div>
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Pending</p>
+      <div class="kpi-val" style="color:var(--amber);">₹{{ pending_revenue|floatformat:2 }}</div>
+      <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">{{ pending_count }} invoices</p>
+    </div>
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Overdue</p>
+      <div class="kpi-val" style="color:var(--red);">₹{{ overdue_revenue|floatformat:2 }}</div>
+      <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">{{ overdue_count }} invoices</p>
+    </div>
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Outstanding</p>
+      <div class="kpi-val" style="color:#7c3aed;">₹{{ outstanding|floatformat:2 }}</div>
+    </div>
+    <div class="rpt-card" style="padding:18px;">
+      <p style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">Avg Invoice</p>
+      <div class="kpi-val" style="color:#0891b2;">₹{{ average_invoice|floatformat:2 }}</div>
+    </div>
+  </div>
+
+  <!-- ═══ TABS ══════════════════════════════════════════════════════════ -->
+  <div class="rpt-card" style="margin-bottom:20px; overflow:hidden;">
+    <div style="border-bottom:1px solid #e5e7eb; padding:0 20px; display:flex; gap:0;">
+      <button class="tab-btn active" onclick="showTab('invoices')">Invoices</button>
+      <button class="tab-btn"        onclick="showTab('monthly')">Monthly</button>
+      <button class="tab-btn"        onclick="showTab('status')">Status</button>
+      <button class="tab-btn"        onclick="showTab('customers')">Customers</button>
+      <button class="tab-btn"        onclick="showTab('gst')">GST</button>
+    </div>
+
+    <!-- ── TAB: INVOICES ──────────────────────────────────────────────── -->
+    <div id="tab-invoices" class="tab-panel active" style="padding:20px;">
+      <p class="section-title">Invoice Details ({{ total_invoices }} records)</p>
+      {% if invoices %}
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr>
+            <th>Invoice #</th><th>Customer</th><th style="text-align:right;">Subtotal</th>
+            <th style="text-align:right;">GST</th><th style="text-align:right;">Total</th>
+            <th>Status</th><th>Date</th><th>Action</th>
+          </tr></thead>
+          <tbody>
+          {% for inv in invoices %}
+          <tr>
+            <td style="font-weight:600;color:var(--blue);">{{ inv.invoice_number }}</td>
+            <td>{{ inv.customer.name|default:"—" }}</td>
+            <td style="text-align:right;">₹{{ inv.subtotal|floatformat:2 }}</td>
+            <td style="text-align:right;">₹{{ inv.gst_amount|floatformat:2 }}</td>
+            <td style="text-align:right;font-weight:600;">₹{{ inv.total|floatformat:2 }}</td>
+            <td>
+              {% if inv.status == 'paid' %}<span class="badge badge-paid">Paid</span>
+              {% elif inv.status == 'overdue' %}<span class="badge badge-overdue">Overdue</span>
+              {% elif inv.status == 'pending' %}<span class="badge badge-pending">Pending</span>
+              {% elif inv.status == 'issued'  %}<span class="badge badge-issued">Issued</span>
+              {% elif inv.status == 'draft'   %}<span class="badge badge-draft">Draft</span>
+              {% elif inv.status == 'cancelled'%}<span class="badge badge-cancelled">Cancelled</span>
+              {% else %}<span class="badge badge-draft">{{ inv.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td style="color:#6b7280;">{{ inv.issued_date|date:"d M Y" }}</td>
+            <td><a href="{% url 'accounts:invoice_pdf' inv.id %}" style="color:var(--blue);font-size:12px;font-weight:600;">PDF</a></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:40px;color:#9ca3af;">
+        <p style="font-size:15px;margin:0;">No invoices match your filters</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ── TAB: MONTHLY ───────────────────────────────────────────────── -->
+    <div id="tab-monthly" class="tab-panel" style="padding:20px;">
+      <p class="section-title">Monthly Revenue (Last 12 Months)</p>
+      <div style="position:relative;height:300px;margin-bottom:24px;">
+        <canvas id="monthlyRevenueChart"></canvas>
+      </div>
+      <p class="section-title">Invoice Count per Month</p>
+      <div style="position:relative;height:220px;">
+        <canvas id="monthlyCountChart"></canvas>
+      </div>
+    </div>
+
+    <!-- ── TAB: STATUS ────────────────────────────────────────────────── -->
+    <div id="tab-status" class="tab-panel" style="padding:20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div>
+          <p class="section-title">Status Distribution</p>
+          <div style="position:relative;height:260px;">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+        <div>
+          <p class="section-title">Breakdown</p>
+          <table>
+            <thead><tr><th>Status</th><th>Count</th><th>%</th><th style="text-align:right;">Revenue</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge badge-paid">Paid</span></td><td>{{ paid_count }}</td><td>{{ paid_pct }}%</td><td style="text-align:right;">₹{{ paid_revenue|floatformat:2 }}</td></tr>
+              <tr><td><span class="badge badge-pending">Pending</span></td><td>{{ pending_count }}</td><td>{{ pending_pct }}%</td><td style="text-align:right;">₹{{ pending_revenue|floatformat:2 }}</td></tr>
+              <tr><td><span class="badge badge-overdue">Overdue</span></td><td>{{ overdue_count }}</td><td>{{ overdue_pct }}%</td><td style="text-align:right;">₹{{ overdue_revenue|floatformat:2 }}</td></tr>
+              <tr><td><span class="badge badge-draft">Draft</span></td><td>{{ draft_count }}</td><td>{{ draft_pct }}%</td><td style="text-align:right;">—</td></tr>
+              <tr><td><span class="badge badge-cancelled">Cancelled</span></td><td>{{ cancelled_count }}</td><td>{{ cancelled_pct }}%</td><td style="text-align:right;">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: CUSTOMERS ─────────────────────────────────────────────── -->
+    <div id="tab-customers" class="tab-panel" style="padding:20px;">
+      <p class="section-title">Top 10 Customers by Revenue</p>
+      <table style="margin-bottom:28px;">
+        <thead><tr><th>#</th><th>Customer</th><th style="text-align:right;">Total</th><th style="text-align:right;">Paid</th><th style="text-align:right;">Pending</th><th style="text-align:right;">Overdue</th><th>Invoices</th></tr></thead>
+        <tbody>
+        {% for c in top_customers %}
+        <tr>
+          <td style="color:#6b7280;font-weight:700;">#{{ forloop.counter }}</td>
+          <td style="font-weight:600;">{{ c.name }}</td>
+          <td style="text-align:right;font-weight:600;color:var(--blue);">₹{{ c.total_revenue|floatformat:2 }}</td>
+          <td style="text-align:right;color:var(--green);">₹{{ c.paid_revenue|floatformat:2 }}</td>
+          <td style="text-align:right;color:var(--amber);">₹{{ c.pending_rev|floatformat:2 }}</td>
+          <td style="text-align:right;color:var(--red);">₹{{ c.overdue_rev|floatformat:2 }}</td>
+          <td>{{ c.invoice_count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px;">No data</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      <p class="section-title">Customers with Pending Payments</p>
+      <table style="margin-bottom:28px;">
+        <thead><tr><th>Customer</th><th style="text-align:right;">Pending Amount</th><th>Invoices</th></tr></thead>
+        <tbody>
+        {% for c in customers_with_pending %}
+        <tr>
+          <td style="font-weight:600;">{{ c.name }}</td>
+          <td style="text-align:right;color:var(--amber);font-weight:600;">₹{{ c.pending_amount|floatformat:2 }}</td>
+          <td>{{ c.pending_count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">No pending payments</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      <p class="section-title">Customers with Overdue Invoices</p>
+      <table>
+        <thead><tr><th>Customer</th><th style="text-align:right;">Overdue Amount</th><th>Invoices</th></tr></thead>
+        <tbody>
+        {% for c in customers_with_overdue %}
+        <tr>
+          <td style="font-weight:600;">{{ c.name }}</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">₹{{ c.overdue_amount|floatformat:2 }}</td>
+          <td>{{ c.overdue_count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">No overdue invoices</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── TAB: GST ───────────────────────────────────────────────────── -->
+    <div id="tab-gst" class="tab-panel" style="padding:20px;">
+      <!-- GST Summary Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px;">
+        <div class="rpt-card" style="padding:14px;">
+          <p style="font-size:11px;font-weight:700;color:#6b7280;margin:0 0 6px;text-transform:uppercase;">Taxable Amount</p>
+          <div style="font-size:20px;font-weight:700;color:#111827;">₹{{ gst_stats.taxable_amount|floatformat:2 }}</div>
+        </div>
+        <div class="rpt-card" style="padding:14px;">
+          <p style="font-size:11px;font-weight:700;color:#6b7280;margin:0 0 6px;text-transform:uppercase;">CGST Collected</p>
+          <div style="font-size:20px;font-weight:700;color:var(--blue);">₹{{ gst_stats.total_cgst|floatformat:2 }}</div>
+        </div>
+        <div class="rpt-card" style="padding:14px;">
+          <p style="font-size:11px;font-weight:700;color:#6b7280;margin:0 0 6px;text-transform:uppercase;">SGST Collected</p>
+          <div style="font-size:20px;font-weight:700;color:var(--green);">₹{{ gst_stats.total_sgst|floatformat:2 }}</div>
+        </div>
+        <div class="rpt-card" style="padding:14px;">
+          <p style="font-size:11px;font-weight:700;color:#6b7280;margin:0 0 6px;text-transform:uppercase;">IGST Collected</p>
+          <div style="font-size:20px;font-weight:700;color:var(--amber);">₹{{ gst_stats.total_igst|floatformat:2 }}</div>
+        </div>
+        <div class="rpt-card" style="padding:14px;">
+          <p style="font-size:11px;font-weight:700;color:#6b7280;margin:0 0 6px;text-transform:uppercase;">Total GST</p>
+          <div style="font-size:20px;font-weight:700;color:#7c3aed;">₹{{ gst_stats.total_gst|floatformat:2 }}</div>
+        </div>
+        <div class="rpt-card" style="padding:14px;">
+          <p style="font-size:11px;font-weight:700;color:#6b7280;margin:0 0 6px;text-transform:uppercase;">Grand Total</p>
+          <div style="font-size:20px;font-weight:700;color:var(--brand);">₹{{ gst_stats.grand_total|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <p class="section-title">Monthly GST Collection</p>
+      <div style="position:relative;height:280px;margin-bottom:18px;">
+        <canvas id="gstChart"></canvas>
+      </div>
+
+      <div style="margin-top:14px;">
+        <a href="{% url 'accounts:reports' %}?export=gst_csv{% if from_date %}&from_date={{ from_date }}{% endif %}{% if to_date %}&to_date={{ to_date }}{% endif %}"
+           style="padding:8px 16px; background:var(--green); color:white; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none;">
+          ⬇ Export GST CSV
+        </a>
+      </div>
+    </div>
+
+  </div><!-- end tab card -->
+
+</div><!-- container -->
+</div><!-- bg -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ── TAB SWITCHER ─────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── CHART DATA ───────────────────────────────────────────────────────────
+const monthlyLabels   = {{ monthly_labels|safe }};
+const monthlyRevenue  = {{ monthly_revenue|safe }};
+const monthlyPaid     = {{ monthly_paid|safe }};
+const monthlyPending  = {{ monthly_pending|safe }};
+const monthlyOverdue  = {{ monthly_overdue|safe }};
+const monthlyCount    = {{ monthly_invoice_count|safe }};
+
+const gstLabels = {{ gst_labels|safe }};
+const gstCGST   = {{ gst_cgst|safe }};
+const gstSGST   = {{ gst_sgst|safe }};
+const gstIGST   = {{ gst_igst|safe }};
+const gstTotal  = {{ gst_total|safe }};
+
+const BRAND = '#0D1B4B';
+const BLUE  = '#1d4ed8';
+const GREEN = '#059669';
+const AMBER = '#d97706';
+const RED   = '#dc2626';
+const PURP  = '#7c3aed';
+
+const defaultOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { labels: { font: { size: 11 }, usePointStyle: true, padding: 14 } } },
+  scales: {
+    y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 }, callback: v => '₹' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v) } },
+    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+  }
+};
+
+// Monthly Revenue Chart
+new Chart(document.getElementById('monthlyRevenueChart'), {
+  type: 'bar',
+  data: {
+    labels: monthlyLabels,
+    datasets: [
+      { label: 'Paid',    data: monthlyPaid,    backgroundColor: GREEN, borderRadius: 4, stack: 'a' },
+      { label: 'Pending', data: monthlyPending, backgroundColor: AMBER, borderRadius: 4, stack: 'a' },
+      { label: 'Overdue', data: monthlyOverdue, backgroundColor: RED,   borderRadius: 4, stack: 'a' },
+    ]
+  },
+  options: { ...defaultOpts, plugins: { ...defaultOpts.plugins }, scales: { ...defaultOpts.scales, x: { stacked: true, grid:{display:false}, ticks:{font:{size:10}} }, y: { ...defaultOpts.scales.y, stacked: true } } }
+});
+
+// Monthly Count Chart
+new Chart(document.getElementById('monthlyCountChart'), {
+  type: 'line',
+  data: {
+    labels: monthlyLabels,
+    datasets: [{ label: 'Invoices Created', data: monthlyCount, borderColor: BLUE, backgroundColor: BLUE+'20', fill: true, tension: 0.4, pointRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { font:{size:11}, usePointStyle:true } } },
+    scales: { y: { beginAtZero:true, grid:{color:'#f0f0f0'}, ticks:{font:{size:10}} }, x: { grid:{display:false}, ticks:{font:{size:10}} } }
+  }
+});
+
+// Status Doughnut
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Paid', 'Pending', 'Overdue', 'Draft', 'Cancelled'],
+    datasets: [{ data: [{{ paid_count }}, {{ pending_count }}, {{ overdue_count }}, {{ draft_count }}, {{ cancelled_count }}], backgroundColor: [GREEN, AMBER, RED, '#9ca3af', '#f9a8d4'], borderColor: '#fff', borderWidth: 3, hoverOffset: 8 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{font:{size:11}, usePointStyle:true, padding:16} } } }
+});
+
+// GST Chart
+new Chart(document.getElementById('gstChart'), {
+  type: 'bar',
+  data: {
+    labels: gstLabels,
+    datasets: [
+      { label: 'CGST', data: gstCGST, backgroundColor: BLUE,  borderRadius: 4, stack: 'g' },
+      { label: 'SGST', data: gstSGST, backgroundColor: GREEN, borderRadius: 4, stack: 'g' },
+      { label: 'IGST', data: gstIGST, backgroundColor: AMBER, borderRadius: 4, stack: 'g' },
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{font:{size:11}, usePointStyle:true, padding:14} } },
+    scales:{
+      x:{ stacked:true, grid:{display:false}, ticks:{font:{size:10}} },
+      y:{ stacked:true, beginAtZero:true, grid:{color:'#f0f0f0'}, ticks:{font:{size:10}, callback: v=>'₹'+(v>=1000?(v/1000).toFixed(0)+'k':v)} }
+    }
+  }
+});
+</script>
 {% endblock %}
