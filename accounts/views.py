@@ -1248,6 +1248,39 @@ def settings_view(request):
                 messages.success(request, 'Password changed successfully!')
             return redirect('accounts:settings')
 
+        elif action == 'update_company':
+            from accounts.models import CompanySettings
+            company_name = request.POST.get('company_name', '').strip()
+            gstin        = request.POST.get('gstin', '').strip() or None
+            pan          = request.POST.get('pan', '').strip() or None
+            address      = request.POST.get('address', '').strip()
+            city         = request.POST.get('city', '').strip()
+            state        = request.POST.get('state', '').strip()
+            pincode      = request.POST.get('pincode', '').strip()
+            phone        = request.POST.get('phone', '').strip()
+            email        = request.POST.get('email', '').strip()
+            website      = request.POST.get('website', '').strip() or None
+
+            try:
+                company, created = CompanySettings.objects.get_or_create(user=user)
+                company.company_name = company_name
+                company.gstin   = gstin
+                company.pan     = pan
+                company.address = address
+                company.city    = city
+                company.state   = state
+                company.pincode = pincode
+                company.phone   = phone
+                company.email   = email
+                company.website = website
+                if 'logo' in request.FILES:
+                    company.logo = request.FILES['logo']
+                company.save()
+                messages.success(request, '✅ Company settings saved successfully!')
+            except Exception as e:
+                messages.error(request, f'❌ Error saving company settings: {str(e)}')
+            return redirect('accounts:settings')
+
         elif action == 'delete_account':
             if request.POST.get('confirm_delete') == 'DELETE':
                 user.delete()
@@ -1256,4 +1289,15 @@ def settings_view(request):
                 messages.error(request, 'Type DELETE to confirm.')
             return redirect('accounts:settings')
 
-    return render(request, 'accounts/settings.html', {'page_title': 'Settings', 'user': user})
+   # Load existing company settings or create empty instance
+    try:
+        company = user.company_settings
+    except Exception:
+        company = None
+
+    context = {
+        'page_title': 'Settings',
+        'user': user,
+        'company': company,
+    }
+    return render(request, 'accounts/settings.html', context)

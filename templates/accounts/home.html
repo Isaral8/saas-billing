@@ -1560,138 +1560,614 @@
   font-size: 18px;
   overflow: hidden;
 }
-.integrations-right {
-  position: relative;
-  height: 460px;
-}
-.float-card {
-  position: absolute;
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.08);
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 200px;
-  transition: box-shadow 0.3s;
-}
-.float-card:nth-child(1) { top: 20px;  left: 8%;  animation: floatA 4s ease-in-out infinite; }
-.float-card:nth-child(2) { top: 140px; left: 44%; animation: floatB 4.5s ease-in-out infinite; animation-delay: 0.8s; }
-.float-card:nth-child(3) { top: 260px; left: 4%;  animation: floatA 5s ease-in-out infinite; animation-delay: 1.4s; }
-.float-card:nth-child(4) { top: 360px; left: 40%; animation: floatB 4s ease-in-out infinite; animation-delay: 0.3s; }
-@keyframes floatA {
-  0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
-  50%       { transform: translateY(-12px) rotate(0.5deg); }
-}
-@keyframes floatB {
-  0%, 100% { transform: translateY(0px) rotate(0.5deg); }
-  50%       { transform: translateY(-10px) rotate(-0.5deg); }
-}
-.float-card:hover {
-  box-shadow: 0 20px 50px rgba(26,86,219,0.15);
-  animation-play-state: paused;
-}
-.float-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 22px;
-}
-.float-text strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--text);
-}
-.float-text span {
-  font-size: 12px;
-  color: var(--text-4);
-  font-weight: 500;
-}
-.float-badge {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 4px 9px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-.badge-green  { background: var(--green-light); color: var(--green); }
-.badge-blue   { background: var(--primary-light); color: var(--primary); }
-.badge-orange { background: #FFF7ED; color: #D97706; }
-@media (max-width: 1024px) {
-  .integrations-inner { grid-template-columns: 1fr; gap: 60px; }
-  .integrations-right { height: 340px; }
-  .float-card:nth-child(1) { top: 0;    left: 2%; }
-  .float-card:nth-child(2) { top: 90px; left: 42%; }
-  .float-card:nth-child(3) { top: 190px; left: 2%; }
-  .float-card:nth-child(4) { top: 270px; left: 42%; }
-}
-@media (max-width: 600px) {
-  .integrations-list { grid-template-columns: 1fr; }
-  .integrations-right { display: none; }
+/* ==========================================================
+   INTEGRATION VISUAL
+========================================================== */
+
+.integrations-right{
+    position:relative;
+    min-height:650px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
 }
 
-    /* WHY iSaral SECTION */
-.why-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 52px;
+/* Center */
+
+.center-orbit{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:220px;
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10;
 }
 
-.why-card {
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-xl);
-  padding: 28px;
-  transition: all 0.2s;
+/* Glow */
+
+.center-orbit::before{
+    content:"";
+    position:absolute;
+    width:360px;
+    height:360px;
+    border-radius:50%;
+    background:radial-gradient(circle,
+        rgba(26,86,219,.16),
+        rgba(26,86,219,.06),
+        transparent 72%);
+    filter:blur(18px);
 }
 
-.why-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-3px);
-  border-color: var(--primary-mid);
+/* Rings */
+
+.orbit-ring{
+    position:absolute;
+    border-radius:50%;
+    border:2px dashed rgba(26,86,219,.18);
 }
 
-.why-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--r-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  margin-bottom: 16px;
+.ring1{
+    width:140px;
+    height:140px;
+    animation:rotateRing 14s linear infinite;
 }
 
-.why-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 10px;
+.ring2{
+    width:220px;
+    height:220px;
+    animation:rotateRing 22s linear infinite reverse;
 }
 
-.why-desc {
-  font-size: 14px;
-  color: var(--text-3);
-  line-height: 1.7;
+.ring3{
+    width:300px;
+    height:300px;
+    animation:rotateRing 30s linear infinite;
 }
 
-@media (max-width: 1024px) {
-  .why-grid { grid-template-columns: repeat(2, 1fr); }
+@keyframes rotateRing{
+
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
+
 }
 
-@media (max-width: 540px) {
-  .why-grid { grid-template-columns: 1fr; }
+/* Logo */
+
+.orbit-logo{
+
+    width:90px;
+    height:90px;
+    border-radius:22px;
+    background:#fff;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    box-shadow:
+    0 20px 45px rgba(26,86,219,.16),
+    0 0 0 10px rgba(26,86,219,.05);
+
+    animation:pulseLogo 3s ease-in-out infinite;
 }
 
+.orbit-logo img{
+
+    width:60px;
+    height:auto;
+
+}
+
+@keyframes pulseLogo{
+
+0%,100%{
+
+transform:scale(1);
+
+}
+
+50%{
+
+transform:scale(1.08);
+
+}
+
+}
+
+/* Floating Cards */
+
+.float-card{
+
+    position:absolute;
+    width:245px;
+    background:#fff;
+    border-radius:18px;
+    padding:16px 18px;
+
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+    border:1px solid #E5E7EB;
+
+    box-shadow:
+    0 15px 45px rgba(15,23,42,.08);
+
+    transition:.35s ease;
+    animation:floatCard 5s ease-in-out infinite;
+}
+
+.float-card:hover{
+
+    transform:translateY(-8px);
+    box-shadow:
+    0 25px 60px rgba(26,86,219,.18);
+
+}
+
+/* Floating Animation */
+
+@keyframes floatCard{
+
+0%,100%{
+
+transform:translateY(0px);
+
+}
+
+50%{
+
+transform:translateY(-12px);
+
+}
+
+}
+
+/* Positions */
+
+.payment{
+
+top:35px;
+left:30px;
+
+}
+
+.gst{
+
+top:110px;
+right:10px;
+
+}
+
+.tally{
+
+bottom:120px;
+left:20px;
+
+}
+
+.reminder{
+
+bottom:30px;
+right:30px;
+
+}
+
+/* Connector Lines */
+
+.float-card::after{
+
+content:"";
+position:absolute;
+height:2px;
+width:70px;
+background:linear-gradient(90deg,#1A56DB,transparent);
+
+}
+
+.payment::after{
+
+left:100%;
+top:50%;
+
+}
+
+.gst::after{
+
+right:100%;
+top:50%;
+transform:rotate(180deg);
+
+}
+
+.tally::after{
+
+left:100%;
+top:50%;
+
+}
+
+.reminder::after{
+
+right:100%;
+top:50%;
+transform:rotate(180deg);
+
+}
+
+/* Icon */
+
+.float-icon{
+
+width:48px;
+height:48px;
+border-radius:14px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:22px;
+
+flex-shrink:0;
+
+}
+
+/* Text */
+
+.float-text{
+
+flex:1;
+
+}
+
+.float-text strong{
+
+display:block;
+font-size:15px;
+font-weight:800;
+color:#111827;
+margin-bottom:2px;
+
+}
+
+.float-text span{
+
+font-size:12px;
+color:#6B7280;
+
+}
+
+/* Badge */
+
+.float-badge{
+
+margin-left:auto;
+padding:5px 10px;
+
+font-size:11px;
+font-weight:700;
+
+border-radius:20px;
+
+white-space:nowrap;
+
+}
+
+.badge-green{
+
+background:#ECFDF5;
+color:#059669;
+
+}
+
+.badge-blue{
+
+background:#EFF6FF;
+color:#2563EB;
+
+}
+
+.badge-orange{
+
+background:#FFF7ED;
+color:#EA580C;
+
+}
+
+/* Responsive */
+
+@media(max-width:991px){
+
+.integrations-inner{
+
+grid-template-columns:1fr;
+gap:60px;
+
+}
+
+.integrations-right{
+
+min-height:760px;
+
+}
+
+.float-card{
+
+width:220px;
+
+}
+
+.payment{
+
+top:0;
+left:50%;
+transform:translateX(-50%);
+
+}
+
+.gst{
+
+top:170px;
+right:0;
+
+}
+
+.tally{
+
+bottom:180px;
+left:0;
+
+}
+
+.reminder{
+
+bottom:20px;
+left:50%;
+right:auto;
+transform:translateX(-50%);
+
+}
+
+}
+
+@media(max-width:600px){
+
+.integrations-list{
+
+grid-template-columns:1fr;
+
+}
+
+.integrations-right{
+
+display:none;
+
+}
+
+}
+    /* ===============================
+   PREMIUM WHY ISARAL
+================================*/
+
+.section.bg-gray{
+    position:relative;
+    overflow:hidden;
+    padding:110px 0;
+    background:
+        radial-gradient(circle at top left,#dbeafe 0%,transparent 35%),
+        radial-gradient(circle at bottom right,#eff6ff 0%,transparent 35%),
+        linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+}
+
+.section.bg-gray::before{
+    content:"";
+    position:absolute;
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:rgba(59,130,246,.08);
+    top:-120px;
+    right:-80px;
+    filter:blur(20px);
+}
+
+.section.bg-gray::after{
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:rgba(14,165,233,.08);
+    bottom:-100px;
+    left:-80px;
+    filter:blur(30px);
+}
+
+.why-grid{
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:30px;
+    margin-top:70px;
+
+}
+
+.why-card{
+
+    position:relative;
+
+    background:rgba(255,255,255,.78);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.6);
+
+    border-radius:24px;
+
+    padding:36px;
+
+    transition:.35s cubic-bezier(.4,0,.2,1);
+
+    box-shadow:
+        0 10px 35px rgba(15,23,42,.06),
+        0 2px 8px rgba(15,23,42,.04);
+
+    overflow:hidden;
+
+}
+
+.why-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:linear-gradient(
+        135deg,
+        rgba(37,99,235,.08),
+        transparent 45%
+    );
+
+    opacity:0;
+
+    transition:.35s;
+
+}
+
+.why-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:
+        0 30px 70px rgba(37,99,235,.18);
+
+    border-color:#3b82f6;
+
+}
+
+.why-card:hover::before{
+
+    opacity:1;
+
+}
+
+.why-icon{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:34px;
+
+    margin-bottom:24px;
+
+    background:linear-gradient(135deg,#2563eb,#60a5fa);
+
+    color:#fff;
+
+    box-shadow:0 12px 24px rgba(37,99,235,.25);
+
+    transition:.35s;
+
+}
+
+.why-card:nth-child(2) .why-icon{
+background:linear-gradient(135deg,#10b981,#6ee7b7);
+}
+
+.why-card:nth-child(3) .why-icon{
+background:linear-gradient(135deg,#f59e0b,#fcd34d);
+}
+
+.why-card:nth-child(4) .why-icon{
+background:linear-gradient(135deg,#8b5cf6,#c084fc);
+}
+
+.why-card:nth-child(5) .why-icon{
+background:linear-gradient(135deg,#ec4899,#f9a8d4);
+}
+
+.why-card:nth-child(6) .why-icon{
+background:linear-gradient(135deg,#06b6d4,#67e8f9);
+}
+
+.why-card:hover .why-icon{
+
+    transform:rotate(-8deg) scale(1.08);
+
+}
+
+.why-title{
+
+    font-size:22px;
+
+    font-weight:800;
+
+    color:#0f172a;
+
+    margin-bottom:14px;
+
+}
+
+.why-desc{
+
+    color:#475569;
+
+    line-height:1.8;
+
+    font-size:15px;
+
+}
+
+@media(max-width:992px){
+
+.why-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.section.bg-gray{
+
+padding:70px 0;
+
+}
+
+.why-grid{
+
+grid-template-columns:1fr;
+
+gap:20px;
+
+}
+
+.why-card{
+
+padding:28px;
+
+}
+
+}
    /* =================================
    STATS TICKER SECTION - CORRECTED
 ================================= */
@@ -3684,6 +4160,58 @@ opacity:.7;
   100% { transform: translateX(-50%); }
 }
 
+@media(max-width:991px){
+
+.integrations-inner{
+
+grid-template-columns:1fr;
+
+}
+
+.integrations-right{
+
+margin-top:70px;
+
+min-height:450px;
+
+}
+
+.payment{
+
+top:0;
+
+left:50%;
+
+transform:translateX(-50%);
+
+}
+
+.gst{
+
+top:120px;
+
+right:0;
+
+}
+
+.tally{
+
+left:0;
+
+bottom:120px;
+
+}
+
+.reminder{
+
+right:20px;
+
+bottom:0;
+
+}
+
+}
+
 </style>
 </head>
 <body>
@@ -3699,7 +4227,10 @@ opacity:.7;
 <!-- TOP BAR -->
 <div class="topbar" role="banner">
   <div class="topbar-inner">
+
     <div class="topbar-left">
+
+      <!-- Email 1 -->
       <a href="mailto:info@isaral.in" class="topbar-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -3707,15 +4238,32 @@ opacity:.7;
         </svg>
         info@isaral.in
       </a>
+
       <div class="topbar-div"></div>
+
+      <!-- Email 2 -->
+      <a href="mailto:support@isaral.in" class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        support@isaral.in
+      </a>
+
+      <div class="topbar-div"></div>
+
+      <!-- Phone 1 -->
       <a href="tel:+919109024198" class="topbar-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 012 2.18 2 2 0 013.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
         </svg>
         +91 91090 24198
       </a>
-    </div>
 
+      <div class="topbar-div"></div>
+
+    
+    </div>
 
   </div>
 </div>
@@ -4511,46 +5059,95 @@ opacity:.7;
         </div>
       </div>
 
-      <!-- RIGHT: Floating live-status cards -->
-      <div class="integrations-right" aria-hidden="true">
+      <!-- RIGHT: Premium Integration Animation -->
+<div class="integrations-right" aria-hidden="true">
 
-        <div class="float-card">
-          <div class="float-icon" style="background:#DCFCE7;">💳</div>
-          <div class="float-text">
+    <!-- Center Logo -->
+    <div class="center-orbit">
+
+        <div class="orbit-ring ring1"></div>
+        <div class="orbit-ring ring2"></div>
+        <div class="orbit-ring ring3"></div>
+
+        <img src="{% static 'images/logo.png' %}"
+             alt="iSaral"
+             class="orbit-logo">
+
+    </div>
+
+    <!-- Payment -->
+    <div class="float-card payment">
+
+        <div class="float-icon" style="background:#DCFCE7;">
+            💳
+        </div>
+
+        <div class="float-text">
             <strong>Payment Received</strong>
-            <span>Razorpay · ₹24,500 via UPI</span>
-          </div>
-          <span class="float-badge badge-green">Live</span>
+            <span>Razorpay • ₹24,500 via UPI</span>
         </div>
 
-        <div class="float-card">
-          <div class="float-icon" style="background:#EBF2FF;">🧾</div>
-          <div class="float-text">
+        <span class="float-badge badge-green">
+            Live
+        </span>
+
+    </div>
+
+    <!-- GST -->
+    <div class="float-card gst">
+
+        <div class="float-icon" style="background:#EBF2FF;">
+            🧾
+        </div>
+
+        <div class="float-text">
             <strong>GST Invoice Sent</strong>
-            <span>INV-2024-0892 · WhatsApp</span>
-          </div>
-          <span class="float-badge badge-blue">Sent</span>
+            <span>INV-2024-0892 • WhatsApp</span>
         </div>
 
-        <div class="float-card">
-          <div class="float-icon" style="background:#F0FDF4;">📊</div>
-          <div class="float-text">
+        <span class="float-badge badge-blue">
+            Sent
+        </span>
+
+    </div>
+
+    <!-- Tally -->
+    <div class="float-card tally">
+
+        <div class="float-icon" style="background:#F0FDF4;">
+            📊
+        </div>
+
+        <div class="float-text">
             <strong>Tally Synced</strong>
-            <span>48 entries · just now</span>
-          </div>
-          <span class="float-badge badge-green">✓ Done</span>
+            <span>48 entries • Just now</span>
         </div>
 
-        <div class="float-card">
-          <div class="float-icon" style="background:#FFF7ED;">💬</div>
-          <div class="float-text">
+        <span class="float-badge badge-green">
+            ✓ Done
+        </span>
+
+    </div>
+
+    <!-- Reminder -->
+    <div class="float-card reminder">
+
+        <div class="float-icon" style="background:#FFF7ED;">
+            💬
+        </div>
+
+        <div class="float-text">
             <strong>Reminder Sent</strong>
-            <span>3 overdue · WhatsApp</span>
-          </div>
-          <span class="float-badge badge-orange">Auto</span>
+            <span>3 overdue • WhatsApp</span>
         </div>
 
-      </div>
+        <span class="float-badge badge-orange">
+            Auto
+        </span>
+
+    </div>
+
+</div>
     </div>
   </div>
 </section>

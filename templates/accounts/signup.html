@@ -1,19 +1,19 @@
-{% load static %}
+﻿{% load static %}
 {% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Create your iSaral account — Smart GST Billing & Business Software for Indian SMEs">
-    <title>Sign Up — iSaral</title>
+    <meta name="description" content="Create your iSaral account â€” Smart GST Billing & Business Software for Indian SMEs">
+    <title>Sign Up â€” iSaral</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <style>
-        /* ── TOKENS (identical to login) ──────── */
+        /* â”€â”€ TOKENS (identical to login) â”€â”€â”€â”€â”€â”€â”€â”€ */
         :root {
             --ink:        #0C1A2E;
             --ink-2:      #1E3A5F;
@@ -55,14 +55,14 @@
         img { display: block; max-width: 100%; }
         input, button, select { font-family: inherit; }
 
-        /* ── LAYOUT ───────────────────────────── */
+        /* â”€â”€ LAYOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .shell {
             min-height: 100vh;
             display: grid;
             grid-template-columns: 1fr 1fr;
         }
 
-        /* ── LEFT PANEL ───────────────────────── */
+        /* â”€â”€ LEFT PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .panel {
             position: relative;
             display: flex;
@@ -142,7 +142,7 @@
             font-weight: 400; line-height: 1.7; max-width: 340px; margin-bottom: 36px;
         }
 
-        /* Steps — left panel version */
+        /* Steps â€” left panel version */
         .onboard-steps { display: flex; flex-direction: column; gap: 16px; }
         .ostep {
             display: flex; align-items: flex-start; gap: 14px;
@@ -181,7 +181,7 @@
         }
         .stat-label { font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,.5); letter-spacing: .2px; }
 
-        /* ── RIGHT PANEL ──────────────────────── */
+        /* â”€â”€ RIGHT PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .form-side {
             display: flex; flex-direction: column;
             align-items: center; justify-content: flex-start;
@@ -375,7 +375,7 @@ appearance: none;
         .legal a { color: var(--ink-4); font-weight: 600; }
         .legal a:hover { color: var(--blue); }
 
-        /* ── RESPONSIVE ───────────────────────── */
+        /* â”€â”€ RESPONSIVE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         @media (max-width: 960px) {
             .shell { grid-template-columns: 1fr; }
             .panel { display: none; }
@@ -394,7 +394,7 @@ appearance: none;
 
 <div class="shell">
 
-    <!-- ─── LEFT PANEL ─────────────────────── -->
+    <!-- â”€â”€â”€ LEFT PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <aside class="panel">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -426,7 +426,7 @@ appearance: none;
                     <div class="ostep-num c1">1</div>
                     <div class="ostep-body">
                         <strong>Create your account</strong>
-                        <span>Enter your details — takes under a minute</span>
+                        <span>Enter your details â€” takes under a minute</span>
                     </div>
                 </div>
                 <div class="ostep">
@@ -452,17 +452,17 @@ appearance: none;
                 <div class="stat-label">Businesses</div>
             </div>
             <div class="stat">
-                <div class="stat-num">₹840Cr+</div>
+                <div class="stat-num">â‚¹840Cr+</div>
                 <div class="stat-label">Invoices raised</div>
             </div>
             <div class="stat">
-                <div class="stat-num">4.8 ★</div>
+                <div class="stat-num">4.8 â˜…</div>
                 <div class="stat-label">App rating</div>
             </div>
         </div>
     </aside>
 
-    <!-- ─── RIGHT: FORM ────────────────────── -->
+    <!-- â”€â”€â”€ RIGHT: FORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <main class="form-side">
 
     <!-- Top Bar -->
@@ -540,7 +540,7 @@ appearance: none;
 
           <!-- Social sign up -->
 <div class="social-row">
-<a href="/accounts/social/login/google/" class="btn-sso">
+<a href="/accounts/google/login/" class="btn-sso">
         <svg width="16" height="16" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
             <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
@@ -549,7 +549,7 @@ appearance: none;
         </svg>
         Continue with Google
     </a>
-   <a href="/accounts/social/login/microsoft/" class="btn-sso">
+   <a href="/accounts/microsoft/login/" class="btn-sso">
         <i class="bi bi-microsoft" style="color:#0078D4;font-size:15px;"></i>
         Continue with Microsoft
     </a>
@@ -659,8 +659,8 @@ appearance: none;
             </p>
 
             <p class="legal">
-                © 2026 iSaral Business Solutions Pvt. Ltd. ·
-                <a href="https://isaral.in/privacy-policy/" target="_blank" rel="noopener">Privacy</a> ·
+                Â© 2026 iSaral Business Solutions Pvt. Ltd. Â·
+                <a href="https://isaral.in/privacy-policy/" target="_blank" rel="noopener">Privacy</a> Â·
                 <a href="https://isaral.in/terms-conditions/" target="_blank" rel="noopener">Terms</a>
             </p>
         </div>
