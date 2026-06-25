@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Plans & Pricing — iSaral{% endblock %}
+{% block page_title %}Plans & Pricing{% endblock %}
+
+{% block content %}
+<div style="padding: 28px; background: #f5f7fa; min-height: calc(100vh - 64px);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 40px; text-align: center;">
+      <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin: 0 0 12px 0; font-family: 'Poppins', sans-serif;">
+        Plans & Pricing
+      </h1>
+      <p style="color: #6b7280; font-size: 16px; margin: 0; max-width: 500px; margin-left: auto; margin-right: auto;">
+        Choose the perfect plan for your business. All plans include 7-day free trial.
+      </p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; margin-bottom: 40px;">
+
+      <!-- Starter Plan -->
+      <div class="card" style="position: relative; overflow: hidden; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background: #f0f4ff; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+          <span style="color: #1a73e8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+            FOR STARTUPS
+          </span>
+        </div>
+
+        <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0; font-family: 'Poppins', sans-serif;">Starter</h2>
+        <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0;">Perfect to get started</p>
+
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 36px; font-weight: 700; color: #1a73e8; font-family: 'Poppins', sans-serif;">₹2,999</span>
+          <span style="color: #6b7280; font-size: 14px;">/month</span>
+          <p style="color: #9ca3af; font-size: 12px; margin: 8px 0 0 0;">Billed monthly</p>
+        </div>
+
+        <button onclick="selectPlan('starter', 'Starter', 2999)" style="width: 100%; padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: all 0.2s;">
+          Start Free Trial
+        </button>
+
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Upto 5 invoices/month
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Basic reporting
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Email support
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> GST calculation
+            </li>
+            <li style="padding: 10px 0; color: #9ca3af; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-times" style="color: #d1d5db;"></i> Advanced analytics
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Professional Plan (Featured) -->
+      <div class="card" style="border: 2px solid #1a73e8; position: relative; overflow: hidden; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 8px 16px rgba(26, 115, 232, 0.15); transform: scale(1.02);">
+        <div style="background: #1a73e8; color: white; padding: 12px 16px; border-radius: 0; margin: -24px -24px 20px -24px; text-align: center;">
+          <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+            ⭐ MOST POPULAR
+          </span>
+        </div>
+
+        <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0; font-family: 'Poppins', sans-serif;">Professional</h2>
+        <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0;">For growing teams</p>
+
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 36px; font-weight: 700; color: #1a73e8; font-family: 'Poppins', sans-serif;">₹5,499</span>
+          <span style="color: #6b7280; font-size: 14px;">/month</span>
+          <p style="color: #9ca3af; font-size: 12px; margin: 8px 0 0 0;">Billed monthly</p>
+        </div>
+
+        <button onclick="selectPlan('professional', 'Professional', 5499)" style="width: 100%; padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);">
+          Start Free Trial
+        </button>
+
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Unlimited invoices
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Advanced reporting
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Priority support
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Customer portal
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Custom branding
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Enterprise Plan -->
+      <div class="card" style="position: relative; overflow: hidden; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background: #fff3e0; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+          <span style="color: #ff9800; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+            FOR ENTERPRISES
+          </span>
+        </div>
+
+        <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0; font-family: 'Poppins', sans-serif;">Enterprise</h2>
+        <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0;">Custom solutions</p>
+
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 36px; font-weight: 700; color: #ff9800; font-family: 'Poppins', sans-serif;">Custom</span>
+          <p style="color: #6b7280; font-size: 14px; margin: 12px 0 0 0;">Contact us for pricing</p>
+        </div>
+
+        <button onclick="selectPlan('enterprise', 'Enterprise', 0)" style="width: 100%; padding: 12px 20px; background: transparent; color: #ff9800; border: 2px solid #ff9800; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: all 0.2s;">
+          Contact Sales
+        </button>
+
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Everything in Professional
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Full API access
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Dedicated account manager
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> Custom integrations
+            </li>
+            <li style="padding: 10px 0; color: #4b5563; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-check" style="color: #27ae60;"></i> SLA guarantee
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== EMBED FORM MODAL ===== -->
+<div id="embedModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; animation: fadeIn 0.3s ease; overflow-y: auto;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 16px; overflow: hidden; max-width: 600px; width: 90%; animation: slideUp 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; display: flex; flex-direction: column;">
+    
+    <!-- Close Button -->
+    <button onclick="closeEmbedModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #9ca3af; z-index: 10;">
+      ✕
+    </button>
+
+    <!-- Form Header -->
+    <div style="background: linear-gradient(135deg, #1A56DB 0%, #2563EB 100%); padding: 28px 32px; text-align: center; color: #fff;">
+      <h3 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 900; margin: 0 0 8px 0; color: #fff; letter-spacing: -0.5px;">
+        💬 Get Started with <span id="planName2"></span>
+      </h3>
+      <p style="font-size: 14px; color: rgba(255, 255, 255, 0.85); margin: 0; font-weight: 500; line-height: 1.6;">
+        Share your details and we'll reach out within 2 hours with your free trial details
+      </p>
+    </div>
+
+    <!-- Form Content -->
+    <div style="flex: 1; overflow-y: auto; background: #fff; padding: 32px;">
+      <form method="POST" action="{% url 'accounts:plan_signup' %}" id="planSignupForm" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+        
+        <input type="hidden" name="plan" id="selectedPlan" value="Professional">
+        <input type="hidden" name="price" id="selectedPrice" value="5499">
+
+        <!-- Company Name -->
+        <div>
+          <label style="display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; font-size: 14px;">Company Name *</label>
+          <input type="text" name="company_name" required placeholder="Your company name" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s;">
+        </div>
+
+        <!-- Full Name -->
+        <div>
+          <label style="display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; font-size: 14px;">Full Name *</label>
+          <input type="text" name="full_name" required placeholder="Your full name" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s;">
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label style="display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; font-size: 14px;">Email Address *</label>
+          <input type="email" name="email" required placeholder="you@company.com" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s;">
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label style="display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; font-size: 14px;">Phone Number *</label>
+          <input type="tel" name="phone" required placeholder="9876543210" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s;">
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <input type="checkbox" id="terms" name="terms" required style="width: 18px; height: 18px; margin-top: 2px; cursor: pointer;">
+          <label for="terms" style="color: #6b7280; font-size: 13px; cursor: pointer; margin: 0;">
+            I agree to the <a href="#" style="color: #1a73e8; text-decoration: none; font-weight: 600;">Terms of Service</a> and <a href="#" style="color: #1a73e8; text-decoration: none; font-weight: 600;">Privacy Policy</a>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" style="width: 100%; padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px; transition: all 0.2s; margin-top: 12px;">
+          Start Free Trial →
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== THANK YOU MODAL ===== -->
+<div id="thankYouModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1001; animation: fadeIn 0.3s ease;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 16px; padding: 40px; max-width: 500px; width: 90%; text-align: center; animation: slideUp 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.2);">
+    
+    <div style="font-size: 60px; margin-bottom: 16px; animation: bounceIn 0.6s ease;">✓</div>
+    <h2 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0 0 12px 0; font-family: 'Poppins', sans-serif;">
+      Thank You! 🎉
+    </h2>
+    <p style="color: #6b7280; font-size: 16px; margin: 0 0 24px 0; line-height: 1.6;">
+      Your details have been received successfully!
+    </p>
+
+    <div style="background: #e8f0fe; padding: 16px; border-radius: 10px; margin-bottom: 24px; text-align: left;">
+      <p style="font-size: 13px; color: #1a73e8; margin: 0 0 12px 0; font-weight: 600;">
+        <i class="fa-solid fa-envelope"></i> What happens next?
+      </p>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="color: #4b5563; font-size: 13px; padding: 6px 0;">✓ Our team will review your request</li>
+        <li style="color: #4b5563; font-size: 13px; padding: 6px 0;">✓ You'll receive login credentials via email within 2 hours</li>
+        <li style="color: #4b5563; font-size: 13px; padding: 6px 0;">✓ Start your 7-day free trial immediately</li>
+      </ul>
+    </div>
+
+    <a href="{% url 'accounts:dashboard' %}" style="display: inline-block; width: 100%; padding: 12px 20px; background: #1a73e8; color: white; border-radius: 8px; text-align: center; margin-bottom: 12px; font-weight: 600; text-decoration: none; transition: all 0.2s;">
+      Go to Dashboard →
+    </a>
+
+    <button onclick="closeThankYouModal()" style="background: none; border: 1px solid #e5e7eb; color: #6b7280; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;">
+      Close
+    </button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 20px));
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  @keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  /* Modal Responsiveness */
+  @media (max-width: 768px) {
+    #embedModal > div {
+      max-height: 85vh !important;
+    }
+  }
+
+  @media (max-width: 540px) {
+    #embedModal > div {
+      width: 95% !important;
+      max-height: 90vh !important;
+      top: 50% !important;
+    }
+  }
+</style>
+
+<script>
+  function selectPlan(planId, planName, price) {
+    document.getElementById('planName2').textContent = planName;
+    document.getElementById('selectedPlan').value = planId;
+    document.getElementById('selectedPrice').value = price;
+    document.getElementById('embedModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEmbedModal() {
+    document.getElementById('embedModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  function closeThankYouModal() {
+    document.getElementById('thankYouModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  // Handle form submission
+  document.getElementById('planSignupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{% url "accounts:plan_signup" %}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        closeEmbedModal();
+        setTimeout(() => {
+          document.getElementById('thankYouModal').style.display = 'block';
+        }, 500);
+      } else {
+        alert(data.message || 'Error submitting form');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  });
+
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    const embedModal = document.getElementById('embedModal');
+    const thankYouModal = document.getElementById('thankYouModal');
+    
+    if (event.target === embedModal) closeEmbedModal();
+    if (event.target === thankYouModal) closeThankYouModal();
+  });
+</script>
+
+{% endblock %}

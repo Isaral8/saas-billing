@@ -1,0 +1,5473 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="iSaral - India's #1 GST Billing & Invoicing, CRM, Order Management & Customer Support software for Indian SMEs. 100% GST-compliant invoices, Razorpay payments, UPI collection. Trusted by 5,000+ businesses. Start free today.">
+  <meta name="keywords" content="GST Billing & Invoicing software India, GST invoice software, CRM for Indian SMEs, billing software India, Razorpay billing, UPI payment software, customer support software India, order management India, small business software India, saas billing India">
+  <meta name="author" content="iSaral Business Solutions Pvt. Ltd.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="iSaral - Smart GST Billing & Invoicing & Business Software for Indian SMEs">
+  <meta property="og:description" content="GST Billing & Invoicing, CRM, order management, Razorpay payments and support tickets - all in one platform built for Indian businesses.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.isaral.in">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="iSaral - GST Billing & Invoicing & Business Software for India">
+  <meta name="twitter:description" content="India's leading all-in-one GST Billing & Invoicing, CRM, and customer support software for SMEs.">
+  <link rel="canonical" href="https://www.isaral.in">
+  <title>iSaral - GST Billing & Invoicing & Business Software for Indian SMEs | CRM, Orders, Support</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "iSaral",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "All-in-one GST Billing & Invoicing, CRM, order management and customer support software for Indian SMEs.",
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "INR",
+      "lowPrice": "999",
+      "highPrice": "4999"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "1200"
+    }
+  }
+  </script>
+
+  <style>
+    /* =================================
+       DESIGN TOKENS
+    ================================= */
+    :root {
+      --primary:       #1A56DB;
+      --primary-dark:  #1143B0;
+      --primary-light: #EBF2FF;
+      --primary-mid:   #BDD3FF;
+      --accent:        #FF5C28;
+      --accent-light:  #FFF0EB;
+      --green:         #0BA759;
+      --green-light:   #DCFCE7;
+      --orange:        #F59E0B;
+      --red:           #EF4444;
+      --text:          #0F1B2D;
+      --text-2:        #1E2F45;
+      --text-3:        #2D4563;
+      --text-4:        #5A6D82;
+      --text-5:        #8B96A8;
+      --border:        #E0E9F2;
+      --border-2:      #F2F7FB;
+      --bg:            #FFFFFF;
+      --bg-2:          #F5F9FE;
+      --bg-3:          #EBF2FF;
+      --bg-dark:       #0B1622;
+      --bg-dark-2:     #132033;
+      --max-w:         1240px;
+      --r-sm:          6px;
+      --r-md:          10px;
+      --r-lg:          16px;
+      --r-xl:          24px;
+      --topbar-h:      40px;
+      --nav-h:         68px;
+      --shadow-sm:     0 1px 3px rgba(15,27,45,0.06), 0 1px 2px rgba(15,27,45,0.04);
+      --shadow-md:     0 4px 16px rgba(15,27,45,0.08), 0 2px 6px rgba(15,27,45,0.05);
+      --shadow-lg:     0 16px 48px rgba(15,27,45,0.10), 0 6px 16px rgba(15,27,45,0.06);
+    }
+
+    /* =================================
+       RESET & BASE
+    ================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+      font-size: 16px;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, select, textarea { font-family: inherit; }
+
+    /* =================================
+       LAYOUT
+    ================================= */
+    .wrap {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .section { padding: 88px 0; }
+    .section-sm { padding: 60px 0; }
+    .bg-gray { background: var(--bg-2); }
+    .bg-dark { background: var(--bg-dark); }
+
+    /* =================================
+       ANIMATIONS
+    ================================= */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse-g {
+      0%,100% { opacity:1; transform:scale(1); box-shadow: 0 0 0 0 rgba(11,167,89,0.4); }
+      50%      { opacity:0.8; transform:scale(0.9); box-shadow: 0 0 0 5px rgba(11,167,89,0); }
+    }
+
+    @keyframes slide-bg {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% { opacity: 0.5; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-8px); }
+    }
+
+    @keyframes bounce-chat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .fade-up { animation: fadeUp 0.55s ease both; }
+    .fade-up-1 { animation-delay: 0.1s; }
+    .fade-up-2 { animation-delay: 0.2s; }
+    .fade-up-3 { animation-delay: 0.3s; }
+
+    .animate-fade-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
+    .animate-slide-left { animation: slideInLeft 0.8s ease-out forwards; opacity: 0; }
+    .animate-slide-right { animation: slideInRight 0.8s ease-out forwards; opacity: 0; }
+
+    .animate-fade-up:nth-child(1) { animation-delay: 0.1s; }
+    .animate-fade-up:nth-child(2) { animation-delay: 0.2s; }
+    .animate-fade-up:nth-child(3) { animation-delay: 0.3s; }
+    .animate-fade-up:nth-child(4) { animation-delay: 0.4s; }
+    .animate-fade-up:nth-child(5) { animation-delay: 0.5s; }
+    .animate-fade-up:nth-child(6) { animation-delay: 0.6s; }
+
+    /* =================================
+       TYPOGRAPHY
+    ================================= */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 800; color: var(--primary);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 14px;
+      background: var(--primary-light);
+      padding: 6px 16px; border-radius: 50px;
+      border: 1px solid var(--primary-mid);
+    }
+    .h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -1.5px; color: var(--text);
+    }
+    .h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -1px; color: var(--text);
+    }
+    .h3 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .lead {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-2);
+      line-height: 1.75;
+    }
+    .body-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-2);
+      line-height: 1.8;
+    }
+    .center { text-align: center; }
+    .max-660 { max-width: 660px; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+
+    /* =================================
+       BUTTONS
+    ================================= */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 24px; border-radius: var(--r-md);
+      font-size: 15px; font-weight: 800; line-height: 1;
+      transition: all 0.18s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap; cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--primary); color: #fff;
+      box-shadow: 0 2px 10px rgba(26,86,219,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark); color: #fff;
+      box-shadow: 0 6px 22px rgba(26,86,219,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #fff; color: var(--text-2);
+      border: 1.5px solid var(--border);
+      font-weight: 700;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-lg {
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 800;
+      border-radius: var(--r-lg);
+    }
+    .btn-ghost {
+      color: var(--text-2);
+      padding: 12px 18px;
+      font-weight: 700;
+    }
+    .btn-ghost:hover { color: var(--primary); background: var(--primary-light); }
+
+    /* =================================
+       ANNOUNCEMENT BAR
+    ================================= */
+    .announcement-bar {
+      background: linear-gradient(90deg, var(--primary-dark), #2563EB, var(--primary-dark));
+      background-size: 200% 100%;
+      animation: slide-bg 6s linear infinite;
+      padding: 8px 24px; text-align: center;
+      font-size: 13px; font-weight: 600; color: #fff;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      position: relative; z-index: 1001;
+    }
+    .announcement-bar a { color: #FDE68A; text-decoration: underline; }
+    .announcement-bar .ann-badge {
+      background: rgba(255,255,255,0.2); border-radius: 50px;
+      padding: 2px 10px; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .ann-close {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .ann-close:hover { color: #fff; }
+
+    /* =================================
+       TOP BAR
+    ================================= */
+    .topbar {
+      background: #f8f9fa;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .topbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 8px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .topbar-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .topbar-item:hover { color: var(--primary); }
+    .topbar-item svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+    .topbar-div {
+      width: 1px;
+      height: 15px;
+      background: #ddd;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .whatsapp-btn {
+      background: #25D366;
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 18px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .whatsapp-btn:hover {
+      background: #1ebe5d;
+      transform: translateY(-1px);
+    }
+
+    /* =================================
+       NAVBAR
+    ================================= */
+    .navbar {
+      position: sticky;
+      top: var(--topbar-h);
+      z-index: 999;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: var(--nav-h);
+      transition: box-shadow 0.2s;
+    }
+    .navbar.scrolled { box-shadow: var(--shadow-md); }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+      height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .nav-logo img { height: 48px; width: auto; object-fit: contain; }
+    .nav-links {
+      display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center;
+    }
+    .nav-item { position: relative; }
+    .nav-item > a,
+    .nav-item > button {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 15px; border-radius: var(--r-sm);
+      font-size: 15px; font-weight: 700; color: var(--text-2);
+      transition: all 0.15s; background: none; border: none;
+    }
+    .nav-item > a:hover, .nav-item > button:hover { background: var(--bg-2); color: var(--text); }
+    .nav-chevron { width: 14px; height: 14px; transition: transform 0.2s; }
+    .nav-item:hover .nav-chevron { transform: rotate(180deg); }
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 8px;
+      min-width: 340px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 9999;
+    }
+    .nav-item:hover .nav-dropdown {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: var(--r-md);
+      transition: background 0.15s; cursor: pointer;
+    }
+    .dropdown-item:hover { background: var(--bg-2); }
+    .dropdown-icon {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .dropdown-text { overflow: hidden; }
+    .dropdown-text strong {
+      display: block; font-size: 14px; font-weight: 800; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dropdown-text span {
+      font-size: 13px; color: var(--text-4); font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+    }
+    .nav-ctas { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      padding: 9px; border-radius: var(--r-sm); cursor: pointer;
+      background: var(--bg-2);
+    }
+    .nav-hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px; transition: all 0.25s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: calc(var(--topbar-h) + var(--nav-h));
+      left: 0; right: 0; bottom: 0;
+      background: #fff;
+      overflow-y: auto;
+      padding: 20px 20px 48px;
+      z-index: 998;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mob-label {
+      font-size: 12px; font-weight: 800; color: var(--text-5);
+      text-transform: uppercase; letter-spacing: 1.2px;
+      margin: 20px 0 8px 12px;
+    }
+    .mob-label:first-child { margin-top: 6px; }
+    .mobile-menu a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px; border-radius: var(--r-lg);
+      font-size: 15px; font-weight: 700; color: var(--text-2);
+      transition: background 0.15s;
+    }
+    .mobile-menu a:hover { background: var(--bg-2); }
+    .mob-divider { height: 1px; background: var(--border); margin: 14px 0; }
+    .mob-ctas { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .mob-ctas .btn { justify-content: center; padding: 14px; font-size: 16px; font-weight: 800; }
+
+    /* =================================
+   HERO (IMPROVED) - SPLIT LAYOUT
+================================= */
+.hero {
+  padding: 72px 0 0;
+  background: linear-gradient(135deg, #EBF2FF 0%, #f8fbff 50%, #fff5f0 100%);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  min-height: 560px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,86,219,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  padding-bottom: 60px;
+}
+.hero-content {
+  max-width: 560px;
+  text-align: left;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 16px 6px 8px;
+  border-radius: 50px;
+  margin-bottom: 24px;
+  border: 1px solid var(--primary-mid);
+  box-shadow: var(--shadow-sm);
+}
+.badge-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-g 2.5s infinite;
+}
+.hero-title {
+  margin-bottom: 18px;
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  color: var(--text);
+}
+.hero-title .animated-text {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  display: inline-block;
+
+  background: linear-gradient(
+    90deg,
+    #2563eb,
+    #06b6d4,
+    #2563eb
+  );
+
+  background-size: 300% auto;
+  animation: gradientMove 4s linear infinite;
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes gradientMove {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 300% center;
+  }
+}
+.hero-title .blue  { color: var(--primary); }
+.hero-title .orange { color: var(--accent); }
+.hero-sub {
+  color: var(--text-3);
+  font-size: 16px;
+  line-height: 1.75;
+  margin-bottom: 32px;
+  max-width: 500px;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  justify-content: flex-start;
+}
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-4);
+  margin-bottom: 28px;
+  justify-content: flex-start;
+}
+.trust-item { display: flex; align-items: center; gap: 5px; }
+.trust-check { color: var(--green); font-weight: 800; font-size: 13px; }
+
+/* HERO SOCIAL PROOF */
+.hero-social-proof {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 0;
+  justify-content: flex-start;
+}
+.avatar-group {
+  display: flex;
+  align-items: center;
+}
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  object-fit: cover;
+  margin-left: -8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.avatar:first-child { margin-left: 0; }
+.rating-text { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.stars { color: var(--orange); font-size: 13px; letter-spacing: 1px; }
+
+/* RIGHT SIDE — dashboard mockup */
+.hero-app {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(26,86,219,0.12), 0 8px 24px rgba(0,0,0,0.06);
+  transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-top: 0;
+}
+.hero-app:hover {
+  box-shadow: 0 32px 80px rgba(26,86,219,0.18);
+  transform: perspective(1000px) rotateY(-1deg) rotateX(0deg) translateY(-6px);
+}
+.hero-app img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Floating notification cards on the dashboard */
+.hero-app-overlay {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+}
+.hero-float-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  animation: floatA 4s ease-in-out infinite;
+  border: 1px solid var(--border);
+  min-width: 180px;
+}
+.hero-float-card:nth-child(2) {
+  animation: floatB 4.5s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+.hero-float-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.hero-float-card small {
+  display: block;
+  font-size: 11px;
+  color: var(--text-4);
+  font-weight: 500;
+}
+.hero-float-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--green-light);
+  color: var(--green);
+  white-space: nowrap;
+}
+
+/* Live dot for top-right of dashboard */
+.hero-live-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(11,167,89,0.12);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(11,167,89,0.25);
+}
+.hero-live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-g 2s infinite;
+}
+
+/* Browser chrome bar on dashboard */
+.hero-app-chrome {
+  background: #f1f3f5;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chrome-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.chrome-url {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text-4);
+  margin-left: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding-bottom: 0;
+  }
+  .hero-content { max-width: 100%; }
+  .hero-app {
+    transform: none;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 768px) {
+  .hero { padding: 40px 0 0; }
+  .hero-actions { justify-content: flex-start; }
+  .hero-trust { gap: 12px; }
+}
+@media (max-width: 540px) {
+  .hero-inner { gap: 28px; }
+  .hero-app-overlay { display: none; }
+}
+    .hero-app-overlay {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+}
+
+.explore-dashboard-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, var(--primary), #2563EB);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 24px rgba(26,86,219,0.35);
+}
+
+.explore-dashboard-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 36px rgba(26,86,219,0.45);
+}
+
+.explore-dashboard-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 768px) {
+  .hero-app-overlay {
+    bottom: 16px;
+    right: 16px;
+  }
+  .explore-dashboard-btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 540px) {
+  .hero-app-overlay {
+    bottom: 12px;
+    right: 12px;
+  }
+  .explore-dashboard-btn {
+    padding: 11px 18px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  .explore-dashboard-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+    /* =================================
+       TRUSTED BY
+    ================================= */
+    .trusted {
+      padding: 44px 0;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .trusted-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-5);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .trusted-track {
+      display: flex;
+      gap: 48px;
+      animation: marquee 22s linear infinite;
+      width: max-content;
+    }
+    .trusted-logos-wrap {
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    }
+    .trusted-logo {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      opacity: 0.7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    .trusted-logo:hover { opacity: 0.95; }
+    .logo-sq {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--bg-3);
+      flex-shrink: 0;
+    }
+
+    /* =================================
+   PREMIUM SHOWCASE SECTIONS
+================================= */
+.showcase-section {
+  padding: 120px 0;
+  background: #fff;
+  overflow: hidden;
+}
+.showcase-section:nth-child(even) {
+  background: #F8FBFF;
+}
+.showcase-header {
+  text-align: center;
+  margin-bottom: 100px;
+}
+.showcase-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+  background: var(--primary-light);
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 1px solid var(--primary-mid);
+}
+.showcase-header-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(30px, 4.5vw, 52px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.showcase-header-sub {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.75;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Each feature block */
+.showcase-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-bottom: 140px;
+  position: relative;
+}
+.showcase-block:last-child { margin-bottom: 0; }
+.showcase-block.reverse { direction: rtl; }
+.showcase-block.reverse > * { direction: ltr; }
+
+/* TEXT SIDE */
+.showcase-content {
+  padding: 0 8px;
+}
+.showcase-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 5px 14px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+.showcase-module-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  display: block;
+}
+.showcase-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.showcase-desc {
+  font-size: 16px;
+  color: var(--text-3);
+  line-height: 1.8;
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+.showcase-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.showcase-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+.showcase-feature-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-weight: 900;
+}
+.showcase-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 2px solid currentColor;
+}
+.showcase-link:hover {
+  gap: 12px;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* IMAGE SIDE */
+.showcase-image-wrap {
+  position: relative;
+}
+/* Glow behind image */
+.showcase-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: 32px;
+  opacity: 0.5;
+  filter: blur(40px);
+  z-index: 0;
+  transition: opacity 0.4s;
+}
+.showcase-image-wrap:hover .showcase-glow { opacity: 0.8; }
+
+/* Browser frame card */
+.showcase-browser {
+  position: relative;
+  z-index: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.04),
+    0 8px 24px rgba(0,0,0,0.06),
+    0 24px 64px rgba(0,0,0,0.08),
+    0 0 0 1px rgba(0,0,0,0.06);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(0) scale(1);
+  background: #fff;
+}
+.showcase-image-wrap:hover .showcase-browser {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.04),
+    0 16px 40px rgba(0,0,0,0.08),
+    0 40px 80px rgba(0,0,0,0.10),
+    0 0 0 1px rgba(0,0,0,0.06);
+}
+
+/* Mac-style chrome bar */
+.showcase-chrome {
+  background: linear-gradient(180deg, #f5f6f7 0%, #eef0f2 100%);
+  border-bottom: 1px solid #dde0e4;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sc-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sc-dot-r { background: #FF5F57; box-shadow: 0 0 0 0.5px #E0443E; }
+.sc-dot-y { background: #FFBD2E; box-shadow: 0 0 0 0.5px #DEA123; }
+.sc-dot-g { background: #28CA41; box-shadow: 0 0 0 0.5px #1AAB29; }
+.sc-url {
+  flex: 1;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid #dde0e4;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--text-4);
+  margin-left: 8px;
+  font-family: 'Inter', monospace;
+}
+.showcase-browser img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Floating badge on image */
+.showcase-float-badge {
+  position: absolute;
+  bottom: -16px;
+  right: -16px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  z-index: 10;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 160px;
+  animation: floatBadge 3s ease-in-out infinite;
+}
+.showcase-float-badge.left {
+  right: auto;
+  left: -16px;
+  bottom: 30px;
+}
+@keyframes floatBadge {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.sfb-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.sfb-label { font-size: 11px; color: var(--text-4); font-weight: 500; }
+
+/* SCROLL REVEAL */
+.reveal-left,
+.reveal-right,
+.reveal-up {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.reveal-left  { transform: translateX(-50px); }
+.reveal-right { transform: translateX(50px); }
+.reveal-up    { transform: translateY(40px); }
+
+.reveal-left.visible,
+.reveal-right.visible,
+.reveal-up.visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0);
+}
+
+/* Stagger delays */
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .showcase-block { grid-template-columns: 1fr; gap: 50px; margin-bottom: 100px; }
+  .showcase-block.reverse { direction: ltr; }
+}
+@media (max-width: 768px) {
+  .showcase-section { padding: 80px 0; }
+  .showcase-header { margin-bottom: 60px; }
+  .showcase-block { gap: 40px; margin-bottom: 80px; }
+  .showcase-float-badge { display: none; }
+}
+@media (max-width: 540px) {
+  .showcase-section { padding: 60px 0; }
+  .showcase-title { font-size: 22px; }
+}
+
+    /* =================================
+   WORKFLOW SECTION - COMPACT DESIGN (FULLY UPDATED)
+================================= */
+
+.workflow-section {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #F5F9FE 0%, #FFFFFF 50%, #EBF2FF 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.workflow-section::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26, 86, 219, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.workflow-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.workflow-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.workflow-subtitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.6;
+  max-width: 550px;
+  margin: 0 auto;
+}
+
+/* Workflow Grid Layout - Compact */
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Connecting line */
+.workflow-grid::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 2%;
+  right: 2%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #1A56DB 5%,
+    #1A56DB 95%,
+    transparent 100%
+  );
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.workflow-step {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  padding: 0 8px;
+}
+
+/* Step Card - Compact */
+.step-card {
+  background: #ffffff;
+  border: 1.5px solid #EAECF0;
+  border-radius: 16px;
+  padding: 24px 16px 28px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(15, 27, 45, 0.04), 0 4px 16px rgba(26, 86, 219, 0.05);
+}
+
+.step-card:hover {
+  border-color: #1A56DB;
+  box-shadow: 0 4px 16px rgba(15, 27, 45, 0.06), 0 8px 28px rgba(26, 86, 219, 0.12);
+  transform: translateY(-6px);
+  background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+}
+
+/* Numbered Badge - Compact */
+.step-number {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1A56DB 0%, #2563EB 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  position: absolute;
+  top: -22px;
+  right: 50%;
+  transform: translateX(50%);
+  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.35), 0 2px 6px rgba(26, 86, 219, 0.2);
+  border: 3px solid #ffffff;
+  z-index: 5;
+}
+
+/* Icon - Compact */
+.step-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  margin-top: 8px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.step-card:hover .step-icon {
+  transform: scale(1.1) translateY(-3px);
+}
+
+/* Title - Compact */
+.step-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Description - Compact */
+.step-desc {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* ===== RESPONSIVE ===== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .workflow-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .workflow-grid::after {
+    display: none;
+  }
+
+  .step-card {
+    padding: 20px 14px 24px;
+    min-height: 180px;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    top: -20px;
+  }
+
+  .step-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .step-title {
+    font-size: 15px;
+  }
+
+  .step-desc {
+    font-size: 12px;
+  }
+}
+
+/* Tablet Small */
+@media (max-width: 768px) {
+  .workflow-section {
+    padding: 60px 0;
+  }
+
+  .workflow-header {
+    margin-bottom: 50px;
+  }
+
+  .workflow-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .step-card {
+    padding: 18px 12px 22px;
+    min-height: 170px;
+  }
+
+  .step-icon {
+    font-size: 30px;
+  }
+
+  .step-title {
+    font-size: 14px;
+  }
+
+  .step-desc {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+}
+
+/* Mobile */
+@media (max-width: 540px) {
+  .workflow-section {
+    padding: 50px 0;
+  }
+
+  .workflow-header {
+    margin-bottom: 40px;
+  }
+
+  .workflow-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .step-card {
+    padding: 16px 12px 20px;
+    min-height: 160px;
+  }
+
+  .step-number {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+    top: -19px;
+  }
+
+  .step-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .step-title {
+    font-size: 13px;
+  }
+
+  .step-desc {
+    font-size: 11px;
+  }
+
+  .workflow-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .workflow-subtitle {
+    font-size: 13px;
+  }
+}
+
+
+/* =================================
+   INTEGRATIONS SECTION - DYNAMIC SPLIT LAYOUT
+================================= */
+.integrations-section {
+  padding: 120px 0;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.integrations-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #CBD5E1 1.2px, transparent 1.2px);
+  background-size: 26px 26px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+.integrations-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.integrations-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+  background: var(--primary-light);
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 1px solid var(--primary-mid);
+}
+.integrations-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(26px, 3.2vw, 40px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.integrations-title .blue { color: var(--primary); }
+.integrations-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-3);
+  line-height: 1.75;
+  margin-bottom: 36px;
+}
+.integrations-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.integ-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-decoration: none;
+}
+.integ-pill:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(26,86,219,0.15);
+  transform: translateY(-4px) scale(1.02);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+.integ-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  overflow: hidden;
+}
+.integrations-right {
+  position: relative;
+  height: 460px;
+}
+.float-card {
+  position: absolute;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 200px;
+  transition: box-shadow 0.3s;
+}
+.float-card:nth-child(1) { top: 20px;  left: 8%;  animation: floatA 4s ease-in-out infinite; }
+.float-card:nth-child(2) { top: 140px; left: 44%; animation: floatB 4.5s ease-in-out infinite; animation-delay: 0.8s; }
+.float-card:nth-child(3) { top: 260px; left: 4%;  animation: floatA 5s ease-in-out infinite; animation-delay: 1.4s; }
+.float-card:nth-child(4) { top: 360px; left: 40%; animation: floatB 4s ease-in-out infinite; animation-delay: 0.3s; }
+@keyframes floatA {
+  0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
+  50%       { transform: translateY(-12px) rotate(0.5deg); }
+}
+@keyframes floatB {
+  0%, 100% { transform: translateY(0px) rotate(0.5deg); }
+  50%       { transform: translateY(-10px) rotate(-0.5deg); }
+}
+.float-card:hover {
+  box-shadow: 0 20px 50px rgba(26,86,219,0.15);
+  animation-play-state: paused;
+}
+.float-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 22px;
+}
+.float-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+.float-text span {
+  font-size: 12px;
+  color: var(--text-4);
+  font-weight: 500;
+}
+.float-badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-green  { background: var(--green-light); color: var(--green); }
+.badge-blue   { background: var(--primary-light); color: var(--primary); }
+.badge-orange { background: #FFF7ED; color: #D97706; }
+@media (max-width: 1024px) {
+  .integrations-inner { grid-template-columns: 1fr; gap: 60px; }
+  .integrations-right { height: 340px; }
+  .float-card:nth-child(1) { top: 0;    left: 2%; }
+  .float-card:nth-child(2) { top: 90px; left: 42%; }
+  .float-card:nth-child(3) { top: 190px; left: 2%; }
+  .float-card:nth-child(4) { top: 270px; left: 42%; }
+}
+@media (max-width: 600px) {
+  .integrations-list { grid-template-columns: 1fr; }
+  .integrations-right { display: none; }
+}
+
+    /* WHY iSaral SECTION */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 52px;
+}
+
+.why-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 28px;
+  transition: all 0.2s;
+}
+
+.why-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  border-color: var(--primary-mid);
+}
+
+.why-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.why-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.why-desc {
+  font-size: 14px;
+  color: var(--text-3);
+  line-height: 1.7;
+}
+
+@media (max-width: 1024px) {
+  .why-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 540px) {
+  .why-grid { grid-template-columns: 1fr; }
+}
+
+   /* =================================
+   STATS TICKER SECTION - CORRECTED
+================================= */
+.stats-ticker {
+  padding: 48px 0;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Gradient fade overlays */
+.stats-ticker::before,
+.stats-ticker::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.stats-ticker::before {
+  left: 0;
+  background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+}
+
+.stats-ticker::after {
+  right: 0;
+  background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+}
+
+/* Marquee animation */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Stats track with scrolling animation */
+.stats-track {
+  display: flex;
+  gap: 60px;
+  width: max-content;
+  animation: ticker-scroll 25s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  padding: 50px 20px;
+}
+
+/* Individual stat item */
+.stat-item {
+  text-align: center;
+  position: relative;
+  padding: 0 30px;
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+.stat-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 1px;
+  height: 60px;
+  background: #e5e7eb;
+  transform: translateY(-50%);
+}
+
+.stat-number {
+  font-size: 42px;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+  margin-bottom: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* Responsive - Tablet */
+@media (max-width: 992px) {
+  .stats-track {
+    gap: 40px;
+    animation: ticker-scroll 30s linear infinite;
+  }
+
+  .stat-item {
+    padding: 0 20px;
+    min-width: 180px;
+  }
+
+  .stat-item::after {
+    display: none;
+  }
+
+  .stat-number {
+    font-size: 32px;
+  }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 576px) {
+  .stats-track {
+    gap: 30px;
+    animation: ticker-scroll 35s linear infinite;
+    padding: 40px 15px;
+  }
+
+  .stat-item {
+    padding: 0 15px;
+    min-width: 150px;
+  }
+
+  .stat-number {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+}
+
+    /* =================================
+       TESTIMONIALS SECTION
+    ================================= */
+    .testimonials-section {
+      padding: 100px 0;
+      background: #f8fbff;
+    }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 60px;
+    }
+  .testi-card{
+    position:relative;
+    background:#ffffff;
+
+    border:1px solid rgba(37,99,235,.08);
+
+    border-radius:24px;
+
+    padding:32px;
+
+    overflow:hidden;
+
+    transition:
+        transform .45s cubic-bezier(.4,0,.2,1),
+        box-shadow .45s cubic-bezier(.4,0,.2,1),
+        border-color .45s ease;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.05),
+        0 2px 10px rgba(37,99,235,.04);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    height:100%;
+}
+  .testi-card:hover{
+    transform:translateY(-10px);
+
+    border-color:#2563eb;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.12),
+        0 10px 30px rgba(37,99,235,.15);
+}
+  .testi-stars{
+
+    color:#f59e0b;
+
+    letter-spacing:2px;
+
+    font-size:16px;
+
+    animation:starGlow 2s infinite;
+}
+
+@keyframes starGlow{
+
+0%,100%{
+opacity:1;
+}
+
+50%{
+opacity:.7;
+}
+
+}
+    .testi-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #475569;
+      margin-bottom: 25px;
+    }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+.testi-photo{
+    width:64px;
+    height:64px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:3px solid #fff;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.12);
+
+    transition:.4s ease;
+}
+
+.testi-card:hover .testi-photo{
+    transform:scale(1.08);
+}
+    .testi-name {
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .testi-role{
+
+    color:#2563eb;
+
+    font-weight:600;
+
+    transition:.3s ease;
+}
+
+.testi-card:hover .testi-role{
+    transform:translateX(4px);
+}
+    .testi-company {
+      display: inline-block;
+      margin-top: 5px;
+      color: #2563eb;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .testi-result {
+      display: inline-block;
+      margin-top: 8px;
+      background: #ecfdf5;
+      color: #059669;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+.testi-card::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:4px;
+
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #06b6d4,
+        #8b5cf6
+    );
+
+    transform:scaleX(0);
+
+    transition:.4s ease;
+}
+
+.testi-card:hover::before{
+    transform:scaleX(1);
+}
+
+.testi-card:hover::before{
+    transform:scaleX(1);
+}
+
+   /* =================================
+   THE SHIFT (BEFORE/AFTER) - DYNAMIC
+================================= */
+.shift-section {
+  padding: 120px 0;
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f0f7ff 100%);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.shift-section::before {
+  content: '';
+  position: absolute;
+  top: -200px; left: -200px;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,86,219,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.shift-section::after {
+  content: '';
+  position: absolute;
+  bottom: -150px; right: -150px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(11,167,89,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.shift-header {
+  text-align: center;
+  margin-bottom: 64px;
+  position: relative;
+  z-index: 1;
+}
+.shift-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+  background: var(--primary-light);
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 1px solid var(--primary-mid);
+}
+.shift-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4.5vw, 48px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.shift-subtitle {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.75;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* VS divider badge */
+.shift-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  padding-top: 60px;
+}
+.shift-vs-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1A56DB, #2563EB);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(26,86,219,0.4);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  border: 3px solid #fff;
+  outline: 2px solid var(--primary-mid);
+}
+.shift-grid {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  gap: 32px;
+  max-width: 1060px;
+  margin: 0 auto;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+/* Columns */
+.shift-column {
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  transition: all 0.4s ease;
+}
+.shift-column:hover {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.10);
+  transform: translateY(-6px);
+}
+
+/* Column headers */
+.shift-column-header {
+  padding: 24px 28px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.shift-column-header.bad-header {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  border-bottom: 2px solid #FCA5A5;
+}
+.shift-column-header.good-header {
+  background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+  border-bottom: 2px solid #86EFAC;
+}
+.shift-col-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.bad-header .shift-col-icon { background: rgba(220,38,38,0.12); }
+.good-header .shift-col-icon { background: rgba(11,167,89,0.12); }
+.shift-column-title {
+  font-size: 18px;
+  font-weight: 900;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shift-column-title.without { color: #DC2626; }
+.shift-column-title.with    { color: #059669; }
+.shift-col-count {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-left: auto;
+}
+.bad-header  .shift-col-count { background: rgba(220,38,38,0.12); color: #DC2626; }
+.good-header .shift-col-count { background: rgba(11,167,89,0.12);  color: #059669; }
+
+/* Items container */
+.shift-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  overflow: hidden;
+}
+.shift-item {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-2);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  color: var(--text-2);
+}
+.shift-item:last-child { border-bottom: none; }
+
+/* Left accent bar */
+.shift-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.25s ease;
+}
+.shift-item.bad::before  { background: #EF4444; }
+.shift-item.good::before { background: var(--green); }
+
+.shift-item:hover::before { width: 5px; }
+
+/* Icon bubble */
+.shift-item-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+.shift-item.bad  .shift-item-icon { background: #FEE2E2; color: #DC2626; }
+.shift-item.good .shift-item-icon { background: var(--green-light); color: var(--green); }
+.shift-item:hover .shift-item-icon { transform: scale(1.15); }
+
+/* Hover background sweep */
+.shift-item.bad:hover  { background: #FFF5F5; }
+.shift-item.good:hover { background: #F0FDF4; }
+
+@media (max-width: 900px) {
+  .shift-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 560px;
+  }
+  .shift-vs { display: none; }
+}
+@media (max-width: 540px) {
+  .shift-column-header { padding: 20px; }
+  .shift-item { padding: 12px 16px; font-size: 13px; }
+}
+
+    /* =================================
+       PRICING WITH TOGGLE
+    ================================= */
+    .pricing-section {
+      padding: 120px 0;
+      background: var(--bg-2);
+    }
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .pricing-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .pricing-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .pricing-subtitle {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-2);
+      line-height: 1.75;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .pricing-toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 40px 0 60px 0;
+      background: #fff;
+      border-radius: 12px;
+      padding: 4px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
+    .toggle-btn {
+      padding: 12px 28px;
+      border: none;
+      background: transparent;
+      color: var(--text-3);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .toggle-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(26,86,219,0.3);
+    }
+    .toggle-btn:hover:not(.active) {
+      color: var(--text);
+    }
+    .save-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--green-light);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .plan-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 40px 32px;
+      position: relative;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .plan-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(26,86,219,0.12);
+    }
+ .plan-card.featured {
+  background: #0F1B2D;           /* dark navy background */
+  border-color: #0F1B2D;
+  box-shadow: 0 20px 60px rgba(15,27,45,0.35);
+  transform: scale(1.02);
+}
+/* Featured card text overrides */
+.plan-card.featured .plan-name { color: rgba(255,255,255,0.55); }
+.plan-card.featured .plan-cur,
+.plan-card.featured .plan-amt  { color: #fff; }
+.plan-card.featured .plan-per  { color: rgba(255,255,255,0.55); }
+.plan-card.featured .plan-desc { color: rgba(255,255,255,0.75); }
+.plan-card.featured .plan-hr   { background: rgba(255,255,255,0.12); }
+.plan-card.featured .plan-feat { color: rgba(255,255,255,0.85); }
+.plan-card.featured .plan-feat::before { color: #4ADE80; }
+.plan-card.featured .plan-gst  { color: rgba(255,255,255,0.45); }
+
+/* Featured card CTA - white button */
+.plan-card.featured .plan-cta.pri {
+  background: #fff;
+  color: var(--primary);
+  font-weight: 900;
+}
+.plan-card.featured .plan-cta.pri:hover {
+  background: #f0f4ff;
+}
+
+/* Featured popular badge */
+.plan-card.featured .plan-popular {
+  background: var(--primary);
+}
+.plan-card.featured:hover {
+  box-shadow: 0 30px 80px rgba(15,27,45,0.45);
+  transform: scale(1.02) translateY(-8px);
+}
+
+  .plan-popular {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: var(--primary);
+  padding: 5px 18px;
+  border-radius: 50px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+    .plan-name {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--text-4);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 12px;
+    }
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .plan-cur {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-2);
+    }
+    .plan-amt {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .plan-per {
+      font-size: 14px;
+      color: var(--text-4);
+      font-weight: 600;
+    }
+    .plan-savings {
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 700;
+      margin-top: 4px;
+      display: none;
+    }
+    .plan-savings.show {
+      display: block;
+    }
+    .plan-desc {
+      font-size: 15px;
+      color: var(--text-2);
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-weight: 500;
+      flex-grow: 1;
+    }
+    .plan-hr {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+    .plan-feats {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+    .plan-feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 15px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+    .plan-feat::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 900;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .plan-cta {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--r-md);
+      text-align: center;
+      font-size: 15px;
+      font-weight: 800;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .plan-cta.pri {
+      background: var(--primary);
+      color: #fff;
+    }
+    .plan-cta.pri:hover {
+      background: var(--primary-dark);
+    }
+    .plan-cta.out {
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+      font-weight: 700;
+      background: transparent;
+    }
+    .plan-cta.out:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .plan-gst {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-5);
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    /* =================================
+       FAQ SECTION
+    ================================= */
+    .faq-section {
+      padding: 120px 0;
+      background: #fff;
+    }
+    .faq-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .faq-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .faq-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .faq-subtitle {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-2);
+      line-height: 1.75;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+      margin-top: 60px;
+    }
+    .faq-item {
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .faq-item:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    .faq-question {
+      padding: 20px 24px;
+      background: #fff;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+    .faq-question:hover {
+      background: var(--bg-2);
+    }
+    .faq-question::after {
+      content: '+';
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    .faq-item.active .faq-question::after {
+      transform: rotate(45deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background: var(--bg-2);
+    }
+    .faq-item.active .faq-answer {
+      max-height: 300px;
+      padding: 0 24px 20px 24px;
+    }
+    .faq-answer-text {
+      font-size: 15px;
+      color: var(--text-2);
+      line-height: 1.8;
+      font-weight: 500;
+    }
+
+    /* =================================
+   CTA BAND — REDESIGNED CARD STYLE
+================================= */
+.cta-band {
+  padding: 80px 0;
+  background: #f0f4ff;
+  position: relative;
+}
+
+.cta-card {
+  background: linear-gradient(135deg, #1A56DB 0%, #2563EB 50%, #6366F1 100%);
+  border-radius: 28px;
+  padding: 64px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(26,86,219,0.25);
+}
+
+/* Decorative blob */
+.cta-card::before {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -80px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+.cta-card::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: 200px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+
+/* Eyebrow */
+.cta-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+/* Title */
+.cta-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+/* Subtitle */
+.cta-sub {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.75;
+  margin-bottom: 32px;
+  max-width: 480px;
+}
+
+/* Buttons */
+.cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.cta-btn-white {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: var(--primary);
+  padding: 14px 28px;
+  border-radius: var(--r-lg);
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+.cta-btn-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  color: var(--primary);
+}
+
+.cta-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: var(--r-lg);
+  font-size: 15px;
+  font-weight: 800;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.cta-btn-ghost:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border-color: rgba(255,255,255,0.6);
+}
+
+/* Trust items */
+.cta-trust {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.cta-trust span {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.cta-trust span::before {
+  content: '✓';
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+}
+
+/* RIGHT: Stat cards */
+.cta-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cta-stat-card {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 16px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+}
+.cta-stat-card:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateX(4px);
+}
+
+.cta-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.cta-stat-card strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.cta-stat-card span {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cta-card {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 48px 36px;
+  }
+}
+@media (max-width: 540px) {
+  .cta-band { padding: 40px 0; }
+  .cta-card { padding: 36px 24px; border-radius: 20px; }
+  .cta-title { letter-spacing: -1px; }
+  .cta-actions { flex-direction: column; }
+  .cta-btn-white, .cta-btn-ghost { width: 100%; justify-content: center; }
+  .cta-trust { gap: 12px; }
+}
+
+    /* =================================
+       FOOTER
+    ================================= */
+    .footer {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F5F9FE 50%, #F0F6FF 100%);
+      padding: 80px 0 0;
+      border-top: 1px solid var(--border);
+      position: relative;
+    }
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -200px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26, 86, 219, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .footer::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 92, 40, 0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 280px 1fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 52px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .footer-logo img {
+      height: 48px;
+      width: auto;
+      border-radius: 9px;
+      object-fit: contain;
+      background: #fff;
+      padding: 4px;
+    }
+    .footer-logo-txt {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .footer-logo-txt span {
+      color: var(--primary);
+    }
+    .footer-desc {
+      font-size: 14px;
+      color: var(--text-3);
+      line-height: 1.75;
+      margin-bottom: 18px;
+      font-weight: 500;
+    }
+    .footer-desc strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .footer-socials {
+      display: flex;
+      gap: 10px;
+    }
+    .social-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: #ccc;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+    .social-btn svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+      fill: currentColor;
+    }
+    .social-btn:nth-child(1) {
+      background: linear-gradient(135deg, #0A66C2, #1D5AB8);
+    }
+    .social-btn:nth-child(1):hover {
+      background: linear-gradient(135deg, #0D5AA8, #0A4BA8);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(10, 102, 194, 0.3);
+    }
+    .social-btn:nth-child(2) {
+      background: linear-gradient(135deg, #FF0000, #E80000);
+    }
+    .social-btn:nth-child(2):hover {
+      background: linear-gradient(135deg, #E80000, #C00000);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(255, 0, 0, 0.3);
+    }
+    .social-btn:nth-child(3) {
+      background: linear-gradient(135deg, #1877F2, #0A5FEA);
+    }
+    .social-btn:nth-child(3):hover {
+      background: linear-gradient(135deg, #0A5FEA, #0847D1);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(24, 119, 242, 0.3);
+    }
+    .social-btn:nth-child(4) {
+      background: linear-gradient(135deg, #FD1D1D 0%, #F77737 25%, #FEDA75 50%, #30B133 75%, #3B2B8F 100%);
+    }
+    .social-btn:nth-child(4):hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(253, 29, 29, 0.3);
+    }
+    .social-btn:nth-child(5) {
+      background: linear-gradient(135deg, #25D366, #20BA5A);
+    }
+    .social-btn:nth-child(5):hover {
+      background: linear-gradient(135deg, #20BA5A, #1AA84E);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
+    }
+    .footer-col h5 {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 18px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 14px;
+      color: var(--text-3);
+      font-weight: 500;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .footer-col a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+    .footer-col a:hover {
+      color: var(--primary);
+      transform: translateX(4px);
+    }
+    .footer-col a:hover::before {
+      width: 100%;
+    }
+    .footer-bottom {
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: var(--text-4);
+      font-weight: 500;
+    }
+    .footer-legal {
+      display: flex;
+      gap: 18px;
+    }
+    .footer-legal a {
+      font-size: 13px;
+      color: var(--text-4);
+      font-weight: 500;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .footer-legal a:hover {
+      color: var(--primary);
+    }
+    .footer-badges {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    .footer-badge {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-2);
+      border: 1.5px solid var(--border);
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .footer-badge:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .footer-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* =================================
+       CHATBOT WIDGET
+    ================================= */
+    .chatbot-bubble {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+    .chat-toggle-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #2563EB);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 4px 20px rgba(26, 86, 219, 0.4);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: bounce-chat 2s infinite;
+    }
+    .chat-toggle-btn:hover {
+      transform: scale(1.15);
+      box-shadow: 0 8px 32px rgba(26, 86, 219, 0.6);
+    }
+    .chat-window {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 380px;
+      height: 600px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 48px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.8) translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    .chat-window.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+    }
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary), #2563EB);
+      color: white;
+      padding: 20px;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .chat-header .close-chat {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 24px;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .chat-header .close-chat:hover {
+      transform: rotate(90deg);
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-message {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 80%;
+      animation: fadeInUp 0.3s ease;
+    }
+    .bot-message {
+      background: var(--bg-2);
+      color: var(--text);
+      align-self: flex-start;
+    }
+    .user-message {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-radius: 12px 0 12px 12px;
+    }
+    .chat-input-area {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+    .chat-send-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 18px;
+    }
+    .chat-send-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px;
+    }
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-4);
+      animation: typing 1.4s infinite;
+    }
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    /* =================================
+       LOGO SIZES
+    ================================= */
+    .isaral-logo {
+      height: 70px !important;
+      width: auto !important;
+      display: block !important;
+      object-fit: contain;
+    }
+    .footer-isaral-logo {
+      height: 60px !important;
+      width: auto !important;
+      display: block !important;
+      object-fit: contain;
+    }
+
+    /* =================================
+       RESPONSIVE
+    ================================= */
+    @media (max-width: 1024px) {
+      .pricing-grid { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr 1fr; }
+      .why-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .shift-grid { grid-template-columns: 1fr; }
+      .module-block { grid-template-columns: 1fr; gap: 40px; }
+      .workflow-grid { grid-template-columns: repeat(3, 1fr); gap: 40px; }
+      .workflow-grid::after { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      :root { --topbar-h: auto; }
+    }
+
+    @media (max-width: 768px) {
+      .section { padding: 56px 0; }
+      .nav-links, .nav-ctas { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero { padding: 44px 0 0; }
+      .plan-card { padding: 32px 24px; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .module-block { margin-bottom: 60px; }
+      .module-image { margin-top: 20px; }
+      .workflow-grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+      .integrations-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 24px; }
+      .modules-section, .workflow-section, .integrations-section, .shift-section, .faq-section {
+        padding: 60px 0;
+      }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .topbar-inner { flex-direction: column; gap: 10px; }
+      .topbar-left { flex-wrap: wrap; justify-content: center; }
+      .whatsapp-btn { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 540px) {
+      .h1 { font-size: 28px; letter-spacing: -0.8px; }
+      .footer-top { grid-template-columns: 1fr; }
+      .wrap { padding: 0 16px; }
+      .chat-window {
+        width: calc(100% - 40px);
+        height: 500px;
+        bottom: 100px;
+        right: 20px;
+        left: 20px;
+      }
+      .toggle-btn { padding: 10px 20px; font-size: 13px; }
+      .plan-amt { font-size: 40px; }
+      .workflow-grid { grid-template-columns: 1fr; gap: 20px; }
+      .shift-column { padding: 24px; }
+      .topbar-item { font-size: 12px; }
+      .whatsapp-btn { font-size: 12px; padding: 6px 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .trusted-track { animation: none; }
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .explore-crm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, var(--primary), #2563EB);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 16px rgba(26,86,219,0.4);
+  white-space: nowrap;
+  width: fit-content;
+}
+.explore-crm-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 8px 24px rgba(26,86,219,0.5);
+  color: #fff;
+}
+.explore-crm-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.animated-text{
+    display:inline-block;
+    animation:textWave 2.5s ease-in-out infinite;
+}
+
+@keyframes textWave{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-10px);
+    }
+}
+/* =================================
+   EMBEDDED FORM SECTION — DARK REDESIGN
+================================= */
+.embedded-form-section {
+  padding: 100px 0;
+  background: #0B1622;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background glow blobs */
+.embedded-form-section::before {
+  content: '';
+  position: absolute;
+  top: -150px; left: -150px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,86,219,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.embedded-form-section::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; right: -100px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,92,40,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Header */
+.efs-header {
+  text-align: center;
+  margin-bottom: 64px;
+  position: relative;
+  z-index: 1;
+}
+
+.efs-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.efs-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.efs-highlight {
+  color: var(--accent);
+}
+
+.efs-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.75;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* Grid */
+.efs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* LEFT — benefits */
+.efs-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.efs-benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.efs-b-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.efs-benefit strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.efs-benefit p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.65;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Stats row */
+.efs-stats {
+  display: flex;
+  gap: 0;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.efs-stat {
+  flex: 1;
+  text-align: center;
+  padding: 22px 16px;
+  border-right: 1px solid rgba(255,255,255,0.10);
+}
+.efs-stat:last-child { border-right: none; }
+
+.efs-stat strong {
+  display: block;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.efs-stat span {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* RIGHT — iframe wrapper */
+.efs-form-wrap {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .efs-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .embedded-form-section { padding: 70px 0; }
+}
+
+@media (max-width: 540px) {
+  .efs-title { letter-spacing: -0.8px; }
+  .efs-stats { flex-direction: column; }
+  .efs-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.10); }
+  .efs-stat:last-child { border-bottom: none; }
+  .embedded-form-section { padding: 50px 0; }
+}
+
+@media (max-width: 540px) {
+  .embedded-form-section { padding: 60px 0; }
+  .form-stats { gap: 20px; }
+  .form-stats .stat strong { font-size: 22px; }
+}
+/* Module image tint overlays — makes each feel unique */
+.module-block:nth-child(1) .module-image { border-color: #BDD3FF; }
+.module-block:nth-child(1) .module-image::before { background: #f0f5ff; border-bottom-color: #BDD3FF; }
+
+.module-block:nth-child(2) .module-image { border-color: #BBF7D0; }
+.module-block:nth-child(2) .module-image::before { background: #f0fdf4; border-bottom-color: #BBF7D0; }
+
+.module-block:nth-child(3) .module-image { border-color: #FDE68A; }
+.module-block:nth-child(3) .module-image::before { background: #fffbeb; border-bottom-color: #FDE68A; }
+
+.module-block:nth-child(4) .module-image { border-color: #FECACA; }
+.module-block:nth-child(4) .module-image::before { background: #fff5f5; border-bottom-color: #FECACA; }
+
+.module-block:nth-child(5) .module-image { border-color: #DDD6FE; }
+.module-block:nth-child(5) .module-image::before { background: #f5f3ff; border-bottom-color: #DDD6FE; }
+
+/* Browser chrome bar on all module images */
+.module-image::before {
+  content: '● ● ●';
+  display: block;
+  padding: 8px 14px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #cbd5e1;
+  border-bottom: 1px solid var(--border);
+}
+
+.module-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.module-image:hover img {
+  transform: scale(1.02);
+}
+
+/* ===== DYNAMIC MOCKUP WIDGETS ===== */
+.mock-app { padding: 18px; background: #fff; }
+.mock-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 8px; }
+.mock-pill { background: var(--primary); color: #fff; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 50px; }
+.mock-search { font-size: 11px; color: var(--text-4); background: var(--bg-2); padding: 6px 12px; border-radius: 8px; flex: 1; }
+.mock-stats-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.mock-stat { flex: 1; background: var(--bg-2); border-radius: 10px; padding: 10px 12px; }
+.mock-stat span { display: block; font-size: 15px; font-weight: 900; color: var(--text); }
+.mock-stat small { font-size: 10px; color: var(--text-4); font-weight: 600; }
+.mock-stat.green span { color: var(--green); }
+.mock-stat.amber span { color: var(--orange); }
+.mock-table { border: 1px solid var(--border-2); border-radius: 10px; overflow: hidden; }
+.mock-row { display: grid; grid-template-columns: 1.2fr 1.4fr 1fr 0.9fr; gap: 6px; padding: 9px 12px; font-size: 11px; align-items: center; border-bottom: 1px solid var(--border-2); }
+.mock-row:last-child { border-bottom: none; }
+.mock-row.mock-head { background: var(--bg-2); font-weight: 800; color: var(--text-4); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; }
+.mock-row span:first-child { font-weight: 700; color: var(--primary); }
+.mock-badge { padding: 3px 8px; border-radius: 20px; font-weight: 800; font-size: 9px; text-align: center; }
+.mock-badge.green { background: var(--green-light); color: var(--green); }
+.mock-badge.amber { background: #FFF7ED; color: #D97706; }
+.mock-badge.red { background: #FEE2E2; color: #DC2626; }
+.mock-badge.pulse { animation: pulse-g 2s infinite; }
+
+.mock-cards { display: flex; flex-direction: column; gap: 8px; }
+.mock-card { display: flex; align-items: center; gap: 10px; background: var(--bg-2); border-radius: 10px; padding: 10px 12px; }
+.mock-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.mock-card-text { flex: 1; }
+.mock-card-text strong { display: block; font-size: 12px; color: var(--text); }
+.mock-card-text span { font-size: 10px; color: var(--text-4); }
+.mock-tag { font-size: 9px; font-weight: 800; padding: 3px 9px; border-radius: 20px; background: var(--primary-light); color: var(--primary); }
+
+.mock-chart-row { display: flex; gap: 16px; align-items: center; padding: 4px; }
+.mock-bars { display: flex; align-items: flex-end; gap: 6px; height: 90px; flex: 1; }
+.mock-bar { flex: 1; background: linear-gradient(180deg, var(--primary), #2563EB); border-radius: 4px 4px 0 0; transition: height 1s cubic-bezier(0.34,1.56,0.64,1); }
+.mock-donut { width: 90px; height: 90px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(var(--green) 0% 58%, var(--orange) 58% 80%, #EF4444 80% 92%, #bdc3c7 92% 100%); position: relative; }
+.mock-donut::after { content: ''; position: absolute; inset: 16px; background: #fff; border-radius: 50%; }
+.mock-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; font-size: 9px; color: var(--text-4); font-weight: 700; }
+.mock-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.mock-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+@media (max-width: 540px) {
+  .mock-row { grid-template-columns: 1fr 1fr; font-size: 10px; }
+  .mock-row span:nth-child(2) { display: none; }
+}
+
+/* ── TYPEWRITER ── */
+.typewriter-wrap { display: inline-block; }
+.typewriter-cursor {
+  display: inline-block;
+  font-weight: 400;
+  color: var(--primary);
+  animation: blink 0.75s step-end infinite;
+  margin-left: 2px;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── LIVE FEED STRIP ── */
+.live-feed-strip {
+  background: #0B1622;
+  padding: 10px 0;
+  overflow: hidden;
+  position: relative;
+}
+.live-feed-strip::before, .live-feed-strip::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.live-feed-strip::before { left: 0; background: linear-gradient(to right, #0B1622, transparent); }
+.live-feed-strip::after  { right: 0; background: linear-gradient(to left, #0B1622, transparent); }
+
+.live-feed-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 24px;
+  max-width: 100%;
+  overflow: hidden;
+}
+.live-feed-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.live-dot-anim {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #0BA759;
+  animation: pulse-g 2s infinite;
+  display: inline-block;
+}
+.live-feed-track {
+  display: flex;
+  gap: 60px;
+  animation: liveFeedScroll 30s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+.live-feed-item {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  flex-shrink: 0;
+}
+.live-feed-item strong { color: #fff; }
+@keyframes liveFeedScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="announcement-bar" id="annBar">
+  <span class="ann-badge">New</span>
+  Celebrate! iSaral Pro now includes AI-powered invoice matching &amp; auto-reconciliation —
+  <a href="#get-started">Try it Free →</a>
+  <span class="ann-close" onclick="document.getElementById('annBar').style.display='none'">&times;</span>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar" role="banner">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <a href="mailto:info@isaral.in" class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        info@isaral.in
+      </a>
+      <div class="topbar-div"></div>
+      <a href="tel:+919109024198" class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 012 2.18 2 2 0 013.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        +91 91090 24198
+      </a>
+    </div>
+
+
+  </div>
+</div>
+
+<!-- PRIMARY NAVBAR -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Primary Navigation">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo" aria-label="iSaral Home">
+      <img src="{% static 'images/logo.png' %}" alt="iSaral Logo" class="isaral-logo">
+    </a>
+
+    <div class="nav-links">
+      <div class="nav-item">
+        <button aria-haspopup="true" aria-expanded="false">
+          Products
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown" role="menu">
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#EBF2FF">💪</div>
+            <div class="dropdown-text">
+              <strong>GST Billing &amp; Invoicing</strong>
+              <span>Invoices, e-Way bills, GSTR</span>
+            </div>
+          </a>
+          <a href="https://isaral.in/hrms-software/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F0FDF4">👥</div>
+            <div class="dropdown-text">
+              <strong>HRMS &amp; Payroll</strong>
+              <span>Employee management, salary</span>
+            </div>
+          </a>
+          <a href="https://isaral.in/digital-signature/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF7ED">🔒</div>
+            <div class="dropdown-text">
+              <strong>Digital Signature</strong>
+              <span>DSC services, e-signature</span>
+            </div>
+          </a>
+          <a href="https://isaral.ai/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF0F0">🤖</div>
+            <div class="dropdown-text">
+              <strong>AI Solutions</strong>
+              <span>AI-powered business tools</span>
+            </div>
+          </a>
+          <a href="https://isaralgurukula.com/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F5F3FF">🎓</div>
+            <div class="dropdown-text">
+              <strong>iSaral Gurukula</strong>
+              <span>Training &amp; courses</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="#modules">Solution</a></div>
+      <div class="nav-item"><a href="#pricing">Pricing</a></div>
+      <div class="nav-item"><a href="#testimonials">Customers</a></div>
+
+    <div class="nav-item">
+  <button aria-haspopup="true" aria-expanded="false">
+    Resources
+    <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+
+  <div class="nav-dropdown" role="menu">
+
+    <a href="https://isaral.in/blogs/" class="dropdown-item" role="menuitem">
+      <div class="dropdown-icon" style="background:#EBF2FF">📰</div>
+      <div class="dropdown-text">
+        <strong>Blog</strong>
+        <span>Latest insights, updates & articles</span>
+      </div>
+    </a>
+
+    <a href="https://isaral.in/career/" class="dropdown-item" role="menuitem">
+      <div class="dropdown-icon" style="background:#F0FDF4">💼</div>
+      <div class="dropdown-text">
+        <strong>Careers</strong>
+        <span>Join our team and grow with us</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+    <div class="nav-item"><a href="#faq">FAQ</a></div>
+    </div>
+
+    <div class="nav-ctas">
+      <a href="{% url 'accounts:login' %}" class="btn btn-ghost">Login</a>
+      <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Start Free →</a>
+    </div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile Navigation">
+  <div class="mob-label">Products</div>
+  <a href="https://isaral.in/" onclick="closeMenu()">💪 GST Billing &amp; Invoicing</a>
+  <a href="https://isaral.in/hrms-software/" onclick="closeMenu()">👥 HRMS &amp; Payroll</a>
+  <a href="https://isaral.in/digital-signature/" onclick="closeMenu()">🔒 Digital Signature</a>
+  <a href="https://isaral.ai/" onclick="closeMenu()">🤖 AI Solutions</a>
+  <a href="https://isaralgurukula.com/" onclick="closeMenu()">🎓 iSaral Gurukula</a>
+  <div class="mob-label">Navigate</div>
+  <a href="#pricing" onclick="closeMenu()">Pricing</a>
+  <a href="#testimonials" onclick="closeMenu()">Customers</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <div class="mob-divider"></div>
+  <div class="mob-ctas">
+    <a href="{% url 'accounts:login' %}" class="btn btn-secondary" onclick="closeMenu()">Login</a>
+    <a href="{% url 'accounts:signup' %}" class="btn btn-primary" onclick="closeMenu()">Start Free Today →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-inner wrap">
+    <!-- LEFT: Text content -->
+    <div class="hero-content">
+      <div class="hero-badge fade-up">
+        <span class="badge-dot"></span>
+        Trusted by 5,000+ Indian businesses
+      </div>
+<h1 class="hero-title">
+    The Smarter Way To Run Your<br>
+    <span class="typewriter-wrap">
+        <span id="typewriter-text" class="animated-text"></span>
+        <span class="typewriter-cursor">|</span>
+    </span>
+</h1>
+      <p class="hero-sub fade-up fade-up-2">
+        GST Billing &amp; Invoicing, CRM, order management, Razorpay payments and customer support — all in one platform built specifically for Indian SMEs. <strong>Save 8+ hours every week.</strong>
+      </p>
+      <div class="hero-actions fade-up fade-up-3">
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary btn-lg">Start Free Today →</a>
+        <a href="https://www.youtube.com/@isaralbusinesssolutionspvt6454" class="btn btn-secondary btn-lg" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="#fff"/></svg>
+          Watch Demo
+        </a>
+      </div>
+      <div class="hero-trust fade-up fade-up-3">
+        <span class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0BA759" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+          No credit card needed
+        </span>
+        <span class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0BA759" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+          100% GST compliant
+        </span>
+        <span class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0BA759" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+          Go live in 1 day
+        </span>
+      </div>
+      <div class="hero-social-proof fade-up fade-up-3">
+        <div class="avatar-group">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80" alt="User" class="avatar">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=80" alt="User" class="avatar">
+          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&q=80" alt="User" class="avatar">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80" alt="User" class="avatar">
+        </div>
+        <div class="rating-text">
+          <span class="stars">★★★★★</span> 4.8/5<br>
+          <span style="font-size:12px;color:var(--text-4);font-weight:500;">from 1,200+ verified reviews</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Dashboard mockup -->
+    <div class="hero-app fade-up fade-up-2">
+      <!-- Browser chrome -->
+      <div class="hero-app-chrome">
+        <span class="chrome-dot" style="background:#FF5F57"></span>
+        <span class="chrome-dot" style="background:#FFBD2E"></span>
+        <span class="chrome-dot" style="background:#28CA42"></span>
+        <span class="chrome-url">app.isaral.in / dashboard</span>
+      </div>
+
+      <img src="{% static 'images/crm image.png' %}" alt="iSaral Dashboard">
+
+      <!-- Live badge top-right -->
+      <div class="hero-live-badge">
+        <span class="hero-live-dot"></span>
+        LIVE
+      </div>
+
+     <!-- Explore CRM Button -->
+      <div class="hero-app-overlay">
+        <a href="https://isaral.ai/" target="_blank" rel="noopener" class="explore-crm-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          Explore CRM →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE ACTIVITY FEED -->
+<div class="live-feed-strip">
+  <div class="live-feed-inner">
+    <span class="live-feed-label">
+      <span class="live-dot-anim"></span> Live activity
+    </span>
+    <div class="live-feed-track" id="liveFeedTrack">
+      <div class="live-feed-item">🧾 <strong>Ravi Industries</strong> just sent INV-2026-112 · ₹53,200</div>
+      <div class="live-feed-item">💳 <strong>Bheem Co.</strong> received ₹26,644 via Razorpay UPI</div>
+      <div class="live-feed-item">👤 <strong>New customer</strong> added from Maharashtra</div>
+      <div class="live-feed-item">✅ <strong>TKT-0091</strong> resolved — CSAT ★★★★★</div>
+      <div class="live-feed-item">📊 <strong>GSTR-1</strong> exported successfully for June 2026</div>
+      <div class="live-feed-item">🧾 <strong>Raju Traders</strong> Invoice marked Paid · ₹1,08,500</div>
+    </div>
+  </div>
+</div>
+<div class="stats-track">
+    <div class="stat-item">
+        <div class="stat-number"><span class="counter" data-target="1000000" data-suffix="M+" data-divisor="1000000">0</span></div>
+        <div class="stat-label">INVOICES GENERATED</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number"><span class="counter" data-target="99.9" data-suffix="%" data-decimal="1">0</span></div>
+        <div class="stat-label">SYSTEM UPTIME</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number"><span class="counter" data-target="4.8" data-suffix="/5" data-decimal="1">0</span></div>
+        <div class="stat-label">CUSTOMER RATING</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">₹<span class="counter" data-target="480" data-suffix="Cr+">0</span></div>
+        <div class="stat-label">PAYMENTS PROCESSED</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number"><span class="counter" data-target="18" data-suffix="+">0</span></div>
+        <div class="stat-label">STATES COVERED</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number"><span class="counter" data-target="30" data-suffix=" sec">0</span></div>
+        <div class="stat-label">AVG INVOICE TIME</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number"><span class="counter" data-target="8" data-suffix="h">0</span></div>
+        <div class="stat-label">SAVED PER WEEK</div>
+    </div>
+    <!-- Duplicate for seamless loop -->
+    <div class="stat-item">
+        <div class="stat-number">1M+</div>
+        <div class="stat-label">INVOICES GENERATED</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">99.9%</div>
+        <div class="stat-label">SYSTEM UPTIME</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">4.8/5</div>
+        <div class="stat-label">CUSTOMER RATING</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">₹480Cr+</div>
+        <div class="stat-label">PAYMENTS PROCESSED</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">18+</div>
+        <div class="stat-label">STATES COVERED</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">30 sec</div>
+        <div class="stat-label">AVG INVOICE TIME</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">8h</div>
+        <div class="stat-label">SAVED PER WEEK</div>
+    </div>
+</div>
+<!-- PREMIUM SHOWCASE SECTION -->
+<section id="modules" class="showcase-section">
+  <div class="wrap">
+
+    <div class="showcase-header reveal-up">
+      <div class="showcase-eyebrow">One platform · Five modules</div>
+      <h2 class="showcase-header-title">Everything your Indian SME needs,<br>in one place</h2>
+      <p class="showcase-header-sub">Stop juggling spreadsheets, WhatsApp groups and four different tools. iSaral unifies billing, CRM, orders, support and analytics — built for Indian business rules.</p>
+    </div>
+
+    <!-- MODULE 1: GST BILLING — Text Left, Image Right -->
+    <div class="showcase-block">
+      <div class="showcase-content reveal-left">
+        <div class="showcase-tag" style="background:#EBF2FF;color:#1A56DB;">
+          <span>⚡</span> GST Billing & Invoicing
+        </div>
+        <h3 class="showcase-title">Send GST-compliant invoices in 30 seconds</h3>
+        <p class="showcase-desc">Auto-fill GST, HSN codes, CGST/SGST/IGST, e-Way bills and GSTR-1/3B exports. Built for Indian tax rules, updated with every GST Council circular.</p>
+        <div class="showcase-features">
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            100% GST compliant — always updated
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Razorpay payment links on every invoice
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            GSTR-1 & GSTR-3B auto-export
+          </div>
+        </div>
+       <a href="{% url 'accounts:invoices' %}">Explore GST Billing</a>
+
+      </div>
+
+      <div class="showcase-image-wrap reveal-right">
+        <div class="showcase-glow" style="background:linear-gradient(135deg,#BDD3FF,#EBF2FF);"></div>
+        <div class="showcase-browser">
+          <div class="showcase-chrome">
+            <span class="sc-dot sc-dot-r"></span>
+            <span class="sc-dot sc-dot-y"></span>
+            <span class="sc-dot sc-dot-g"></span>
+            <span class="sc-url">app.isaral.in / billing</span>
+          </div>
+         <div class="mock-app">
+            <div class="mock-topbar">
+              <span class="mock-pill">+ Create Invoice</span>
+              <span class="mock-search">🔍 Search invoices…</span>
+            </div>
+            <div class="mock-stats-row">
+              <div class="mock-stat"><span>₹3,48,325</span><small>Total Revenue</small></div>
+              <div class="mock-stat green"><span>₹1,55,760</span><small>Paid</small></div>
+              <div class="mock-stat amber"><span>3</span><small>Pending</small></div>
+            </div>
+            <div class="mock-table">
+              <div class="mock-row mock-head"><span>Invoice</span><span>Customer</span><span>Amount</span><span>Status</span></div>
+              <div class="mock-row"><span>INV-2026-045</span><span>Raju Traders</span><span>₹26,644</span><span class="mock-badge red">IGST</span></div>
+              <div class="mock-row"><span>INV-2026-003</span><span>Bheem Co.</span><span>₹53,914</span><span class="mock-badge green pulse">Paid</span></div>
+              <div class="mock-row"><span>INV-2026-017</span><span>Ravi Industries</span><span>₹53,206</span><span class="mock-badge amber">Pending</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-float-badge">
+          <div class="sfb-icon" style="background:#DCFCE7;">🧾</div>
+          <div>
+            <div>Invoice Sent</div>
+            <div class="sfb-label">via WhatsApp · just now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 2: CRM — Image Left, Text Right -->
+<div class="showcase-block reverse">
+  <div class="showcase-content reveal-right">
+
+    <div class="showcase-tag" style="background:#F0FDF4;color:#059669;">
+      <span>👥</span> CRM & Lead Management
+    </div>
+
+    <h3 class="showcase-title">
+      Close More Deals with an AI-Powered CRM Built for India
+    </h3>
+
+    <p class="showcase-desc">
+      Capture leads, manage your sales pipeline, and automate follow-ups via WhatsApp and email — all from one powerful platform.
+    </p>
+
+    <div class="showcase-features">
+      <div class="showcase-feature">
+        <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+        Visual sales pipeline with drag & drop
+      </div>
+
+      <div class="showcase-feature">
+        <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+        Automated WhatsApp & email follow-ups
+      </div>
+
+      <div class="showcase-feature">
+        <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+        360° customer interaction tracking
+      </div>
+    </div>
+
+    <!-- CRM BUTTON -->
+    <a href="{% url 'accounts:customer_list' %}">Explore AI CRM</a>
+
+
+  </div>
+
+  <div class="showcase-image-wrap reveal-left">
+    <div class="showcase-glow" style="background:linear-gradient(135deg,#BBF7D0,#D1FAE5);"></div>
+
+    <div class="showcase-browser">
+      <div class="showcase-chrome">
+        <span class="sc-dot sc-dot-r"></span>
+        <span class="sc-dot sc-dot-y"></span>
+        <span class="sc-dot sc-dot-g"></span>
+        <span class="sc-url">isaral.ai</span>
+      </div>
+
+      <img src="{% static 'images/crm image3.png' %}" alt="iSaral CRM Dashboard">
+    </div>
+
+    <div class="showcase-float-badge left">
+      <div class="sfb-icon" style="background:#BBF7D0;">💼</div>
+      <div>
+        <div>Lead Converted</div>
+        <div class="sfb-label">₹1.2L Deal Closed</div>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- MODULE 3: ORDER MANAGEMENT — Text Left, Image Right -->
+    <div class="showcase-block">
+      <div class="showcase-content reveal-left">
+        <div class="showcase-tag" style="background:#FFF7ED;color:#D97706;">
+          <span>📦</span> Order Management
+        </div>
+        <h3 class="showcase-title">Track every order from quote to delivery</h3>
+        <p class="showcase-desc">Inventory, quotations, sales orders, fulfilment — connected to billing and your accountant in real time.</p>
+        <div class="showcase-features">
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Live inventory across multiple warehouses
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Quote → Order → Invoice in one click
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Tally sync for your accountant
+          </div>
+        </div>
+   <a href="{% url 'accounts:invoices' %}">Explore Orders</a>
+      </div>
+
+      <div class="showcase-image-wrap reveal-right">
+        <div class="showcase-glow" style="background:linear-gradient(135deg,#FDE68A,#FEF3C7);"></div>
+        <div class="showcase-browser">
+          <div class="showcase-chrome">
+            <span class="sc-dot sc-dot-r"></span>
+            <span class="sc-dot sc-dot-y"></span>
+            <span class="sc-dot sc-dot-g"></span>
+            <span class="sc-url">app.isaral.in / orders</span>
+          </div>
+       <div class="mock-app">
+            <div class="mock-topbar">
+              <span class="mock-pill">+ Add Customer</span>
+              <span class="mock-search">🔍 Search customers…</span>
+            </div>
+            <div class="mock-cards">
+              <div class="mock-card">
+                <div class="mock-avatar" style="background:#1A56DB;">RT</div>
+                <div class="mock-card-text"><strong>Raju Traders</strong><span>raju@gmail.com · Maharashtra</span></div>
+                <span class="mock-tag">IGST</span>
+              </div>
+              <div class="mock-card">
+                <div class="mock-avatar" style="background:#0BA759;">BC</div>
+                <div class="mock-card-text"><strong>Bheem Co.</strong><span>bheem@gmail.com · Karnataka</span></div>
+                <span class="mock-tag">CGST+SGST</span>
+              </div>
+              <div class="mock-card">
+                <div class="mock-avatar" style="background:#F59E0B;">RI</div>
+                <div class="mock-card-text"><strong>Ravi Industries</strong><span>ravi@gmail.com · Karnataka</span></div>
+                <span class="mock-tag">CGST+SGST</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-float-badge">
+          <div class="sfb-icon" style="background:#FEF3C7;">📦</div>
+          <div>
+            <div>Order Fulfilled</div>
+            <div class="sfb-label">Auto-synced to Tally</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 4: SUPPORT — Image Left, Text Right -->
+    <div class="showcase-block reverse">
+      <div class="showcase-content reveal-right">
+        <div class="showcase-tag" style="background:#FFF0F0;color:#DC2626;">
+          <span>💬</span> Customer Support
+        </div>
+        <h3 class="showcase-title">Resolve customer tickets faster</h3>
+        <p class="showcase-desc">Email, WhatsApp, and web tickets in a single unified inbox — with SLAs, assignments and CSAT tracking.</p>
+        <div class="showcase-features">
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Unified inbox: email, WhatsApp & web
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            SLA timers & auto-assignment
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            CSAT, response time & agent reports
+          </div>
+        </div>
+    <a href="{% url 'accounts:tickets' %}">Explore Support</a>
+
+      </div>
+
+      <div class="showcase-image-wrap reveal-left">
+        <div class="showcase-glow" style="background:linear-gradient(135deg,#FECACA,#FEE2E2);"></div>
+        <div class="showcase-browser">
+          <div class="showcase-chrome">
+            <span class="sc-dot sc-dot-r"></span>
+            <span class="sc-dot sc-dot-y"></span>
+            <span class="sc-dot sc-dot-g"></span>
+            <span class="sc-url">app.isaral.in / support</span>
+          </div>
+         <div class="mock-app">
+            <div class="mock-topbar">
+              <span class="mock-pill">+ New Ticket</span>
+              <span class="mock-search">🔍 Search tickets…</span>
+            </div>
+            <div class="mock-table">
+              <div class="mock-row mock-head"><span>Ticket</span><span>Subject</span><span>Priority</span><span>Status</span></div>
+              <div class="mock-row"><span>TKT-0091</span><span>Tally sync issue</span><span class="mock-badge red">High</span><span class="mock-badge amber">Open</span></div>
+              <div class="mock-row"><span>TKT-0090</span><span>GSTIN update</span><span class="mock-badge amber">Medium</span><span class="mock-badge green pulse">Resolved</span></div>
+              <div class="mock-row"><span>TKT-0088</span><span>Invoice query</span><span class="mock-badge green">Low</span><span class="mock-badge green">Closed</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-float-badge left">
+          <div class="sfb-icon" style="background:#FEE2E2;">💬</div>
+          <div>
+            <div>Ticket Resolved</div>
+            <div class="sfb-label">CSAT: ★★★★★</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 5: ANALYTICS — Text Left, Image Right -->
+    <div class="showcase-block">
+      <div class="showcase-content reveal-left">
+        <div class="showcase-tag" style="background:#F5F3FF;color:#7C3AED;">
+          <span>📊</span> Analytics & Reports
+        </div>
+        <h3 class="showcase-title">Real-time insights into your entire business</h3>
+        <p class="showcase-desc">Revenue trends, payment status, top customers, GST liability — at a glance. Export to PDF and Excel.</p>
+        <div class="showcase-features">
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Live dashboards with drill-down
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            GST liability & filing reports
+          </div>
+          <div class="showcase-feature">
+            <div class="showcase-feature-icon" style="background:#DCFCE7;color:#0BA759;">✓</div>
+            Profitability per customer & product
+          </div>
+        </div>
+        <a href="{% url 'accounts:reports' %}">Explore Analytics</a>
+      </div>
+
+      <div class="showcase-image-wrap reveal-right">
+        <div class="showcase-glow" style="background:linear-gradient(135deg,#DDD6FE,#EDE9FE);"></div>
+        <div class="showcase-browser">
+          <div class="showcase-chrome">
+            <span class="sc-dot sc-dot-r"></span>
+            <span class="sc-dot sc-dot-y"></span>
+            <span class="sc-dot sc-dot-g"></span>
+            <span class="sc-url">app.isaral.in / analytics</span>
+          </div>
+      <div class="mock-app">
+            <div class="mock-chart-row">
+              <div class="mock-bars">
+                <div class="mock-bar" data-h="40" style="height:40%"></div>
+                <div class="mock-bar" data-h="65" style="height:65%"></div>
+                <div class="mock-bar" data-h="50" style="height:50%"></div>
+                <div class="mock-bar" data-h="80" style="height:80%"></div>
+                <div class="mock-bar" data-h="60" style="height:60%"></div>
+                <div class="mock-bar" data-h="95" style="height:95%"></div>
+              </div>
+              <div class="mock-donut"></div>
+            </div>
+            <div class="mock-legend">
+              <span><span class="mock-dot" style="background:var(--green);"></span>Paid 58%</span>
+              <span><span class="mock-dot" style="background:var(--orange);"></span>Pending 22%</span>
+              <span><span class="mock-dot" style="background:#EF4444;"></span>Overdue 12%</span>
+              <span><span class="mock-dot" style="background:#bdc3c7;"></span>Draft 8%</span>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-float-badge">
+          <div class="sfb-icon" style="background:#EDE9FE;">📈</div>
+          <div>
+            <div>Revenue Up 34%</div>
+            <div class="sfb-label">vs last month</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- WORKFLOW SECTION - COMPACT DESIGN -->
+<section class="workflow-section">
+  <div class="wrap">
+    <div class="workflow-header">
+      <h2 class="workflow-title">How iSaral works</h2>
+      <p class="workflow-subtitle">From the first lead to the final follow-up — one connected flow, zero data re-entry.</p>
+    </div>
+
+    <div class="workflow-grid">
+      <!-- Step 1: Lead -->
+      <div class="workflow-step">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-icon">👤</div>
+          <h4 class="step-title">Lead</h4>
+          <p class="step-desc">Capture from web, WhatsApp, calls</p>
+        </div>
+      </div>
+
+      <!-- Step 2: CRM -->
+      <div class="workflow-step">
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-icon">💼</div>
+          <h4 class="step-title">CRM</h4>
+          <p class="step-desc">Qualify & nurture in the pipeline</p>
+        </div>
+      </div>
+
+      <!-- Step 3: Quotation -->
+      <div class="workflow-step">
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-icon">📄</div>
+          <h4 class="step-title">Quotation</h4>
+          <p class="step-desc">Send branded GST quote in 1 click</p>
+        </div>
+      </div>
+
+      <!-- Step 4: Invoice -->
+      <div class="workflow-step">
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <div class="step-icon">🧾</div>
+          <h4 class="step-title">Invoice</h4>
+          <p class="step-desc">Auto-convert with HSN + tax</p>
+        </div>
+      </div>
+
+      <!-- Step 5: Payment -->
+      <div class="workflow-step">
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <div class="step-icon">💳</div>
+          <h4 class="step-title">Payment</h4>
+          <p class="step-desc">Razorpay UPI / card / netbanking</p>
+        </div>
+      </div>
+
+      <!-- Step 6: Support -->
+      <div class="workflow-step">
+        <div class="step-card">
+          <div class="step-number">6</div>
+          <div class="step-icon">💬</div>
+          <h4 class="step-title">Support</h4>
+          <p class="step-desc">Tickets, SLAs, CSAT tracking</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY iSaral -->
+<section class="section bg-gray" aria-labelledby="why-heading">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="eyebrow">Why iSaral</div>
+      <h2 class="h2" id="why-heading">Built for India. Loved by SMEs.</h2>
+      <p class="lead max-660 mx-auto" style="margin-top:12px;">
+        Every feature is designed for how Indian businesses actually operate — from GST circulars to UPI to Hindi support.
+      </p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card animate-fade-up">
+        <div class="why-icon" style="background:#EBF2FF">🏪</div>
+        <div class="why-title">Built for India, first</div>
+        <p class="why-desc">GST compliance, Indian tax rules (CGST/SGST/IGST), INR billing, Razorpay UPI — everything designed for Indian businesses.</p>
+      </div>
+      <div class="why-card animate-fade-up">
+        <div class="why-icon" style="background:#F0FDF4">⚡</div>
+        <div class="why-title">Go live in under a day</div>
+        <p class="why-desc">Import customers from Excel, add GSTIN, send first GST invoice within hours — not weeks.</p>
+      </div>
+      <div class="why-card animate-fade-up">
+        <div class="why-icon" style="background:#FFF7ED">💰</div>
+        <div class="why-title">Fraction of the cost</div>
+        <p class="why-desc">Starting at ₹999/month. No hidden charges, no per-user fees on lower plans.</p>
+      </div>
+      <div class="why-card animate-fade-up">
+        <div class="why-icon" style="background:#FFF0F0">🔐</div>
+        <div class="why-title">Your data stays in India</div>
+        <p class="why-desc">AWS Mumbai hosted, DPDP Act compliant, daily encrypted backups.</p>
+      </div>
+      <div class="why-card animate-fade-up">
+        <div class="why-icon" style="background:#F5F3FF">📞</div>
+        <div class="why-title">Real support in Hindi & English</div>
+        <p class="why-desc">9 AM – 9 PM IST support in Indian time zones. Real humans, no chatbots.</p>
+      </div>
+      <div class="why-card animate-fade-up">
+        <div class="why-icon" style="background:#ECFDF5">📱</div>
+        <div class="why-title">Works on any device</div>
+        <p class="why-desc">Full mobile experience for Android and iOS.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS SECTION -->
+<section class="integrations-section">
+  <div class="wrap">
+    <div class="integrations-inner">
+
+      <!-- LEFT: Text + pill list -->
+      <div class="integrations-left">
+        <div class="integrations-eyebrow">Integrations</div>
+        <h2 class="integrations-title">
+          Plugs into the tools<br>
+          <span class="blue">Indian businesses</span><br>
+          already use
+        </h2>
+        <p class="integrations-subtitle">
+          Razorpay, UPI, GST portals, WhatsApp Business, Tally, email &amp; SMS gateways — iSaral connects to your existing stack so nothing breaks.
+        </p>
+
+        <div class="integrations-list">
+          <a href="https://pages.razorpay.com/airegistrationfee" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#1A56DB;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1A56DB"/><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            Razorpay
+          </a>
+          <a href="#" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#FF6B00;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF6B00"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">UPI</text></svg>
+            </div>
+            UPI
+          </a>
+          <a href="#" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#1A56DB;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1A56DB"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">GST</text></svg>
+            </div>
+            GST Portal
+          </a>
+          <a href="https://api.whatsapp.com/send/?phone=919109024198&text&type=phone_number&app_absent=0" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#25D366;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><rect width="24" height="24" rx="4" fill="#25D366"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.07-1.35A9.95 9.95 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.64 13.43c-.19.54-1.12 1.03-1.54 1.09-.38.05-.87.08-1.39-.09-.32-.1-.73-.24-1.26-.47-2.21-.96-3.65-3.19-3.76-3.34-.11-.15-.89-1.19-.89-2.27 0-1.08.56-1.6.76-1.82.19-.21.42-.27.56-.27.14 0 .28.001.4.007.13.006.3-.05.47.36.18.43.6 1.49.65 1.6.05.11.09.24.02.39-.07.15-.11.24-.22.37-.11.13-.23.29-.33.39-.11.11-.22.22-.1.44.13.21.56.93 1.2 1.5.82.74 1.51.97 1.72 1.08.21.11.33.09.45-.05.13-.15.54-.63.68-.85.14-.21.28-.18.47-.11.19.07 1.22.58 1.43.68.21.1.35.15.4.24.05.1.05.55-.14 1.08z" fill="#fff"/></svg>
+            </div>
+            WhatsApp
+          </a>
+          <a href="mailto:rajesh@isaral.in" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#EA4335;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#EA4335"/><path d="M4 8l8 5 8-5M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            Email
+          </a>
+          <a href="mailto:support@isaral.in" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#7C3AED;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#7C3AED"/><path d="M8 10h8M8 14h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="5" width="18" height="14" rx="2" stroke="#fff" stroke-width="1.5" fill="none"/></svg>
+            </div>
+            SMS
+          </a>
+          <a href="https://tallysoftware.shop/" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#16A34A;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#16A34A"/><text x="12" y="16" text-anchor="middle" font-size="8" font-weight="900" fill="#fff">Tally</text></svg>
+            </div>
+            Tally
+          </a>
+          <a href="#" class="integ-pill animate-fade-up">
+            <div class="integ-logo" style="background:#FF9900;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF9900"/><text x="12" y="13" text-anchor="middle" font-size="7" font-weight="900" fill="#fff">AWS</text><text x="12" y="19" text-anchor="middle" font-size="6" font-weight="700" fill="#fff">India</text></svg>
+            </div>
+            AWS India
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT: Floating live-status cards -->
+      <div class="integrations-right" aria-hidden="true">
+
+        <div class="float-card">
+          <div class="float-icon" style="background:#DCFCE7;">💳</div>
+          <div class="float-text">
+            <strong>Payment Received</strong>
+            <span>Razorpay · ₹24,500 via UPI</span>
+          </div>
+          <span class="float-badge badge-green">Live</span>
+        </div>
+
+        <div class="float-card">
+          <div class="float-icon" style="background:#EBF2FF;">🧾</div>
+          <div class="float-text">
+            <strong>GST Invoice Sent</strong>
+            <span>INV-2024-0892 · WhatsApp</span>
+          </div>
+          <span class="float-badge badge-blue">Sent</span>
+        </div>
+
+        <div class="float-card">
+          <div class="float-icon" style="background:#F0FDF4;">📊</div>
+          <div class="float-text">
+            <strong>Tally Synced</strong>
+            <span>48 entries · just now</span>
+          </div>
+          <span class="float-badge badge-green">✓ Done</span>
+        </div>
+
+        <div class="float-card">
+          <div class="float-icon" style="background:#FFF7ED;">💬</div>
+          <div class="float-text">
+            <strong>Reminder Sent</strong>
+            <span>3 overdue · WhatsApp</span>
+          </div>
+          <span class="float-badge badge-orange">Auto</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials-section" id="testimonials" aria-labelledby="testi-heading">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="eyebrow">Customer Success Stories</div>
+      <h2 class="h2" id="testi-heading">5,000+ Indian businesses trust iSaral</h2>
+      <p class="lead max-660 mx-auto" style="margin-top:12px;">
+        From consultants and service providers to growing SMEs — businesses across India use iSaral to simplify billing, CRM, support, and collections.
+      </p>
+    </div>
+
+    <div class="testi-grid">
+      <div class="testi-card animate-fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">
+          "We switched from Excel-based invoicing to iSaral. Invoice creation now takes less than a minute and our payment collections improved dramatically through Razorpay integration."
+        </p>
+        <div class="testi-author">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80" alt="Rahul Khanna" class="testi-photo">
+          <div>
+            <div class="testi-name">Rahul Khanna</div>
+            <div class="testi-role">Founder & CEO</div>
+            <div class="testi-company">TechFlow Solutions · Bangalore</div>
+            <div class="testi-result">↑ 70% Faster Collections</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card animate-fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">
+          "The CRM pipeline transformed our sales process. Automated follow-ups and lead tracking helped us improve conversion rates and never miss an opportunity."
+        </p>
+        <div class="testi-author">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80" alt="Priya Mehta" class="testi-photo">
+          <div>
+            <div class="testi-name">Priya Mehta</div>
+            <div class="testi-role">Sales Director</div>
+            <div class="testi-company">GrowthEdge Technologies · Hyderabad</div>
+            <div class="testi-result">↑ 35% Higher Conversion</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card animate-fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">
+          "The onboarding experience was excellent. GST Billing & Invoicing, CRM, support tickets and customer management are now handled from a single dashboard."
+        </p>
+        <div class="testi-author">
+          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80" alt="Arjun Sharma" class="testi-photo">
+          <div>
+            <div class="testi-name">Arjun Sharma</div>
+            <div class="testi-role">Managing Director</div>
+            <div class="testi-company">Nexus Trading Pvt Ltd · Mumbai</div>
+            <div class="testi-result">↑ 60% Faster Operations</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE SHIFT (BEFORE/AFTER) -->
+<section class="shift-section">
+  <div class="wrap">
+    <div class="shift-header">
+      <div class="shift-eyebrow">⚡ The Shift</div>
+      <h2 class="shift-title">Life before vs after iSaral</h2>
+      <p class="shift-subtitle">See exactly what changes when Indian businesses switch to iSaral.</p>
+    </div>
+
+    <div class="shift-grid">
+
+      <!-- WITHOUT column -->
+      <div class="shift-column animate-slide-left">
+        <div class="shift-column-header bad-header">
+          <div class="shift-col-icon">😓</div>
+          <h3 class="shift-column-title without">Without iSaral</h3>
+          <span class="shift-col-count">6 pain points</span>
+        </div>
+        <div class="shift-items">
+          <div class="shift-item bad">
+            <div class="shift-item-icon">✗</div>
+            Manual invoicing in Excel (2–5 min each)
+          </div>
+          <div class="shift-item bad">
+            <div class="shift-item-icon">✗</div>
+            Juggling 4+ tools — WhatsApp, Tally, Sheets, email
+          </div>
+          <div class="shift-item bad">
+            <div class="shift-item-icon">✗</div>
+            Data errors &amp; duplicate entries
+          </div>
+          <div class="shift-item bad">
+            <div class="shift-item-icon">✗</div>
+            Delayed payments, manual follow-ups
+          </div>
+          <div class="shift-item bad">
+            <div class="shift-item-icon">✗</div>
+            ₹5K–50K/year in GST late-fee penalties
+          </div>
+          <div class="shift-item bad">
+            <div class="shift-item-icon">✗</div>
+            No visibility into who owes you what
+          </div>
+        </div>
+      </div>
+
+      <!-- VS Badge -->
+      <div class="shift-vs">
+        <div class="shift-vs-badge">VS</div>
+      </div>
+
+      <!-- WITH column -->
+      <div class="shift-column animate-slide-right">
+        <div class="shift-column-header good-header">
+          <div class="shift-col-icon">🚀</div>
+          <h3 class="shift-column-title with">With iSaral</h3>
+          <span class="shift-col-count">6 wins</span>
+        </div>
+        <div class="shift-items">
+          <div class="shift-item good">
+            <div class="shift-item-icon">✓</div>
+            GST invoices in 30 seconds — auto-filled
+          </div>
+          <div class="shift-item good">
+            <div class="shift-item-icon">✓</div>
+            One platform: billing, CRM, orders, support
+          </div>
+          <div class="shift-item good">
+            <div class="shift-item-icon">✓</div>
+            Single source of truth, zero duplication
+          </div>
+          <div class="shift-item good">
+            <div class="shift-item-icon">✓</div>
+            Razorpay UPI links + auto-reminders
+          </div>
+          <div class="shift-item good">
+            <div class="shift-item-icon">✓</div>
+            100% GST-compliant, always up to date
+          </div>
+          <div class="shift-item good">
+            <div class="shift-item-icon">✓</div>
+            Live dashboards on every metric
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- PRICING WITH TOGGLE -->
+<section id="pricing" class="pricing-section">
+  <div class="wrap">
+    <div class="pricing-header">
+      <div class="pricing-eyebrow">Pricing</div>
+      <h2 class="pricing-title">Simple, transparent pricing for Indian businesses</h2>
+      <p class="pricing-subtitle">No hidden charges. All prices exclude 18% GST.</p>
+    </div>
+
+    <!-- TOGGLE -->
+    <div class="pricing-toggle-container">
+      <button class="toggle-btn active" data-period="monthly" onclick="togglePricingPeriod(this)">
+        Monthly
+      </button>
+      <button class="toggle-btn" data-period="yearly" onclick="togglePricingPeriod(this)">
+        Yearly
+        <span class="save-badge">Save 20%</span>
+      </button>
+    </div>
+
+    <!-- PRICING CARDS -->
+    <div class="pricing-grid">
+      <!-- STARTER -->
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">
+          <span class="plan-cur">₹</span>
+          <span class="plan-amt monthly-price" data-monthly="999">999</span>
+          <span class="plan-amt yearly-price" data-yearly="9990" style="display:none;">9990</span>
+          <span class="plan-per">/month</span>
+        </div>
+        <div class="plan-savings yearly-savings" style="display:none;">Save ₹2,400/year</div>
+        <p class="plan-desc">For freelancers, consultants and solo founders just getting started.</p>
+        <div class="plan-hr"></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Up to 100 invoices / month</div>
+          <div class="plan-feat">GST-compliant invoices</div>
+          <div class="plan-feat">1 user account</div>
+          <div class="plan-feat">Razorpay payment links</div>
+          <div class="plan-feat">Basic reports & PDF export</div>
+        </div>
+        <a href="#get-started" class="plan-cta out">Get Started Free</a>
+        <p class="plan-gst">14-day free trial. No credit card.</p>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card featured">
+        <div class="plan-popular">★ Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">
+          <span class="plan-cur">₹</span>
+          <span class="plan-amt monthly-price" data-monthly="2499">2499</span>
+          <span class="plan-amt yearly-price" data-yearly="24990" style="display:none;">24990</span>
+          <span class="plan-per">/month</span>
+        </div>
+        <div class="plan-savings yearly-savings" style="display:none;">Save ₹5,988/year</div>
+        <p class="plan-desc">For growing businesses that need CRM, orders and support with billing.</p>
+        <div class="plan-hr"></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Unlimited invoices</div>
+          <div class="plan-feat">Everything in Starter</div>
+          <div class="plan-feat">Up to 5 users</div>
+          <div class="plan-feat">CRM & lead management</div>
+          <div class="plan-feat">Order management & inventory</div>
+          <div class="plan-feat">Support ticket system</div>
+          <div class="plan-feat">GSTR-1 & GSTR-3B export</div>
+        </div>
+        <a href="#get-started" class="plan-cta pri">Start Pro Trial →</a>
+        <p class="plan-gst">14-day free trial. No credit card.</p>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="plan-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price">
+          <span class="plan-cur">₹</span>
+          <span class="plan-amt monthly-price" data-monthly="4999">4999</span>
+          <span class="plan-amt yearly-price" data-yearly="49990" style="display:none;">49990</span>
+          <span class="plan-per">/month</span>
+        </div>
+        <div class="plan-savings yearly-savings" style="display:none;">Save ₹9,988/year</div>
+        <p class="plan-desc">For established businesses needing unlimited users and API access.</p>
+        <div class="plan-hr"></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Everything in Pro</div>
+          <div class="plan-feat">Unlimited users & branches</div>
+          <div class="plan-feat">REST API access</div>
+          <div class="plan-feat">Custom templates</div>
+          <div class="plan-feat">Dedicated account manager</div>
+          <div class="plan-feat">SLA-backed phone support</div>
+          <div class="plan-feat">Tally sync</div>
+        </div>
+        <a href="#get-started" class="plan-cta out">Contact Sales</a>
+        <p class="plan-gst">Custom contracts available.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EMBEDDED FORM SECTION -->
+<section id="get-started" class="embedded-form-section">
+  <div class="wrap">
+    <!-- Header -->
+    <div class="efs-header">
+      <div class="efs-eyebrow">GET STARTED TODAY</div>
+      <h2 class="efs-title">
+        Ready to Become an <span class="efs-highlight">iSaral Professional?</span>
+      </h2>
+      <p class="efs-subtitle">
+        Join 500+ entrepreneurs already transforming their businesses. Fill in your details and we'll reach out within 2 hours.
+      </p>
+    </div>
+
+    <!-- Grid: Benefits LEFT + Form RIGHT -->
+    <div class="efs-grid">
+      <!-- LEFT -->
+      <div class="efs-left animate-slide-left">
+        <div class="efs-benefits">
+          <div class="efs-benefit">
+            <div class="efs-b-icon">🚀</div>
+            <div>
+              <strong>Go Live in 10 Days</strong>
+              <p>Structured implementation — from setup to certified in 10 focused days.</p>
+            </div>
+          </div>
+          <div class="efs-benefit">
+            <div class="efs-b-icon">👥</div>
+            <div>
+              <strong>Expert Mentor Support</strong>
+              <p>Daily assistance with expert — real answers from industry practitioners.</p>
+            </div>
+          </div>
+          <div class="efs-benefit">
+            <div class="efs-b-icon">📊</div>
+            <div>
+              <strong>Success Team Included</strong>
+              <p>Training, onboarding & 5000+ business network support.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="efs-stats">
+          <div class="efs-stat">
+            <strong>500+</strong>
+            <span>Businesses Started</span>
+          </div>
+          <div class="efs-stat">
+            <strong>95%</strong>
+            <span>Success Rate</span>
+          </div>
+          <div class="efs-stat">
+            <strong>₹50L+</strong>
+            <span>Avg. Revenue Increase</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: iframe form -->
+      <div class="efs-right animate-slide-right">
+        <div class="efs-form-wrap">
+
+          <iframe
+            src="https://login.isaral.in/widget/form/6a040320f0077"
+            style="width:100%; height:650px; border:none; border-radius:3px; display:block;"
+            id="inline-6a040320f0077"
+            data-form-name="Blog page form"
+            data-layout-iframe-id="inline-6a040320f0077"
+            data-form-id="6a040320f0077"
+            data-height="650"
+            scrolling="no"
+            title="Blog page form">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section id="faq" class="faq-section">
+  <div class="wrap">
+    <div class="faq-header">
+      <div class="faq-eyebrow">FAQ</div>
+      <h2 class="faq-title">Questions, answered</h2>
+    </div>
+
+    <div class="faq-container">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          Is iSaral really 100% GST compliant?
+        </button>
+        <div class="faq-answer">
+          <p class="faq-answer-text">
+            Yes. iSaral handles CGST/SGST/IGST, HSN codes, reverse charge, e-Way bills and direct GSTR-1 & GSTR-3B exports. We update the platform with every GST Council circular so you never have to.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          How long does it take to go live?
+        </button>
+        <div class="faq-answer">
+          <p class="faq-answer-text">
+            Under 1 day. Import your customers from Excel, add your GSTIN, and send your first GST invoice — all in hours, not weeks. No lengthy implementation roadmap required.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          Where is my data stored?
+        </button>
+        <div class="faq-answer">
+          <p class="faq-answer-text">
+            Data is hosted on AWS Mumbai region. RBI-friendly, DPDP Act compliant, daily encrypted backups. Your customer data and invoices never leave Indian soil.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          Can I collect payments via UPI?
+        </button>
+        <div class="faq-answer">
+          <p class="faq-answer-text">
+            Yes! Every invoice ships with a UPI/card/netbanking payment link via Razorpay. Customers can pay instantly from their phone — no manual follow-ups needed.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          Do you offer Hindi support?
+        </button>
+        <div class="faq-answer">
+          <p class="faq-answer-text">
+            Yes! Our support team works in Indian time zones (9 AM – 9 PM IST) in both Hindi and English. Real humans, no chatbots, no overseas call centres.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFAQ(this)">
+          Can I cancel anytime?
+        </button>
+        <div class="faq-answer">
+          <p class="faq-answer-text">
+            Absolutely. No long-term contracts, no hidden cancellation fees. You can upgrade, downgrade, or cancel your subscription anytime from your account settings.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND — REDESIGNED -->
+<section id="cta" class="cta-band" aria-labelledby="cta-heading">
+  <div class="wrap">
+    <div class="cta-card">
+
+      <!-- LEFT: Text + Buttons -->
+      <div class="cta-left">
+        <div class="cta-eyebrow">
+          🚀 LIMITED TIME OFFER
+        </div>
+
+        <h2 class="cta-title" id="cta-heading">
+          Your business deserves<br>better software.
+        </h2>
+
+        <p class="cta-sub">
+          Join 5,000+ Indian businesses who've automated billing,
+          collections and customer management. Start your 14-day free
+          trial — no credit card needed.
+        </p>
+
+        <div class="cta-actions">
+          <a href="http://127.0.0.1:8000/accounts/signup/" class="cta-btn-white">
+            Start Free Today →
+          </a>
+          <a href="#pricing" class="cta-btn-ghost">See Pricing</a>
+        </div>
+
+        <div class="cta-trust">
+          <span>No credit card needed</span>
+          <span>14-day free trial</span>
+          <span>Go live in 1 day</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: Stat cards -->
+      <div class="cta-right">
+        <div class="cta-stat-card">
+          <div class="cta-stat-icon">₹</div>
+          <div>
+            <strong>₹1 Lakh+ MORE</strong>
+            <span>revenue per year from faster collections</span>
+          </div>
+        </div>
+        <div class="cta-stat-card">
+          <div class="cta-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <strong>32+ Hours Saved</strong>
+            <span>every month on manual invoicing</span>
+          </div>
+        </div>
+        <div class="cta-stat-card">
+          <div class="cta-stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <strong>100% GST Compliant</strong>
+            <span>always updated with latest rules</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="contact" role="contentinfo">
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">
+          <img src="{% static 'images/logo.png' %}" alt="iSaral Logo" class="footer-isaral-logo">
+        </div>
+        <p class="footer-desc">
+          Smart business software for Indian SMEs. GST Billing & Invoicing, CRM, orders, and customer support — all in one platform. Made with heart in India, hosted in India.
+          <strong>Email:</strong> info@isaral.in | <strong>Phone:</strong> +91 9109-024-198
+        </p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/company/isaral-business-solutions-pvt-ltd/" class="social-btn" title="LinkedIn" aria-label="LinkedIn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@isaralbusinesssolutionspvt6454" class="social-btn" title="YouTube" aria-label="YouTube" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/iSaraltally/" class="social-btn" title="Facebook" aria-label="Facebook" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/tallybyisaral" class="social-btn" title="Instagram" aria-label="Instagram" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="https://wa.me/919109024198" class="social-btn" title="WhatsApp" aria-label="WhatsApp" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-9.746 9.798c0 2.734.732 5.406 2.122 7.747L2.505 21.796l4.543-1.192a9.875 9.875 0 004.591 1.171h.004c5.442 0 9.87-4.434 9.87-9.876 0-2.635-.704-5.12-2.039-7.246-1.335-2.126-3.218-3.842-5.517-4.589zm0-1.979C16.527 1.957 24 9.423 24 12.602c0 5.179-4.428 9.617-9.87 9.617a9.875 9.875 0 01-4.591-1.171L2.505 22.25l1.206-4.41A9.817 9.817 0 01.646 12.602C.646 7.423 5.074 1.957 12.051 5z"/></svg>
+          </a>
+        </div>
+        <div class="footer-badges">
+          <span class="footer-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            GST Compliant
+          </span>
+          <span class="footer-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            256-bit SSL
+          </span>
+          <span class="footer-badge">🇮🇳 Data in India</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h5>Products</h5>
+        <a href="https://isaral.in/hrms-software/">HRMS & Payroll</a>
+        <a href="https://isaral.in/digital-signature/">Digital Signature</a>
+        <a href="https://isaral.ai/">AI Solutions</a>
+        <a href="https://isaralgurukula.com/">iSaral Gurukula</a>
+      </div>
+
+      <div class="footer-col">
+    <h5>Resources</h5>
+
+    <a href="https://isaral.in/blogs/">
+        Blog
+    </a>
+
+    <a href="https://isaral.in/career/">
+        Careers
+    </a>
+
+</div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="https://isaral.in/about-us/">About Us</a>
+        <a href="https://isaral.in/contact-us/">Contact</a>
+
+      </div>
+
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <a href="https://isaral.in/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="https://isaral.in/terms-conditions/" target="_blank" rel="noopener">Terms of Service</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2015–2026 iSaral Business Solutions Pvt. Ltd.</div>
+      <div class="footer-legal">
+        <a href="https://isaral.in/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="https://isaral.in/terms-conditions/" target="_blank" rel="noopener">Terms & Conditions</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- CHATBOT WIDGET -->
+<div class="chatbot-bubble">
+  <button class="chat-toggle-btn" id="chatToggle" aria-label="Open chat" title="Chat with us">
+    💬
+  </button>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <h3>iSaral Support</h3>
+      <button class="close-chat" id="closeChat" aria-label="Close chat">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message bot-message">
+        <strong>Hello! 👋</strong><br>Welcome to iSaral. How can we help you today?
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input
+        type="text"
+        class="chat-input"
+        id="chatInput"
+        placeholder="Type your message..."
+        aria-label="Chat message input"
+      >
+      <button class="chat-send-btn" id="sendBtn" aria-label="Send message">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== NAVBAR SCROLL EFFECT =====
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', function () {
+    navbar.classList.toggle('scrolled', window.scrollY > 8);
+  }, { passive: true });
+
+  // ===== MOBILE MENU TOGGLE =====
+  function toggleMenu() {
+    var menu = document.getElementById('mobileMenu');
+    var ham = document.getElementById('hamburger');
+    var isOpen = menu.classList.toggle('open');
+    ham.classList.toggle('open', isOpen);
+    ham.setAttribute('aria-expanded', String(isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  function closeMenu() {
+    var menu = document.getElementById('mobileMenu');
+    var ham = document.getElementById('hamburger');
+    menu.classList.remove('open');
+    ham.classList.remove('open');
+    ham.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  // ===== FAQ TOGGLE =====
+  function toggleFAQ(button) {
+    const item = button.parentElement;
+    const isActive = item.classList.contains('active');
+
+    // Close all other FAQs
+    document.querySelectorAll('.faq-item').forEach(el => {
+      el.classList.remove('active');
+    });
+
+    // Toggle current
+    if (!isActive) {
+      item.classList.add('active');
+    }
+  }
+
+  // ===== PRICING TOGGLE =====
+  function togglePricingPeriod(button) {
+    // Remove active state from all buttons
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Add active to clicked button
+    button.classList.add('active');
+
+    // Get period
+    const period = button.getAttribute('data-period');
+
+    // Toggle prices
+    const monthlyPrices = document.querySelectorAll('.monthly-price');
+    const yearlyPrices = document.querySelectorAll('.yearly-price');
+    const yearlySavings = document.querySelectorAll('.yearly-savings');
+
+    if (period === 'yearly') {
+      monthlyPrices.forEach(el => el.style.display = 'none');
+      yearlyPrices.forEach(el => el.style.display = 'inline');
+      yearlySavings.forEach(el => el.classList.add('show'));
+    } else {
+      monthlyPrices.forEach(el => el.style.display = 'inline');
+      yearlyPrices.forEach(el => el.style.display = 'none');
+      yearlySavings.forEach(el => el.classList.remove('show'));
+    }
+  }
+
+  // ===== CHATBOT WIDGET LOGIC =====
+  const chatToggle = document.getElementById('chatToggle');
+  const chatWindow = document.getElementById('chatWindow');
+  const closeChat = document.getElementById('closeChat');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const chatMessages = document.getElementById('chatMessages');
+
+  // Toggle chat window
+  chatToggle.addEventListener('click', () => {
+    chatWindow.classList.toggle('active');
+    if (chatWindow.classList.contains('active')) {
+      chatInput.focus();
+    }
+  });
+
+  // Close chat
+  closeChat.addEventListener('click', () => {
+    chatWindow.classList.remove('active');
+  });
+
+  // Send message
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-message user-message';
+    userMsg.textContent = message;
+    chatMessages.appendChild(userMsg);
+
+    // Clear input
+    chatInput.value = '';
+
+    // Show typing indicator
+    setTimeout(() => {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'bot-message';
+      typingDiv.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Simulate bot response
+      setTimeout(() => {
+        typingDiv.remove();
+        const botMsg = document.createElement('div');
+        botMsg.className = 'chat-message bot-message';
+        botMsg.innerHTML = getResponse(message);
+        chatMessages.appendChild(botMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 1200);
+    }, 300);
+  }
+
+  // Get bot response
+  function getResponse(userMessage) {
+    const lowerMsg = userMessage.toLowerCase();
+
+    if (lowerMsg.includes('pricing') || lowerMsg.includes('cost') || lowerMsg.includes('price')) {
+      return '<strong>💰 Pricing</strong><br>We offer plans starting at ₹999/month:<br><br>• <strong>Starter</strong>: ₹999/month<br>• <strong>Pro</strong>: ₹2,499/month<br>• <strong>Enterprise</strong>: ₹4,999/month<br><br>All include 14-day free trial!';
+    }
+    if (lowerMsg.includes('feature') || lowerMsg.includes('features')) {
+      return '<strong>✨ Features</strong><br>iSaral includes:<br><br>• 100% GST Compliant Invoicing<br>• CRM & Lead Management<br>• Razorpay Payment Integration<br>• Order & Inventory Management<br>• Support Ticket System<br>• Real-time Analytics';
+    }
+    if (lowerMsg.includes('demo') || lowerMsg.includes('trial')) {
+      return '<strong>🎬 Free Trial</strong><br>Start your 14-day free trial immediately!<br><br>No credit card required. Go live in 1 day.';
+    }
+    if (lowerMsg.includes('contact') || lowerMsg.includes('support') || lowerMsg.includes('help')) {
+      return '<strong>📞 Get in Touch</strong><br><br>Email: info@isaral.in<br>Phone: +91 9109-024-198<br>Hours: 9 AM - 9 PM IST<br><br>Our team is here to help!';
+    }
+    if (lowerMsg.includes('gst') || lowerMsg.includes('compliant')) {
+      return '<strong>✅ GST Compliance</strong><br>iSaral is 100% GST compliant with:<br><br>• Auto CGST/SGST/IGST calculation<br>• E-Way Bill generation<br>• GSTR-1 & GSTR-3B export<br>• Latest GST circulars<br><br>Never miss a compliance deadline!';
+    }
+    if (lowerMsg.includes('thanks') || lowerMsg.includes('thank you') || lowerMsg.includes('bye')) {
+      return '<strong>😊 Thank you!</strong><br>Happy to help! Feel free to reach out anytime.';
+    }
+    return '<strong>Great question!</strong><br>For more details, please visit our website or contact our team at <strong>info@isaral.in</strong>.';
+  }
+
+  // Send on button click
+  sendBtn.addEventListener('click', sendMessage);
+
+  // Send on Enter key
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Close chat when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.chatbot-bubble')) {
+      chatWindow.classList.remove('active');
+    }
+  });
+
+  // Prevent closing when clicking inside chat
+  chatWindow.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // ===== INTERSECTION OBSERVER FOR ANIMATIONS =====
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        if (entry.target.classList.contains('animate-slide-left')) {
+          entry.target.style.transform = 'translateX(0)';
+        } else if (entry.target.classList.contains('animate-slide-right')) {
+          entry.target.style.transform = 'translateX(0)';
+        } else {
+          entry.target.style.transform = 'translateY(0)';
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.animate-fade-up, .animate-slide-left, .animate-slide-right').forEach(el => {
+    observer.observe(el);
+  });
+
+  // ===== NAV DROPDOWN ARIA HANDLING =====
+  document.querySelectorAll('.nav-item').forEach(function (item) {
+    var btn = item.querySelector('button[aria-haspopup]');
+    if (!btn) return;
+    item.addEventListener('mouseenter', function () {
+      btn.setAttribute('aria-expanded', 'true');
+    });
+    item.addEventListener('mouseleave', function () {
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  });
+  // ===== SCROLL REVEAL — INTERSECTION OBSERVER =====
+const revealElements = document.querySelectorAll(
+  '.reveal-left, .reveal-right, .reveal-up'
+);
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, i * 80);
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+revealElements.forEach(el => revealObserver.observe(el));
+
+
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'form_submitted') {
+      document.getElementById('form-container').style.display = 'none';
+      document.getElementById('thank-you-message').style.display = 'block';
+    }
+  });
+
+  // Animate chart bars when scrolled into view
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.mock-bar').forEach((bar, i) => {
+        bar.style.height = '0%';
+        setTimeout(() => { bar.style.height = bar.dataset.h + '%'; }, i * 80);
+      });
+      barObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.mock-chart-row').forEach(el => barObserver.observe(el));
+
+// ===== TYPEWRITER EFFECT =====
+  (function() {
+    const words = [
+      'Indian Business',
+      'GST Billing',
+      'CRM & Leads',
+];
+    let wordIndex = 0, charIndex = 0, deleting = false;
+    const el = document.getElementById('typewriter-text');
+    if (!el) return;
+
+    function type() {
+      const currentWord = words[wordIndex];
+      if (deleting) {
+        el.textContent = currentWord.substring(0, charIndex--);
+        if (charIndex < 0) {
+          deleting = false;
+          wordIndex = (wordIndex + 1) % words.length;
+          setTimeout(type, 400);
+          return;
+        }
+      } else {
+        el.textContent = currentWord.substring(0, charIndex++);
+        if (charIndex > currentWord.length) {
+          deleting = true;
+          setTimeout(type, 2000);
+          return;
+        }
+      }
+      setTimeout(type, deleting ? 60 : 100);
+    }
+    setTimeout(type, 600);
+  })();
+
+  // ===== ANIMATED COUNTERS =====
+  (function() {
+    const counters = document.querySelectorAll('.counter');
+    if (!counters.length) return;
+
+    const cObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target  = parseFloat(el.dataset.target);
+        const suffix  = el.dataset.suffix  || '';
+        const decimal = parseInt(el.dataset.decimal || '0');
+        const duration = 2000;
+        const steps = 60;
+        const step = target / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+          current = Math.min(current + step, target);
+          el.textContent = current.toFixed(decimal) + suffix;
+          if (current >= target) clearInterval(timer);
+        }, duration / steps);
+        cObserver.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+
+    counters.forEach(c => cObserver.observe(c));
+  })();
+
+  // ===== DUPLICATE LIVE FEED FOR SEAMLESS LOOP =====
+  (function() {
+    const track = document.getElementById('liveFeedTrack');
+    if (!track) return;
+    const clone = track.innerHTML;
+    track.innerHTML += clone;
+  })();
+
+</script>
+
+</body>
+</html>

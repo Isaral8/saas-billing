@@ -1,0 +1,68 @@
+<!-- Customer Search Results Template (AJAX) -->
+<!-- Used by customer_search view for live search autocomplete -->
+
+{% if customers %}
+    {% for customer in customers %}
+    <div class="search-result-item" data-customer-id="{{ customer.id }}" onclick="selectCustomer('{{ customer.id }}', '{{ customer.name|escapejs }}');">
+        <div class="result-name">{{ customer.name }}</div>
+        <div class="result-meta">{{ customer.email }} {% if customer.company %} · {{ customer.company }}{% endif %}</div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="search-result-empty">
+        <i class="bi bi-inbox"></i>
+        <p>No customers found matching "{{ query }}"</p>
+    </div>
+{% endif %}
+
+<style>
+    /* ── SEARCH RESULTS STYLING ────────────────────────────────────── */
+    .search-result-item {
+        padding: 12px 14px;
+        border-bottom: 1px solid #E2E8F0;
+        cursor: pointer;
+        transition: background 0.18s;
+    }
+
+    .search-result-item:hover {
+        background: #FAFCFF;
+    }
+
+    .result-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0F172A;
+        margin-bottom: 3px;
+    }
+
+    .result-meta {
+        font-size: 12px;
+        color: #64748B;
+    }
+
+    .search-result-empty {
+        padding: 24px;
+        text-align: center;
+        color: #94A3B8;
+    }
+
+    .search-result-empty i {
+        font-size: 32px;
+        color: #E2E8F0;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .search-result-empty p {
+        margin: 0;
+        font-size: 13px;
+    }
+</style>
+
+<script>
+    function selectCustomer(customerId, customerName) {
+        // This function should be called from the parent page
+        // Example: window.location = `/accounts/customers/${customerId}/`;
+        window.location.href = `/accounts/customers/${customerId}/`;
+    }
+</script>

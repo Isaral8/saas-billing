@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings — iSaral{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<style>
+  .settings-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+  .settings-header { margin-bottom: 28px; }
+  .settings-header h1 { font-size: 22px; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; }
+  .settings-header p { font-size: 13px; color: #6b7280; margin: 0; }
+  .settings-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+  .settings-card-header { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+  .settings-card-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .settings-card-header h2 { font-size: 14px; font-weight: 700; color: #1a1a1a; margin: 0 0 2px; }
+  .settings-card-header p { font-size: 12px; color: #6b7280; margin: 0; }
+  .settings-card-body { padding: 24px; }
+  .settings-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .settings-field { display: flex; flex-direction: column; gap: 6px; }
+  .settings-field.full { grid-column: 1 / -1; }
+  .settings-field label { font-size: 12px; font-weight: 600; color: #374151; }
+  .settings-field input, .settings-field select {
+    height: 38px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0 12px;
+    font-size: 13px; color: #111827; background: #fff; width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .settings-field input[type="file"] { height: auto; padding: 6px 12px; }
+  .settings-field input:focus, .settings-field select:focus {
+    outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+  }
+  .settings-field input[readonly] { background: #f9fafb; color: #6b7280; cursor: not-allowed; }
+  .settings-field .hint { font-size: 11px; color: #9ca3af; }
+  .settings-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+  .btn-save { height: 36px; padding: 0 20px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+  .btn-save:hover { background: #1e40af; }
+  .plan-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; margin-top: 6px; }
+  .notif-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f3f4f6; }
+  .notif-row:last-child { border-bottom: none; }
+  .notif-row-text strong { display: block; font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .notif-row-text span { font-size: 12px; color: #6b7280; }
+  .toggle-switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+  .toggle-switch input { display: none; }
+  .toggle-switch .slider { position: absolute; inset: 0; background: #d1d5db; border-radius: 24px; cursor: pointer; transition: background .2s; }
+  .toggle-switch .slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle-switch input:checked + .slider { background: #1d4ed8; }
+  .toggle-switch input:checked + .slider::before { transform: translateX(18px); }
+  .danger-card { border-color: #fecaca; }
+  .danger-card .settings-card-header { background: #fef2f2; border-bottom-color: #fecaca; }
+  .danger-card .settings-card-header h2 { color: #dc2626; }
+  .danger-warning { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #991b1b; margin-bottom: 16px; line-height: 1.6; }
+  .btn-danger { height: 36px; padding: 0 20px; background: #dc2626; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-danger:hover { background: #b91c1c; }
+  .pw-bars { display: flex; gap: 3px; margin-top: 6px; }
+  .pw-bar { flex: 1; height: 3px; border-radius: 3px; background: #e5e7eb; transition: background .25s; }
+  .pw-bar.weak { background: #ef4444; }
+  .pw-bar.fair { background: #f59e0b; }
+  .pw-bar.strong { background: #10b981; }
+
+  /* Profile photo */
+  .photo-preview {
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    border: 3px solid #e5e7eb; display: block; margin-bottom: 10px;
+  }
+  .photo-placeholder {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: #1d4ed8; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; margin-bottom: 10px;
+  }
+
+  @media (max-width: 640px) {
+    .settings-grid-2 { grid-template-columns: 1fr; }
+    .settings-field.full { grid-column: 1; }
+    .settings-card-body { padding: 16px; }
+  }
+</style>
+
+<div class="settings-wrap">
+
+  <div class="settings-header">
+    <h1>⚙️ Account Preferences</h1>
+    <p>Manage your profile, security, notifications and billing preferences.</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;font-weight:600;
+        border-left:4px solid {% if message.tags == 'error' %}#dc2626{% else %}#16a34a{% endif %};
+        background:{% if message.tags == 'error' %}#fef2f2{% else %}#f0fdf4{% endif %};
+        color:{% if message.tags == 'error' %}#991b1b{% else %}#15803d{% endif %};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- SECTION 1 — PROFILE -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon" style="background:#eff6ff;">👤</div>
+      <div>
+        <h2>Profile Information</h2>
+        <p>Update your photo, name, phone and company</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_profile">
+        <div class="settings-grid-2">
+
+          <!-- Profile Photo -->
+          <div class="settings-field full" style="flex-direction:row;align-items:center;gap:20px;background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e5e7eb;">
+            {% if user.profile_photo %}
+              <img src="{{ user.profile_photo.url }}" class="photo-preview" id="photoPreview">
+            {% else %}
+              <div class="photo-placeholder" id="photoPlaceholder">
+                {{ user.first_name|first|upper|default:user.email|first|upper }}
+              </div>
+              <img src="" class="photo-preview" id="photoPreview" style="display:none;">
+            {% endif %}
+            <div style="flex:1;">
+              <p style="font-size:13px;font-weight:600;color:#1a1a1a;margin:0 0 4px;">Profile Photo</p>
+              <p style="font-size:12px;color:#6b7280;margin:0 0 10px;">JPG, PNG or GIF. Max 2MB.</p>
+              <input type="file" name="profile_photo" accept="image/*" id="photoInput"
+                     style="font-size:12px;" onchange="previewPhoto(this)">
+            </div>
+          </div>
+
+          <div class="settings-field">
+            <label>First Name</label>
+            <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Your first name">
+          </div>
+
+          <div class="settings-field">
+            <label>Last Name</label>
+            <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Your last name">
+          </div>
+
+          <div class="settings-field">
+            <label>Email Address</label>
+            <input type="email" value="{{ user.email }}" readonly>
+            <span class="hint">Email cannot be changed here. Contact support.</span>
+          </div>
+
+          <div class="settings-field">
+            <label>Phone Number</label>
+            <input type="tel" name="phone" value="{{ user.phone }}" placeholder="+91 98765 43210">
+          </div>
+
+          <div class="settings-field full">
+            <label>Company Name</label>
+            <input type="text" name="company_name" value="{{ user.company_name }}" placeholder="Your Company Pvt Ltd">
+          </div>
+
+        </div>
+        <div class="settings-actions">
+          <button type="submit" class="btn-save">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SECTION 2 — COMPANY & GST -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon" style="background:#f0fdf4;">🏢</div>
+      <div>
+        <h2>Company & GST Details</h2>
+        <p>Used on your invoices and GST filings</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="settings-grid-2">
+        <div class="settings-field">
+          <label>GSTIN</label>
+          <input type="text" placeholder="27AABCU9603R1ZX" maxlength="15">
+          <span class="hint">15-character GST Identification Number</span>
+        </div>
+        <div class="settings-field">
+          <label>PAN Number</label>
+          <input type="text" placeholder="AABCU9603R" maxlength="10">
+        </div>
+        <div class="settings-field">
+          <label>Business Type</label>
+          <select>
+            <option>Proprietorship</option>
+            <option>Partnership</option>
+            <option>Private Limited</option>
+            <option>LLP</option>
+            <option>Public Limited</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label>Default GST Rate (%)</label>
+          <select>
+            <option value="0">0% — Exempt</option>
+            <option value="5">5%</option>
+            <option value="12">12%</option>
+            <option value="18" selected>18%</option>
+            <option value="28">28%</option>
+          </select>
+        </div>
+        <div class="settings-field full">
+          <label>Registered Business Address</label>
+          <input type="text" placeholder="No. 25, 1st A Main Road, Bangalore — 560072">
+        </div>
+        <div class="settings-field">
+          <label>State</label>
+          <select>
+            <option>Karnataka</option>
+            <option>Maharashtra</option>
+            <option>Tamil Nadu</option>
+            <option>Delhi</option>
+            <option>Gujarat</option>
+            <option>Telangana</option>
+            <option>West Bengal</option>
+            <option>Rajasthan</option>
+            <option>Uttar Pradesh</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label>Invoice Prefix</label>
+          <input type="text" placeholder="INV" maxlength="10">
+          <span class="hint">e.g. INV → INV-2026-001</span>
+        </div>
+      </div>
+      <div class="settings-actions">
+        <button type="button" class="btn-save">Save GST Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 — PLAN -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon" style="background:#fefce8;">⭐</div>
+      <div>
+        <h2>Plan & Billing</h2>
+        <p>Your current subscription plan</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <p style="font-size:13px;color:#6b7280;margin:0 0 4px;">Current Plan</p>
+          <div class="plan-badge">⭐ {{ user.current_plan|default:"Free"|title }}</div>
+        </div>
+        <a href="{% url 'accounts:plans' %}"
+           style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 18px;
+                  background:#1d4ed8;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
+          ⬆️ Upgrade Plan
+        </a>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:8px;border:1px solid #e5e7eb;">
+        <p style="font-size:12px;color:#6b7280;margin:0;line-height:1.7;">
+          Need to change billing details or view invoices?
+          Contact us at <strong>support@isaral.in</strong> or call <strong>+91 91080 24198</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 — PASSWORD -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon" style="background:#fdf4ff;">🔒</div>
+      <div>
+        <h2>Change Password</h2>
+        <p>Use a strong password of at least 8 characters</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="change_password">
+        <div class="settings-grid-2">
+          <div class="settings-field full">
+            <label>Current Password</label>
+            <input type="password" name="current_password" placeholder="Enter current password">
+          </div>
+          <div class="settings-field">
+            <label>New Password</label>
+            <input type="password" name="new_password" id="newPw" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
+            <div class="pw-bars">
+              <div class="pw-bar" id="pwBar1"></div>
+              <div class="pw-bar" id="pwBar2"></div>
+              <div class="pw-bar" id="pwBar3"></div>
+              <div class="pw-bar" id="pwBar4"></div>
+            </div>
+            <span class="hint" id="pwHint">Enter a new password</span>
+          </div>
+          <div class="settings-field">
+            <label>Confirm New Password</label>
+            <input type="password" name="confirm_password" placeholder="Repeat new password">
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button type="submit" class="btn-save">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SECTION 5 — NOTIFICATIONS -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon" style="background:#fff7ed;">🔔</div>
+      <div>
+        <h2>Notification Preferences</h2>
+        <p>Choose which alerts you receive</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="notif-row">
+        <div class="notif-row-text"><strong>Invoice paid alerts</strong><span>Get notified when a customer pays an invoice</span></div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <div class="notif-row-text"><strong>Overdue invoice reminders</strong><span>Reminder when an invoice passes its due date</span></div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <div class="notif-row-text"><strong>New support ticket</strong><span>Alert when a customer raises a ticket</span></div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <div class="notif-row-text"><strong>New customer added</strong><span>Notify when a new customer is created</span></div>
+        <label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <div class="notif-row-text"><strong>Weekly summary email</strong><span>Revenue and ticket summary every Monday</span></div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <div class="notif-row-text"><strong>GST filing reminders</strong><span>Remind me before GSTR-1 & GSTR-3B deadlines</span></div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="settings-actions">
+        <button type="button" class="btn-save">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 — DANGER ZONE -->
+  <div class="settings-card danger-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon" style="background:#fef2f2;">🗑️</div>
+      <div>
+        <h2>Danger Zone</h2>
+        <p>Irreversible actions — proceed with caution</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="danger-warning">
+        ⚠️ <strong>Deleting your account is permanent.</strong> All your invoices, customers, tickets and data will be erased immediately and cannot be recovered.
+      </div>
+      <form method="POST" onsubmit="return confirm('This will permanently delete your account and ALL data. Are you absolutely sure?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete_account">
+        <div class="settings-field" style="max-width:320px;margin-bottom:16px;">
+          <label>Type <strong>DELETE</strong> to confirm</label>
+          <input type="text" name="confirm_delete" placeholder="DELETE" style="border-color:#fecaca;">
+        </div>
+        <button type="submit" class="btn-danger">🗑️ Delete My Account</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function previewPhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById('photoPreview');
+      const placeholder = document.getElementById('photoPlaceholder');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function checkStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const bars   = ['pwBar1','pwBar2','pwBar3','pwBar4'];
+  const labels = ['','Weak','Fair','Good','Strong'];
+  const cls    = ['','weak','fair','fair','strong'];
+  bars.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'pw-bar';
+    if (i < score) el.classList.add(cls[score]);
+  });
+  document.getElementById('pwHint').textContent = pw.length === 0 ? 'Enter a new password' : labels[score] || 'Weak';
+}
+</script>
+
+
+{% endblock %}

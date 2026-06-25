@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}Customers{% endblock %}
+
+{% block content %}
+<style>
+    /* ── CUSTOMERS PAGE STYLES ──────────────────────────────────────── */
+    .customers-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+    }
+
+    .customers-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0F172A;
+        letter-spacing: -0.4px;
+    }
+
+    .customers-header p {
+        font-size: 14px;
+        color: #64748B;
+        margin-top: 4px;
+    }
+
+    .customers-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        min-width: 300px;
+    }
+
+    .search-box input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        width: 100%;
+        color: #0F172A;
+    }
+
+    .search-box input::placeholder {
+        color: #94A3B8;
+    }
+
+    .search-box i {
+        color: #94A3B8;
+        font-size: 16px;
+    }
+
+    .btn-add-customer {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        background: #1A56DB;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s;
+        text-decoration: none;
+    }
+
+    .btn-add-customer:hover {
+        background: #1143B0;
+        box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+    }
+
+    /* ── STATS CARDS ────────────────────────────────────────────────── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .stat-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0F172A;
+    }
+
+    /* ── TABLE STYLES ──────────────────────────────────────────────── */
+    .table-card {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #F8FAFC;
+        border-bottom: 1px solid #E2E8F0;
+    }
+
+    th {
+        padding: 14px 18px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748B;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+
+    td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #E2E8F0;
+        font-size: 14px;
+        color: #1F2937;
+    }
+
+    tbody tr:hover {
+        background: #F8FAFC;
+    }
+
+    .customer-name {
+        font-weight: 600;
+        color: #0F172A;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.18s;
+    }
+
+    .customer-name:hover {
+        color: #1A56DB;
+    }
+
+    .customer-email {
+        font-size: 13px;
+        color: #64748B;
+    }
+
+    .status-active {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        background: #ECFDF5;
+        color: #065F46;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #059669;
+        border-radius: 50%;
+    }
+
+    .status-inactive {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        background: #F3F4F6;
+        color: #6B7280;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-inactive::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #9CA3AF;
+        border-radius: 50%;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .btn-sm {
+        padding: 6px 10px;
+        font-size: 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.18s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-view {
+        background: #DBEAFE;
+        color: #0C63E4;
+    }
+
+    .btn-view:hover {
+        background: #BFDBFE;
+    }
+
+    .btn-edit {
+        background: #FEF3C7;
+        color: #B45309;
+    }
+
+    .btn-edit:hover {
+        background: #FDE68A;
+    }
+
+    .btn-delete {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .btn-delete:hover {
+        background: #FECACA;
+    }
+
+    /* ── PAGINATION ─────────────────────────────────────────────────── */
+    .pagination-wrapper {
+        padding: 18px;
+        border-top: 1px solid #E2E8F0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #64748B;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 6px 10px;
+        border: 1px solid #E2E8F0;
+        border-radius: 6px;
+        color: #1F2937;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.18s;
+    }
+
+    .pagination a:hover {
+        background: #DBEAFE;
+        border-color: #0C63E4;
+        color: #0C63E4;
+    }
+
+    .pagination .current {
+        background: #1A56DB;
+        color: white;
+        border-color: #1A56DB;
+    }
+
+    /* ── EMPTY STATE ────────────────────────────────────────────────── */
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
+    }
+
+    .empty-state-icon {
+        font-size: 56px;
+        color: #D1D5DB;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0F172A;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        color: #64748B;
+        margin-bottom: 24px;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+        .customers-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .customers-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .search-box {
+            min-width: auto;
+            width: 100%;
+        }
+
+        .btn-add-customer {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 12px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pagination-wrapper {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<!-- Header Section -->
+<div class="customers-header">
+    <div>
+        <h1>Customers</h1>
+        <p>Manage and track all your customers</p>
+    </div>
+    <div class="customers-actions">
+        <form method="GET" action="{% url 'accounts:customer_list' %}" class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" 
+                   name="search" 
+                   placeholder="Search by name, email, company..." 
+                   value="{{ search_query }}"
+                   id="searchInput">
+        </form>
+        <a href="{% url 'accounts:create_customer' %}" class="btn-add-customer">
+            <i class="bi bi-plus-circle"></i>
+            Add Customer
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value">{{ total_customers }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Active Customers</div>
+        <div class="stat-value">{{ active_customers }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Inactive</div>
+        <div class="stat-value">{{ inactive_customers }}</div>
+    </div>
+</div>
+
+<!-- Customers Table -->
+{% if customers %}
+<div class="table-card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th>Company</th>
+                    <th>State</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>
+                        <div class="customer-name" onclick="window.location='{% url 'accounts:get_customer_details' customer.id %}';">
+                            {{ customer.name }}
+                        </div>
+                        <div class="customer-email">{{ customer.email }}</div>
+                    </td>
+                    <td>{{ customer.email }}</td>
+                    <td>{{ customer.phone|default:"—" }}</td>
+                    <td>{{ customer.company|default:"—" }}</td>
+                    <td>{{ customer.state|default:"—" }}</td>
+                    <td>
+                        {% if customer.is_active %}
+                            <span class="status-active">Active</span>
+                        {% else %}
+                            <span class="status-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'accounts:get_customer_details' customer.id %}" class="btn-sm btn-view">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a href="{% url 'accounts:customer_edit' customer.id %}" class="btn-sm btn-edit">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <form method="POST" action="{% url 'accounts:toggle_customer_status' customer.id %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn-sm" style="background:#F3F4F6;color:#374151;">
+        {% if customer.is_active %}
+            <i class="bi bi-toggle-on" style="color:#059669;"></i> Deactivate
+        {% else %}
+            <i class="bi bi-toggle-off" style="color:#9CA3AF;"></i> Activate
+        {% endif %}
+    </button>
+                            </form>
+                            <form method="POST" action="{% url 'accounts:delete_customer' customer.id %}" style="display: inline;" onsubmit="return confirm('Delete customer? This cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm btn-delete">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+        <span>Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ total_customers }} customers</span>
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">← Previous</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next →</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="empty-state">
+    <div class="empty-state-icon">
+        <i class="bi bi-inbox"></i>
+    </div>
+    <h2>No Customers Found</h2>
+    <p>{% if search_query %}No customers match your search "{{ search_query }}".{% else %}You haven't added any customers yet. Start by creating your first customer.{% endif %}</p>
+    <a href="{% url 'accounts:create_customer' %}" class="btn-add-customer">
+        <i class="bi bi-plus-circle"></i>
+        Create First Customer
+    </a>
+</div>
+{% endif %}
+
+<script>
+    // Auto-submit search on input change
+    document.getElementById('searchInput').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
+
+{% endblock %}

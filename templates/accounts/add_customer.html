@@ -1,0 +1,465 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Customers — iSaral{% endblock %}
+{% block page_title %}Manage Customers{% endblock %}
+
+{% block content %}
+<div style="padding: 28px; background: #f5f7fa; min-height: calc(100vh - 64px);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 36px;">
+      <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0;">
+        Manage Customers
+      </h1>
+      <p style="color: #6b7280; font-size: 15px; margin: 0;">
+        Add, view, and manage all your customers in one place
+      </p>
+    </div>
+
+    <!-- Add Customer Form Card -->
+    <div class="card" style="margin-bottom: 40px; max-width: 700px;">
+      <h2 style="font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 0 0 24px 0;">
+        ➕ Add New Customer
+      </h2>
+      
+      <form method="POST" action="{% url 'accounts:create_customer' %}" style="display: flex; flex-direction: column; gap: 18px;">
+        {% csrf_token %}
+
+        <!-- Name Field -->
+        <div class="form-group">
+          <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+            Customer Name <span style="color: #e53935;">*</span>
+          </label>
+          <input type="text" name="name" placeholder="Enter customer name" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+            Email Address <span style="color: #e53935;">*</span>
+          </label>
+          <input type="email" name="email" placeholder="customer@example.com" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+        </div>
+
+        <!-- Phone Field -->
+        <div class="form-group">
+          <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+            Phone Number <span style="color: #e53935;">*</span>
+          </label>
+          <input type="tel" name="phone" placeholder="+91 98765 43210" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+        </div>
+
+        <!-- Company Field -->
+        <div class="form-group">
+          <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+            Company Name (Optional)
+          </label>
+          <input type="text" name="company" placeholder="Company name" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+        </div>
+
+        <!-- GSTIN Field -->
+        <div class="form-group">
+          <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+            GSTIN (Optional)
+          </label>
+          <input type="text" name="gstin" placeholder="27AABGU9603R1Z0" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+        </div>
+
+        <!-- State Field -->
+        <div class="form-group">
+          <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+            State (Optional)
+          </label>
+          <input type="text" name="state" placeholder="e.g., Karnataka" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+          <p style="font-size: 12px; color: #6b7280; margin: 6px 0 0 0;">Used to calculate CGST+SGST (same state) vs IGST (different state) on invoices.</p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px 20px; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fa-solid fa-plus"></i> Add Customer
+        </button>
+      </form>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="card">
+      <h2 style="font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 0 0 24px 0;">
+        👥 Your Customers
+      </h2>
+
+      {% if customers %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr style="background: #f0f4ff;">
+                <th>Customer Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Company</th>
+                <th>GSTIN</th>
+                <th>State</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for customer in customers %}
+                <tr style="border-bottom: 1px solid #e5e7eb; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='transparent'">
+                  <td style="font-weight: 600; color: #1a73e8;">
+                    <a href="javascript:void(0)" onclick="openViewModal('{{ customer.id }}', '{{ customer.name }}', '{{ customer.email }}', '{{ customer.phone }}', '{{ customer.company }}', '{{ customer.gstin }}', '{{ customer.state }}')" style="text-decoration: none; color: #1a73e8;">
+                      {{ customer.name }}
+                    </a>
+                  </td>
+                  <td>{{ customer.email }}</td>
+                  <td>{{ customer.phone }}</td>
+                  <td>{{ customer.company|default:"—" }}</td>
+                  <td>{{ customer.gstin|default:"—" }}</td>
+                  <td>{{ customer.state|default:"—" }}</td>
+                  <td>
+                    <div class="action-menu" style="position: relative; display: inline-block;">
+                      <button onclick="toggleMenu(this)" style="background: none; border: none; cursor: pointer; font-size: 18px; color: #6b7280; padding: 8px; transition: all 0.2s;">
+                        ⋮
+                      </button>
+                      <div class="dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; min-width: 140px;">
+                        <button type="button" onclick="openViewModal('{{ customer.id }}', '{{ customer.name }}', '{{ customer.email }}', '{{ customer.phone }}', '{{ customer.company }}', '{{ customer.gstin }}', '{{ customer.state }}')" style="display: block; width: 100%; padding: 10px 16px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; color: #1a1a1a; transition: all 0.2s; border-bottom: 1px solid #e5e7eb;" onmouseover="this.style.backgroundColor='#f0f4ff'" onmouseout="this.style.backgroundColor='transparent'">
+                          👁️ View
+                        </button>
+                        <button type="button" onclick="openEditModal('{{ customer.id }}', '{{ customer.name }}', '{{ customer.email }}', '{{ customer.phone }}', '{{ customer.company }}', '{{ customer.gstin }}', '{{ customer.state }}')" style="display: block; width: 100%; padding: 10px 16px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; color: #1a1a1a; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f0f4ff'" onmouseout="this.style.backgroundColor='transparent'">
+                          ✏️ Edit
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: #f9fafb; border-radius: 12px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px;">No Customers Yet</h3>
+          <p style="color: #6b7280; margin: 0;">Add your first customer to get started!</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== VIEW CUSTOMER MODAL ===== -->
+<div id="viewModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; animation: fadeIn 0.3s ease;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; animation: slideUp 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.2);">
+    
+    <!-- Close Button -->
+    <button onclick="closeViewModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #9ca3af; transition: all 0.2s;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#9ca3af'">
+      ✕
+    </button>
+
+    <!-- Header -->
+    <div style="margin-bottom: 28px; border-bottom: 2px solid #f0f4ff; padding-bottom: 16px;">
+      <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0;">
+        👥 Customer Details
+      </h2>
+      <p style="font-size: 14px; color: #6b7280; margin: 8px 0 0 0;">View full customer information</p>
+    </div>
+
+    <!-- Content -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="background: #f9fafb; padding: 16px; border-radius: 10px; border-left: 4px solid #1a73e8;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Customer Name</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;" id="viewName">—</p>
+      </div>
+
+      <div style="background: #f9fafb; padding: 16px; border-radius: 10px; border-left: 4px solid #10B981;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;" id="viewEmail">—</p>
+      </div>
+
+      <div style="background: #f9fafb; padding: 16px; border-radius: 10px; border-left: 4px solid #F59E0B;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;" id="viewPhone">—</p>
+      </div>
+
+      <div style="background: #f9fafb; padding: 16px; border-radius: 10px; border-left: 4px solid #8B5CF6;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Company</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;" id="viewCompany">—</p>
+      </div>
+
+      <div style="background: #f9fafb; padding: 16px; border-radius: 10px; border-left: 4px solid #EC4899;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">GSTIN</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;" id="viewGstin">—</p>
+      </div>
+
+      <div style="background: #f9fafb; padding: 16px; border-radius: 10px; border-left: 4px solid #06B6D4;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">State</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;" id="viewState">—</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 12px; margin-top: 28px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+      <button onclick="closeViewModal()" class="btn btn-outline" style="flex: 1; padding: 11px; border-radius: 8px;">
+        Close
+      </button>
+      <button onclick="convertToEdit()" class="btn btn-primary" style="flex: 1; padding: 11px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <i class="fa-solid fa-edit"></i> Edit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT CUSTOMER MODAL ===== -->
+<div id="editModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; animation: fadeIn 0.3s ease; overflow-y: auto;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; animation: slideUp 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.2); my-auto;">
+    
+    <!-- Close Button -->
+    <button onclick="closeEditModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #9ca3af; transition: all 0.2s;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#9ca3af'">
+      ✕
+    </button>
+
+    <!-- Header -->
+    <div style="margin-bottom: 24px; border-bottom: 2px solid #f0f4ff; padding-bottom: 16px;">
+      <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0;">
+        ✏️ Edit Customer
+      </h2>
+      <p style="font-size: 14px; color: #6b7280; margin: 8px 0 0 0;">Update customer information</p>
+    </div>
+
+    <!-- Form -->
+    <form id="editForm" method="POST" style="display: flex; flex-direction: column; gap: 16px;">
+      {% csrf_token %}
+      <input type="hidden" id="editCustomerId" name="customer_id">
+
+      <!-- Name Field -->
+      <div class="form-group">
+        <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+          Customer Name <span style="color: #e53935;">*</span>
+        </label>
+        <input type="text" id="editName" name="name" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+          Email Address <span style="color: #e53935;">*</span>
+        </label>
+        <input type="email" id="editEmail" name="email" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+      </div>
+
+      <!-- Phone Field -->
+      <div class="form-group">
+        <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+          Phone Number <span style="color: #e53935;">*</span>
+        </label>
+        <input type="tel" id="editPhone" name="phone" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+      </div>
+
+      <!-- Company Field -->
+      <div class="form-group">
+        <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+          Company Name (Optional)
+        </label>
+        <input type="text" id="editCompany" name="company" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+      </div>
+
+      <!-- GSTIN Field -->
+      <div class="form-group">
+        <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+          GSTIN (Optional)
+        </label>
+        <input type="text" id="editGstin" name="gstin" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+      </div>
+
+      <!-- State Field -->
+      <div class="form-group">
+        <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1a1a1a;">
+          State (Optional)
+        </label>
+        <input type="text" id="editState" name="state" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s;" onblur="this.style.borderColor='#e5e7eb'" onfocus="this.style.borderColor='#1a73e8'; this.style.boxShadow='0 0 0 3px rgba(26,115,232,0.1)'">
+      </div>
+
+      <!-- Buttons -->
+      <div style="display: flex; gap: 12px; margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+        <button type="button" onclick="closeEditModal()" class="btn btn-outline" style="flex: 1; padding: 11px; border-radius: 8px;">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" style="flex: 1; padding: 11px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-save"></i> Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 20px));
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .dropdown-menu.active {
+    display: block !important;
+  }
+
+  .action-menu button:hover {
+    color: #1a73e8;
+    background: #f0f4ff;
+    border-radius: 6px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  table th {
+    padding: 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #1a1a1a;
+  }
+
+  table td {
+    padding: 14px;
+    font-size: 14px;
+    color: #4b5563;
+  }
+</style>
+
+<script>
+  // Toggle Action Menu
+  function toggleMenu(element) {
+    const menu = element.nextElementSibling;
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function closeMenu(e) {
+      if (!element.parentElement.contains(e.target)) {
+        menu.style.display = 'none';
+        document.removeEventListener('click', closeMenu);
+      }
+    });
+  }
+
+  // Open View Modal
+  function openViewModal(id, name, email, phone, company, gstin, state) {
+    document.getElementById('viewName').textContent = name;
+    document.getElementById('viewEmail').textContent = email;
+    document.getElementById('viewPhone').textContent = phone;
+    document.getElementById('viewCompany').textContent = company || '—';
+    document.getElementById('viewGstin').textContent = gstin || '—';
+    document.getElementById('viewState').textContent = state || '—';
+    
+    // Store data for edit conversion
+    window.currentCustomer = { id, name, email, phone, company, gstin, state };
+    
+    document.getElementById('viewModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close View Modal
+  function closeViewModal() {
+    document.getElementById('viewModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  // Open Edit Modal
+  function openEditModal(id, name, email, phone, company, gstin, state) {
+    document.getElementById('editCustomerId').value = id;
+    document.getElementById('editName').value = name;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editPhone').value = phone;
+    document.getElementById('editCompany').value = company || '';
+    document.getElementById('editGstin').value = gstin || '';
+    document.getElementById('editState').value = state || '';
+    
+    document.getElementById('editModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Convert View to Edit
+  function convertToEdit() {
+    if (window.currentCustomer) {
+      const { id, name, email, phone, company, gstin, state } = window.currentCustomer;
+      closeViewModal();
+      setTimeout(() => {
+        openEditModal(id, name, email, phone, company, gstin, state);
+      }, 200);
+    }
+  }
+
+  // Close Edit Modal
+  function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  // Handle Edit Form Submit
+  document.getElementById('editForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const customerId = document.getElementById('editCustomerId').value;
+    const name = document.getElementById('editName').value;
+    const email = document.getElementById('editEmail').value;
+    const phone = document.getElementById('editPhone').value;
+    const company = document.getElementById('editCompany').value;
+    const gstin = document.getElementById('editGstin').value;
+    const state = document.getElementById('editState').value;
+    
+    // Send data to backend
+    fetch('{% url "accounts:create_customer" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: `customer_id=${customerId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&company=${encodeURIComponent(company)}&gstin=${encodeURIComponent(gstin)}&state=${encodeURIComponent(state)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('✓ Customer updated successfully!');
+        closeEditModal();
+        location.reload();
+      } else {
+        alert('Error: ' + (data.error || 'Failed to update customer'));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
+    });
+  });
+
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    const viewModal = document.getElementById('viewModal');
+    const editModal = document.getElementById('editModal');
+    
+    if (event.target === viewModal) {
+      closeViewModal();
+    }
+    if (event.target === editModal) {
+      closeEditModal();
+    }
+  });
+</script>
+
+{% endblock %}

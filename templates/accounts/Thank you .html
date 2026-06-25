@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Thank You! — iSaral{% endblock %}
+
+{% block content %}
+<div style="background: rgba(0,0,0,0.55); min-height: 100vh; padding: 60px 20px; display: flex; align-items: center; justify-content: center;">
+  <div style="max-width: 460px; width: 100%; background: white; border-radius: 20px; padding: 48px 36px 36px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); text-align: center;">
+
+    <!-- Envelope Icon with Checkmark -->
+    <div style="position: relative; width: 80px; height: 80px; margin: 0 auto 24px;">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <rect x="10" y="22" width="60" height="42" rx="6" stroke="#e8590c" stroke-width="3.5" fill="none"/>
+        <path d="M12 24 L40 48 L68 24" stroke="#e8590c" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div style="position: absolute; top: -4px; right: -4px; width: 26px; height: 26px; background: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white;">
+        <span style="color: white; font-size: 13px; font-weight: 900;">✓</span>
+      </div>
+    </div>
+
+    <!-- Heading -->
+    <h1 style="font-size: 26px; font-weight: 800; color: #1a1a1a; margin: 0 0 12px 0;">
+      Thanks for <span style="color: #dc2626;">Submitting!</span>
+    </h1>
+
+    <!-- Subtext -->
+    <p style="color: #6b7280; font-size: 14px; margin: 0 0 4px 0; line-height: 1.5;">
+      Your message has been sent!
+    </p>
+    <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0; line-height: 1.5;">
+      Our iSaral expert will call you shortly.
+    </p>
+
+    {% if plan or email %}
+    <!-- Optional dynamic details (shown only if passed from view) -->
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; text-align: left; font-size: 13px;">
+      {% if plan %}
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span style="color: #6b7280;">Plan:</span>
+          <span style="color: #1a1a1a; font-weight: 600;">{{ plan }}</span>
+        </div>
+      {% endif %}
+      {% if email %}
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span style="color: #6b7280;">Email:</span>
+          <span style="color: #1a1a1a; font-weight: 600;">{{ email }}</span>
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Expert Call Pill -->
+    <div style="display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; color: #dc2626; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; padding: 8px 16px; border-radius: 999px; margin-bottom: 24px;">
+      ⏱ EXPERT CALLS WITHIN 1 BUSINESS HOUR
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #f0f0f0; margin: 0 0 24px 0;">
+
+    <!-- Action Buttons -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <a href="https://isaral.in" target="_blank" rel="noopener" style="background: linear-gradient(135deg, #dc2626, #991b1b); color: white; padding: 14px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 14px rgba(220,38,38,0.3);">
+        🌐 Visit Our Website
+      </a>
+
+      <a href="tel:+919108024198" style="background: white; color: #1a1a1a; padding: 13px 20px; border: 1.5px solid #e5e7eb; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        📞 Call Us — +91 91080 24198
+      </a>
+
+      <a href="https://wa.me/919108024198" target="_blank" rel="noopener" style="background: linear-gradient(135deg, #25d366, #16a34a); color: white; padding: 14px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 14px rgba(22,163,74,0.3);">
+        💬 WhatsApp Us
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <p style="color: #9ca3af; font-size: 12px; margin: 24px 0 0 0;">
+      🔒 No spam. Your data is 100% safe. · <a href="https://isaral.in" style="color: #dc2626; text-decoration: none;">isaral.in</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

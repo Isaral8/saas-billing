@@ -1,0 +1,745 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block title %}Plans & Pricing — iSaral{% endblock %}
+{% block page_title %}Plans & Pricing{% endblock %}
+{% block nav_billing %}active{% endblock %}
+
+{% block extra_head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS  (shared with create_ticket)
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --z-blue:       #286ef1;
+  --z-blue-dark:  #1a4fbe;
+  --z-blue-soft:  #eef3fd;
+  --z-teal:       #0d7377;
+  --z-teal-soft:  #e8f6f6;
+  --z-amber:      #e67e22;
+  --z-amber-soft: #fef3e6;
+  --z-green:      #27ae60;
+  --z-green-soft: #e9f7ef;
+  --z-red:        #e74c3c;
+  --z-purple:     #8e44ad;
+  --z-purple-soft:#f4eafa;
+  --z-text:       #1a202c;
+  --z-text-2:     #4a5568;
+  --z-text-3:     #718096;
+  --z-border:     #e2e8f0;
+  --z-bg:         #f7f9fc;
+  --z-card:       #ffffff;
+  --z-shadow-sm:  0 1px 3px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.04);
+  --z-shadow:     0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.05);
+  --z-shadow-lg:  0 4px 20px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  --z-radius:     12px;
+  --z-radius-sm:  7px;
+}
+
+/* ─── Base ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--z-bg) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  color: var(--z-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography scale ──────────────────────────────────────── */
+h1 { font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.2; color: var(--z-text); }
+h2 { font-size: clamp(18px, 4vw, 22px); font-weight: 700; line-height: 1.3; color: var(--z-text); }
+h3 { font-size: clamp(15px, 3.5vw, 17px); font-weight: 700; line-height: 1.35; color: var(--z-text); }
+h4 { font-size: 13px; font-weight: 600; line-height: 1.45; color: var(--z-text-2); }
+h5,
+h6 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--z-text-3); }
+p  { font-size: 14px; line-height: 1.6; color: var(--z-text-2); }
+
+/* ─── Page wrapper ──────────────────────────────────────────── */
+.pl-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 20px 64px;
+}
+
+/* ─── Hero section ──────────────────────────────────────────── */
+.pl-hero {
+  background: linear-gradient(115deg, #1a4fbe 0%, #286ef1 55%, #3b8af7 100%);
+  border-radius: 14px; padding: 36px 32px 32px;
+  margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.pl-hero::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+.pl-hero::after {
+  content: '';
+  position: absolute; bottom: -60px; right: 80px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+.pl-hero h1 { color: white !important; }
+.pl-hero p  { color: rgba(255,255,255,0.78) !important; max-width: 560px; margin-top: 8px; font-size: 14px; }
+.pl-hero-meta {
+  display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;
+}
+.pl-hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.15); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: white; font-size: 12px; font-weight: 600;
+  padding: 6px 12px; border-radius: 20px;
+}
+
+/* ─── Filter bar ────────────────────────────────────────────── */
+.pl-filters {
+  background: var(--z-card); border: 1px solid var(--z-border);
+  border-radius: var(--z-radius); box-shadow: var(--z-shadow-sm);
+  padding: 16px 18px; margin-bottom: 24px;
+  display: flex; align-items: center; gap: 14px;
+  flex-wrap: wrap;
+}
+.pl-filter-label {
+  font-size: 11px; font-weight: 700; color: var(--z-text-3);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.pl-filter-chips {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  flex: 1;
+}
+.pl-chip {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--z-border);
+  background: white; color: var(--z-text-2);
+  cursor: pointer; transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; white-space: nowrap;
+}
+.pl-chip:hover  { border-color: var(--z-blue); color: var(--z-blue); background: var(--z-blue-soft); }
+.pl-chip.active { border-color: var(--z-blue); color: var(--z-blue); background: var(--z-blue-soft); }
+
+/* Billing toggle */
+.pl-billing-toggle {
+  display: flex; align-items: center; gap: 0;
+  background: var(--z-bg); border: 1.5px solid var(--z-border);
+  border-radius: 8px; padding: 3px; margin-left: auto;
+  flex-shrink: 0;
+}
+.pl-toggle-btn {
+  padding: 6px 14px; border-radius: 5px;
+  font-size: 12px; font-weight: 600;
+  color: var(--z-text-3); cursor: pointer;
+  transition: all 0.15s; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.pl-toggle-btn.active {
+  background: var(--z-blue); color: white;
+  box-shadow: 0 1px 4px rgba(40,110,241,0.3);
+}
+
+/* ─── Search bar ────────────────────────────────────────────── */
+.pl-search-wrap {
+  position: relative; margin-bottom: 22px;
+}
+.pl-search-wrap i {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--z-text-3); font-size: 14px; pointer-events: none;
+}
+.pl-search {
+  width: 100%; padding: 11px 14px 11px 40px;
+  border: 1.5px solid var(--z-border); border-radius: 9px;
+  font-size: 14px; font-family: 'DM Sans', sans-serif;
+  color: var(--z-text); background: var(--z-card);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+}
+.pl-search:focus {
+  outline: none; border-color: var(--z-blue);
+  box-shadow: 0 0 0 3px rgba(40,110,241,0.12);
+}
+.pl-search::placeholder { color: var(--z-text-3); }
+
+/* ─── Results header ────────────────────────────────────────── */
+.pl-results-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
+}
+.pl-results-bar h2 { font-size: 15px; color: var(--z-text); }
+.pl-count {
+  font-size: 12px; color: var(--z-text-3);
+  background: var(--z-bg); border: 1px solid var(--z-border);
+  padding: 3px 10px; border-radius: 20px; font-weight: 600;
+}
+
+/* Sort dropdown */
+.pl-sort {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--z-text-3); margin-left: auto;
+}
+.pl-sort select {
+  border: 1.5px solid var(--z-border); border-radius: 7px;
+  padding: 6px 28px 6px 10px; font-size: 12px;
+  font-family: 'DM Sans', sans-serif; color: var(--z-text-2);
+  background: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath fill='%23718096' d='M5 7L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  -webkit-appearance: none; cursor: pointer;
+}
+
+/* ─── Plans grid ────────────────────────────────────────────── */
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px;
+}
+.pl-grid.no-results {
+  grid-template-columns: 1fr;
+}
+
+/* ─── Plan card ─────────────────────────────────────────────── */
+.pl-card {
+  background: var(--z-card); border: 1.5px solid var(--z-border);
+  border-radius: var(--z-radius); box-shadow: var(--z-shadow-sm);
+  overflow: hidden; display: flex; flex-direction: column;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  position: relative;
+}
+.pl-card:hover {
+  transform: translateY(-3px); box-shadow: var(--z-shadow-lg);
+  border-color: #c7d9fb;
+}
+.pl-card[data-popular="true"] {
+  border-color: var(--z-blue);
+  box-shadow: 0 0 0 1px var(--z-blue), var(--z-shadow-lg);
+}
+
+/* Popular ribbon */
+.pl-ribbon {
+  position: absolute; top: 14px; right: -28px;
+  background: var(--z-blue); color: white;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 4px 34px; transform: rotate(45deg);
+  box-shadow: 0 2px 6px rgba(40,110,241,0.4);
+}
+
+/* Card accent bar */
+.pl-card-accent {
+  height: 4px; width: 100%;
+}
+
+/* Card header */
+.pl-card-head {
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--z-border);
+}
+.pl-card-service {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 8px;
+  padding: 3px 9px; border-radius: 5px;
+}
+.pl-card-head h3 { margin-bottom: 4px; }
+.pl-card-head p  { font-size: 12px !important; color: var(--z-text-3) !important; }
+
+/* Price display */
+.pl-price {
+  display: flex; align-items: baseline; gap: 4px; margin: 12px 0 0;
+}
+.pl-price .amount {
+  font-size: 28px; font-weight: 700; color: var(--z-text);
+  font-family: 'DM Mono', monospace;
+}
+.pl-price .currency {
+  font-size: 16px; font-weight: 600; color: var(--z-text-2);
+  margin-bottom: 2px;
+}
+.pl-price .period {
+  font-size: 12px; color: var(--z-text-3); font-weight: 500;
+}
+.pl-price .original {
+  font-size: 13px; color: var(--z-text-3); text-decoration: line-through;
+  margin-left: 4px;
+}
+.pl-discount {
+  display: inline-flex; align-items: center;
+  background: var(--z-green-soft); color: var(--z-green);
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; margin-left: 6px;
+}
+
+/* Card body - features */
+.pl-card-body {
+  padding: 16px 18px; flex: 1;
+}
+.pl-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.pl-features li {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; color: var(--z-text-2); line-height: 1.4;
+}
+.pl-features li i {
+  margin-top: 1px; font-size: 11px; flex-shrink: 0;
+  width: 16px; text-align: center;
+}
+.pl-features li i.fa-check  { color: var(--z-green); }
+.pl-features li i.fa-xmark  { color: #cbd5e0; }
+.pl-features li i.fa-circle-minus { color: var(--z-amber); }
+
+/* Card footer */
+.pl-card-foot {
+  padding: 14px 18px; border-top: 1px solid var(--z-border);
+  background: #f9fafb; display: flex; gap: 8px;
+}
+.z-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 16px; border-radius: var(--z-radius-sm);
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid transparent; text-decoration: none;
+  transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  min-height: 38px;
+}
+.z-btn-primary { background: var(--z-blue); color: white; border-color: var(--z-blue); flex: 1; }
+.z-btn-primary:hover { background: var(--z-blue-dark); border-color: var(--z-blue-dark); }
+.z-btn-ghost { background: white; color: var(--z-text-2); border-color: var(--z-border); }
+.z-btn-ghost:hover { background: var(--z-bg); border-color: #c7d2df; }
+
+/* ─── Empty state ───────────────────────────────────────────── */
+.pl-empty {
+  text-align: center; padding: 56px 20px;
+  background: var(--z-card); border: 1px dashed var(--z-border);
+  border-radius: var(--z-radius);
+}
+.pl-empty-icon {
+  width: 56px; height: 56px; border-radius: 14px;
+  background: var(--z-bg); margin: 0 auto 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--z-text-3);
+}
+.pl-empty h3 { font-size: 15px; color: var(--z-text-2); margin-bottom: 6px; }
+.pl-empty p  { font-size: 13px !important; color: var(--z-text-3) !important; }
+
+/* ─── No-results hidden ─────────────────────────────────────── */
+.pl-card.hidden { display: none; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Mobile < 480px */
+@media (max-width: 479px) {
+  .pl-page { padding: 12px 12px 48px; }
+
+  .pl-hero { padding: 22px 18px 20px; border-radius: 10px; margin-bottom: 18px; }
+  .pl-hero h1 { font-size: 20px !important; }
+  .pl-hero p  { font-size: 13px !important; }
+  .pl-hero-meta { gap: 10px; margin-top: 14px; }
+  .pl-hero-badge { font-size: 11px; padding: 5px 10px; }
+
+  .pl-filters { flex-direction: column; align-items: flex-start; padding: 14px; gap: 10px; }
+  .pl-filter-label { margin-bottom: -2px; }
+  .pl-filter-chips { gap: 6px; }
+  .pl-chip { font-size: 12px; padding: 6px 12px; }
+  .pl-billing-toggle { margin-left: 0; }
+
+  .pl-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  .pl-results-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .pl-sort { margin-left: 0; }
+
+  .pl-price .amount { font-size: 24px; }
+
+  .pl-card-head { padding: 15px 15px 12px; }
+  .pl-card-body { padding: 13px 15px; }
+  .pl-card-foot { padding: 12px 15px; }
+}
+
+/* Phablet 480-599px */
+@media (min-width: 480px) and (max-width: 599px) {
+  .pl-page { padding: 14px 14px 52px; }
+  .pl-hero { padding: 26px 22px 22px; margin-bottom: 20px; }
+  .pl-filters { flex-wrap: wrap; }
+  .pl-grid { grid-template-columns: 1fr; gap: 14px; }
+  .pl-billing-toggle { margin-left: 0; }
+}
+
+/* Tablet 600-899px */
+@media (min-width: 600px) and (max-width: 899px) {
+  .pl-page { padding: 18px 20px 56px; }
+  .pl-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .pl-billing-toggle { margin-left: auto; }
+}
+
+/* Desktop 1200px+ */
+@media (min-width: 1200px) {
+  .pl-page { padding: 32px 0 68px; }
+  .pl-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pl-page">
+
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <div class="pl-hero">
+    <h1>Plans &amp; Pricing</h1>
+    <p>Choose the right plan for your business. All plans include dedicated support and onboarding assistance.</p>
+    <div class="pl-hero-meta">
+      <span class="pl-hero-badge"><i class="fa-solid fa-shield-check"></i> GST Compliant</span>
+      <span class="pl-hero-badge"><i class="fa-solid fa-headset"></i> 24hr Support</span>
+      <span class="pl-hero-badge"><i class="fa-solid fa-rotate"></i> Cancel Anytime</span>
+    </div>
+  </div>
+
+  <!-- ── Filters ────────────────────────────────────────────── -->
+  <div class="pl-filters">
+    <span class="pl-filter-label"><i class="fa-solid fa-sliders"></i> Filter</span>
+    <div class="pl-filter-chips" id="filterChips">
+      <span class="pl-chip active" data-filter="all">All Plans</span>
+      <span class="pl-chip" data-filter="tally">📊 Tally</span>
+      <span class="pl-chip" data-filter="dsc">✍️ DSC</span>
+      <span class="pl-chip" data-filter="hrms">👥 HRMS</span>
+      <span class="pl-chip" data-filter="crm">🤖 CRM</span>
+      <span class="pl-chip" data-filter="courses">🎓 Courses</span>
+    </div>
+    <div class="pl-billing-toggle">
+      <span class="pl-toggle-btn active" data-billing="monthly" onclick="setBilling('monthly',this)">Monthly</span>
+      <span class="pl-toggle-btn" data-billing="annual" onclick="setBilling('annual',this)">Annual</span>
+    </div>
+  </div>
+
+  <!-- ── Search ─────────────────────────────────────────────── -->
+  <div class="pl-search-wrap">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" class="pl-search" id="planSearch"
+           placeholder="Search plans, features…"
+           oninput="filterPlans()">
+  </div>
+
+  <!-- ── Results bar ────────────────────────────────────────── -->
+  <div class="pl-results-bar">
+    <h2>Available Plans <span class="pl-count" id="planCount">0</span></h2>
+    <div class="pl-sort">
+      <label for="sortSelect">Sort:</label>
+      <select id="sortSelect" onchange="sortPlans()">
+        <option value="default">Default</option>
+        <option value="price-asc">Price: Low → High</option>
+        <option value="price-desc">Price: High → Low</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── Plans grid ─────────────────────────────────────────── -->
+  <div class="pl-grid" id="planGrid">
+
+    <!-- TALLY SILVER -->
+    <div class="pl-card" data-category="tally" data-price-monthly="2999" data-price-annual="29990" data-name="Tally Silver">
+      <div class="pl-card-accent" style="background: linear-gradient(90deg,#0d7377,#14a085)"></div>
+      <div class="pl-card-head">
+        <span class="pl-card-service" style="background:#e8f6f6;color:#0d7377">
+          <i class="fa-solid fa-chart-bar"></i> Tally Integration
+        </span>
+        <h3>Silver Plan</h3>
+        <p>Best for freelancers &amp; small shops</p>
+        <div class="pl-price">
+          <span class="currency">₹</span>
+          <span class="amount" data-monthly="2999" data-annual="2499">2,999</span>
+          <span class="period">/month</span>
+        </div>
+      </div>
+      <div class="pl-card-body">
+        <ul class="pl-features">
+          <li><i class="fa-solid fa-check"></i> Tally Prime (Single User)</li>
+          <li><i class="fa-solid fa-check"></i> GST Filing Support</li>
+          <li><i class="fa-solid fa-check"></i> Email Support</li>
+          <li><i class="fa-solid fa-circle-minus"></i> Remote Assistance</li>
+          <li><i class="fa-solid fa-xmark"></i> Multi-user License</li>
+          <li><i class="fa-solid fa-xmark"></i> Priority Support</li>
+        </ul>
+      </div>
+      <div class="pl-card-foot">
+        <a href="{% url 'tickets:create' %}" class="z-btn z-btn-ghost"><i class="fa-solid fa-envelope"></i> Enquire</a>
+        <a href="#" class="z-btn z-btn-primary">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- TALLY GOLD (POPULAR) -->
+    <div class="pl-card" data-category="tally" data-price-monthly="5499" data-price-annual="4999" data-name="Tally Gold" data-popular="true">
+      <div class="pl-ribbon">Popular</div>
+      <div class="pl-card-accent" style="background: linear-gradient(90deg,#1a4fbe,#286ef1)"></div>
+      <div class="pl-card-head">
+        <span class="pl-card-service" style="background:#eef3fd;color:#286ef1">
+          <i class="fa-solid fa-chart-bar"></i> Tally Integration
+        </span>
+        <h3>Gold Plan</h3>
+        <p>For growing businesses</p>
+        <div class="pl-price">
+          <span class="currency">₹</span>
+          <span class="amount" data-monthly="5499" data-annual="4583">5,499</span>
+          <span class="period">/month</span>
+          <span class="original" id="orig-tally-gold"></span>
+          <span class="pl-discount" id="disc-tally-gold" style="display:none">Save 17%</span>
+        </div>
+      </div>
+      <div class="pl-card-body">
+        <ul class="pl-features">
+          <li><i class="fa-solid fa-check"></i> Tally Prime (Multi-user)</li>
+          <li><i class="fa-solid fa-check"></i> GST &amp; E-Invoice Filing</li>
+          <li><i class="fa-solid fa-check"></i> Remote Assistance (4 hrs/mo)</li>
+          <li><i class="fa-solid fa-check"></i> Priority Email + Phone</li>
+          <li><i class="fa-solid fa-check"></i> Data Migration Support</li>
+          <li><i class="fa-solid fa-circle-minus"></i> Custom Add-ons</li>
+        </ul>
+      </div>
+      <div class="pl-card-foot">
+        <a href="{% url 'tickets:create' %}" class="z-btn z-btn-ghost"><i class="fa-solid fa-envelope"></i> Enquire</a>
+        <a href="#" class="z-btn z-btn-primary">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- DSC BASIC -->
+    <div class="pl-card" data-category="dsc" data-price-monthly="1499" data-price-annual="1299" data-name="DSC Basic">
+      <div class="pl-card-accent" style="background: linear-gradient(90deg,#8e44ad,#9b59b6)"></div>
+      <div class="pl-card-head">
+        <span class="pl-card-service" style="background:#f4eafa;color:#8e44ad">
+          <i class="fa-solid fa-signature"></i> Digital Signature
+        </span>
+        <h3>DSC Basic</h3>
+        <p>Class-3 individual DSC</p>
+        <div class="pl-price">
+          <span class="currency">₹</span>
+          <span class="amount" data-monthly="1499" data-annual="1249">1,499</span>
+          <span class="period">/year</span>
+        </div>
+      </div>
+      <div class="pl-card-body">
+        <ul class="pl-features">
+          <li><i class="fa-solid fa-check"></i> Class-3 DSC (2 years)</li>
+          <li><i class="fa-solid fa-check"></i> eToken Included</li>
+          <li><i class="fa-solid fa-check"></i> GST, MCA, Income Tax</li>
+          <li><i class="fa-solid fa-check"></i> Doorstep Delivery</li>
+          <li><i class="fa-solid fa-xmark"></i> Organisation DSC</li>
+          <li><i class="fa-solid fa-xmark"></i> Tender Signing</li>
+        </ul>
+      </div>
+      <div class="pl-card-foot">
+        <a href="{% url 'tickets:create' %}" class="z-btn z-btn-ghost"><i class="fa-solid fa-envelope"></i> Enquire</a>
+        <a href="#" class="z-btn z-btn-primary">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- HRMS STARTER -->
+    <div class="pl-card" data-category="hrms" data-price-monthly="3999" data-price-annual="3333" data-name="HRMS Starter">
+      <div class="pl-card-accent" style="background: linear-gradient(90deg,#e67e22,#f39c12)"></div>
+      <div class="pl-card-head">
+        <span class="pl-card-service" style="background:#fef3e6;color:#e67e22">
+          <i class="fa-solid fa-users"></i> HRMS Platform
+        </span>
+        <h3>Starter</h3>
+        <p>Up to 25 employees</p>
+        <div class="pl-price">
+          <span class="currency">₹</span>
+          <span class="amount" data-monthly="3999" data-annual="3333">3,999</span>
+          <span class="period">/month</span>
+        </div>
+      </div>
+      <div class="pl-card-body">
+        <ul class="pl-features">
+          <li><i class="fa-solid fa-check"></i> Attendance &amp; Leave Mgmt</li>
+          <li><i class="fa-solid fa-check"></i> Payroll Processing</li>
+          <li><i class="fa-solid fa-check"></i> ESI &amp; PF Calculation</li>
+          <li><i class="fa-solid fa-check"></i> Employee Self-Service</li>
+          <li><i class="fa-solid fa-circle-minus"></i> Performance Module</li>
+          <li><i class="fa-solid fa-xmark"></i> Custom Reports</li>
+        </ul>
+      </div>
+      <div class="pl-card-foot">
+        <a href="{% url 'tickets:create' %}" class="z-btn z-btn-ghost"><i class="fa-solid fa-envelope"></i> Enquire</a>
+        <a href="#" class="z-btn z-btn-primary">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- AI CRM -->
+    <div class="pl-card" data-category="crm" data-price-monthly="4999" data-price-annual="3999" data-name="AI-Powered CRM">
+      <div class="pl-card-accent" style="background: linear-gradient(90deg,#286ef1,#3b8af7)"></div>
+      <div class="pl-card-head">
+        <span class="pl-card-service" style="background:#eef3fd;color:#286ef1">
+          <i class="fa-solid fa-robot"></i> AI-Powered CRM
+        </span>
+        <h3>CRM Pro</h3>
+        <p>Smart lead &amp; customer management</p>
+        <div class="pl-price">
+          <span class="currency">₹</span>
+          <span class="amount" data-monthly="4999" data-annual="3999">4,999</span>
+          <span class="period">/month</span>
+        </div>
+      </div>
+      <div class="pl-card-body">
+        <ul class="pl-features">
+          <li><i class="fa-solid fa-check"></i> AI Lead Scoring</li>
+          <li><i class="fa-solid fa-check"></i> Pipeline Management</li>
+          <li><i class="fa-solid fa-check"></i> WhatsApp Integration</li>
+          <li><i class="fa-solid fa-check"></i> Email Campaigns</li>
+          <li><i class="fa-solid fa-check"></i> Analytics Dashboard</li>
+          <li><i class="fa-solid fa-circle-minus"></i> Custom Automations</li>
+        </ul>
+      </div>
+      <div class="pl-card-foot">
+        <a href="{% url 'tickets:create' %}" class="z-btn z-btn-ghost"><i class="fa-solid fa-envelope"></i> Enquire</a>
+        <a href="#" class="z-btn z-btn-primary">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- AI COURSES -->
+    <div class="pl-card" data-category="courses" data-price-monthly="1999" data-price-annual="1499" data-name="AI Courses">
+      <div class="pl-card-accent" style="background: linear-gradient(90deg,#27ae60,#2ecc71)"></div>
+      <div class="pl-card-head">
+        <span class="pl-card-service" style="background:#e9f7ef;color:#27ae60">
+          <i class="fa-solid fa-graduation-cap"></i> AI Courses
+        </span>
+        <h3>No-Code AI</h3>
+        <p>Learn AI without coding skills</p>
+        <div class="pl-price">
+          <span class="currency">₹</span>
+          <span class="amount" data-monthly="1999" data-annual="1249">1,999</span>
+          <span class="period">/month</span>
+        </div>
+      </div>
+      <div class="pl-card-body">
+        <ul class="pl-features">
+          <li><i class="fa-solid fa-check"></i> 20+ Video Modules</li>
+          <li><i class="fa-solid fa-check"></i> Live Q&amp;A Sessions</li>
+          <li><i class="fa-solid fa-check"></i> Certificate of Completion</li>
+          <li><i class="fa-solid fa-check"></i> Lifetime Access</li>
+          <li><i class="fa-solid fa-check"></i> Community Access</li>
+          <li><i class="fa-solid fa-circle-minus"></i> 1:1 Mentorship</li>
+        </ul>
+      </div>
+      <div class="pl-card-foot">
+        <a href="{% url 'tickets:create' %}" class="z-btn z-btn-ghost"><i class="fa-solid fa-envelope"></i> Enquire</a>
+        <a href="#" class="z-btn z-btn-primary">Enroll Now <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+  </div><!-- /.pl-grid -->
+
+  <!-- Empty state (shown via JS) -->
+  <div class="pl-empty" id="emptyState" style="display:none">
+    <div class="pl-empty-icon"><i class="fa-solid fa-box-open"></i></div>
+    <h3>No plans found</h3>
+    <p>Try a different filter or clear your search.</p>
+  </div>
+
+</div><!-- /.pl-page -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ── State ───────────────────────────────────────────────────── */
+let activeFilter = 'all';
+let activeBilling = 'monthly';
+
+/* ── Filter chips ────────────────────────────────────────────── */
+document.getElementById('filterChips').addEventListener('click', function(e) {
+  var chip = e.target.closest('.pl-chip');
+  if (!chip) return;
+  document.querySelectorAll('.pl-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeFilter = chip.dataset.filter;
+  filterPlans();
+});
+
+/* ── Billing toggle ──────────────────────────────────────────── */
+function setBilling(mode, el) {
+  activeBilling = mode;
+  document.querySelectorAll('.pl-toggle-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  updatePrices();
+  filterPlans();
+}
+
+function updatePrices() {
+  document.querySelectorAll('.pl-card').forEach(function(card) {
+    var amountEl = card.querySelector('.amount');
+    if (!amountEl) return;
+    var monthly = parseInt(amountEl.dataset.monthly);
+    var annual  = parseInt(amountEl.dataset.annual);
+    var val = activeBilling === 'annual' ? annual : monthly;
+    amountEl.textContent = val.toLocaleString('en-IN');
+
+    // Show discount badge on annual
+    var discEl  = card.querySelector('[id^="disc-"]');
+    var origEl  = card.querySelector('.original');
+    if (discEl) discEl.style.display = activeBilling === 'annual' ? 'inline-flex' : 'none';
+    if (origEl) {
+      if (activeBilling === 'annual') {
+        origEl.textContent = '₹' + monthly.toLocaleString('en-IN');
+      } else {
+        origEl.textContent = '';
+      }
+    }
+    // Update period text
+    var periodEl = card.querySelector('.period');
+    if (periodEl && !card.dataset.category === 'dsc') {
+      periodEl.textContent = activeBilling === 'annual' ? '/month (billed annually)' : '/month';
+    }
+  });
+}
+
+/* ── Search + filter ─────────────────────────────────────────── */
+function filterPlans() {
+  var query = document.getElementById('planSearch').value.toLowerCase().trim();
+  var cards = document.querySelectorAll('.pl-card');
+  var visible = 0;
+
+  cards.forEach(function(card) {
+    var cat   = card.dataset.category || '';
+    var name  = (card.dataset.name || '').toLowerCase();
+    var text  = card.textContent.toLowerCase();
+
+    var matchCat    = activeFilter === 'all' || cat === activeFilter;
+    var matchSearch = !query || text.includes(query) || name.includes(query);
+
+    if (matchCat && matchSearch) {
+      card.classList.remove('hidden');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('planCount').textContent = visible;
+  document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+}
+
+/* ── Sort ────────────────────────────────────────────────────── */
+function sortPlans() {
+  var mode  = document.getElementById('sortSelect').value;
+  var grid  = document.getElementById('planGrid');
+  var cards = Array.from(grid.querySelectorAll('.pl-card'));
+
+  cards.sort(function(a, b) {
+    if (mode === 'price-asc')  return parseInt(a.dataset.priceMonthly) - parseInt(b.dataset.priceMonthly);
+    if (mode === 'price-desc') return parseInt(b.dataset.priceMonthly) - parseInt(a.dataset.priceMonthly);
+    if (mode === 'name')       return (a.dataset.name||'').localeCompare(b.dataset.name||'');
+    return 0;
+  });
+
+  cards.forEach(function(card) { grid.appendChild(card); });
+}
+
+/* ── Init ────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  filterPlans();
+});
+</script>
+{% endblock %}

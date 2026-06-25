@@ -1,0 +1,547 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Invoice — iSaral{% endblock %}
+{% block page_title %}Create Invoice{% endblock %}
+
+{% block content %}
+
+<style>
+  .inv-page {
+    padding: 1.75rem;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .inv-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .inv-page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .inv-icon-wrap {
+    width: 40px;
+    height: 40px;
+    background: #E6F1FB;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #185FA5;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .inv-page-header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .inv-page-header p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 2px 0 0;
+  }
+
+  .inv-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .inv-section {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .inv-section + .inv-section {
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .inv-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin-bottom: 14px;
+  }
+
+  .inv-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+  }
+
+  .inv-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px 16px;
+  }
+
+  .inv-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .inv-field.full {
+    grid-column: 1 / -1;
+  }
+
+  .inv-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0;
+  }
+
+  .inv-field label .req {
+    color: #E24B4A;
+    margin-left: 2px;
+  }
+
+  .inv-field .form-control,
+  .inv-field .form-select,
+  .inv-field select,
+  .inv-field input {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 11px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+    width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  .inv-field .form-control:focus,
+  .inv-field .form-select:focus,
+  .inv-field select:focus,
+  .inv-field input:focus {
+    border-color: #378ADD;
+    box-shadow: 0 0 0 3px rgba(55,138,221,.13);
+    outline: none;
+  }
+
+  .inv-field .form-control[readonly],
+  .inv-field input[readonly] {
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  .inv-field .hint {
+    font-size: 11px;
+    color: #9ca3af;
+    margin: 0;
+  }
+
+  .inv-field .field-error {
+    font-size: 11px;
+    color: #E24B4A;
+    margin: 0;
+  }
+
+  .inv-summary {
+    background: #f8fafd;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 14px;
+  }
+
+  .inv-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .inv-summary-row strong {
+    font-size: 13px;
+    font-weight: 500;
+    color: #111827;
+  }
+
+  .inv-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    margin-top: 8px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .inv-summary-total span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+  }
+
+  .inv-summary-total strong {
+    font-size: 20px;
+    font-weight: 600;
+    color: #185FA5;
+  }
+
+  .gst-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #E1F5EE;
+    color: #085041;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+
+  .inv-tips {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 10px;
+    padding: .85rem 1rem;
+    margin-top: 14px;
+  }
+
+  .inv-tips i {
+    font-size: 15px;
+    color: #185FA5;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .inv-tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .inv-tips li {
+    font-size: 11.5px;
+    color: #1e40af;
+  }
+
+  .inv-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 0 0 14px 14px;
+  }
+
+  .inv-btn {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #d1d5db;
+    background: transparent;
+    color: #374151;
+    text-decoration: none;
+    transition: background .12s, border-color .12s;
+  }
+
+  .inv-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+  }
+
+  .inv-btn-primary {
+    background: #185FA5;
+    color: #ffffff !important;
+    border-color: #185FA5;
+  }
+
+  .inv-btn-primary:hover {
+    background: #0C447C;
+    border-color: #0C447C;
+    color: #ffffff !important;
+  }
+
+  .inv-btn-cancel {
+    color: #A32D2D;
+    border-color: #fca5a5;
+  }
+
+  .inv-btn-cancel:hover {
+    background: #FEF2F2;
+    color: #A32D2D;
+  }
+
+  /* Alert styling */
+  .inv-alert {
+    border-radius: 8px;
+    font-size: 13px;
+    padding: .75rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Ensure Django-rendered widgets (form-control class) match our design */
+  .inv-field .form-control,
+  .inv-field .form-select {
+    height: 38px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    padding: 0 11px !important;
+    font-size: 13px !important;
+    color: #111827 !important;
+    background: #fff !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    display: block !important;
+  }
+  .inv-field .form-control:focus,
+  .inv-field .form-select:focus {
+    border-color: #378ADD !important;
+    box-shadow: 0 0 0 3px rgba(55,138,221,.13) !important;
+    outline: none !important;
+  }
+  select.form-control {
+    appearance: auto;
+  }
+
+  @media (max-width: 640px) {
+    .inv-grid-2, .inv-grid-3 { grid-template-columns: 1fr; }
+    .inv-field.full { grid-column: 1; }
+  }
+
+  .inv-logo{
+    width: 36px;
+    height:36px;
+    object-fit:contain;
+}
+</style>
+
+<div class="inv-page">
+
+<div class="inv-page-header-left">
+    <img src="{% static 'images/logo.png' %}"
+         alt="iSaral Logo"
+         class="inv-logo">
+
+    <div>
+        <h1>Create Invoice</h1>
+        <p>Fill in the details below to generate a new invoice</p>
+    </div>
+</div>
+
+  <!-- Flash messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert inv-alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="inv-card">
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      <!-- Section 1: Customer & invoice details -->
+      <div class="inv-section">
+        <div class="inv-section-label">Customer &amp; invoice details</div>
+
+        <div class="inv-grid-2">
+
+          <!-- Customer — full width -->
+          <div class="inv-field full">
+            <label for="id_customer">Select customer <span class="req">*</span></label>
+            {{ form.customer }}
+            {% if form.customer.errors %}
+              <span class="field-error">{{ form.customer.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Invoice number -->
+          <div class="inv-field">
+            <label for="id_invoice_number">Invoice number <span class="req">*</span></label>
+            {{ form.invoice_number }}
+            {% if form.invoice_number.errors %}
+              <span class="field-error">{{ form.invoice_number.errors.0 }}</span>
+            {% endif %}
+            <span class="hint">Must be unique, e.g. INV-2026-001</span>
+          </div>
+
+          <!-- Invoice date -->
+          <div class="inv-field">
+            <label for="id_issued_date">Invoice date <span class="req">*</span></label>
+            {{ form.issued_date }}
+            {% if form.issued_date.errors %}
+              <span class="field-error">{{ form.issued_date.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Due date -->
+          <div class="inv-field">
+            <label for="id_due_date">Due date</label>
+            {{ form.due_date }}
+            {% if form.due_date.errors %}
+              <span class="field-error">{{ form.due_date.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Status -->
+          <div class="inv-field">
+            <label for="id_status">Status <span class="req">*</span></label>
+            {{ form.status }}
+            {% if form.status.errors %}
+              <span class="field-error">{{ form.status.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 2: Amount & tax -->
+      <div class="inv-section">
+        <div class="inv-section-label">Amount &amp; tax</div>
+
+        <div class="inv-grid-3">
+
+          <!-- Amount (₹) maps to Invoice.subtotal model field -->
+          <div class="inv-field">
+            <label for="id_subtotal">Amount (₹) <span class="req">*</span></label>
+            {{ form.subtotal }}
+            {% if form.subtotal.errors %}
+              <span class="field-error">{{ form.subtotal.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- GST rate — not a model field; used by JS and view to calculate -->
+          <div class="inv-field">
+            <label for="gst_rate">GST rate</label>
+            <select id="gst_rate" name="gst_rate">
+              <option value="0">0% — exempt</option>
+              <option value="5">5% GST</option>
+              <option value="12">12% GST</option>
+              <option value="18" selected>18% GST</option>
+              <option value="28">28% GST</option>
+            </select>
+          </div>
+
+          <!-- GST amount — read-only display; real value sent via hidden field below -->
+          <div class="inv-field">
+            <label>GST amount (₹)</label>
+            <input type="text" id="gst_amount_display" value="0.00" readonly
+              style="height:38px;border:1px solid #d1d5db;border-radius:8px;padding:0 12px;font-size:13px;width:100%;background:#f9fafb;color:#6b7280;" />
+          </div>
+
+        </div>
+
+        {# gst_amount and total are HiddenInput in InvoiceForm — rendered as type="hidden" #}
+        {{ form.gst_amount }}
+        {{ form.total }}
+
+        <!-- Summary box -->
+        <div class="inv-summary">
+          <div class="inv-summary-row">
+            <span>Subtotal</span>
+            <strong>₹<span id="subtotal_display">0.00</span></strong>
+          </div>
+          <div class="inv-summary-row">
+            <span>GST <span class="gst-pill" id="gst_rate_label">18%</span></span>
+            <strong>₹<span id="gst_display">0.00</span></strong>
+          </div>
+          <div class="inv-summary-total">
+            <span>Total payable</span>
+            <strong>₹<span id="total_display">0.00</span></strong>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="inv-tips">
+          <i class="fa-solid fa-circle-info"></i>
+          <ul>
+            <li>Invoice number must be unique across all invoices.</li>
+            <li>GST is calculated automatically when you enter the amount.</li>
+            <li>Fields marked <strong style="color:#E24B4A">*</strong> are required before saving.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Footer actions -->
+      <div class="inv-footer">
+        <a href="{% url 'accounts:invoices' %}" class="inv-btn inv-btn-cancel">
+          <i class="fa-solid fa-xmark"></i> Cancel
+        </a>
+        <button type="submit" class="inv-btn inv-btn-primary">
+          <i class="fa-solid fa-paper-plane"></i> Create invoice
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+function calculateGST() {
+  var subtotalEl = document.getElementById('id_subtotal');
+  var gstRateEl  = document.getElementById('gst_rate');
+  if (!subtotalEl || !gstRateEl) return;
+
+  var subtotal  = parseFloat(subtotalEl.value) || 0;
+  var gstRate   = parseFloat(gstRateEl.value)  || 0;
+  var gstAmt    = Math.round(subtotal * gstRate) / 100;
+  var total     = Math.round((subtotal + gstAmt) * 100) / 100;
+
+  // Update hidden fields that Django will receive on POST
+  var hiddenGst   = document.getElementById('id_gst_amount');
+  var hiddenTotal = document.getElementById('id_total');
+  if (hiddenGst)   hiddenGst.value   = gstAmt.toFixed(2);
+  if (hiddenTotal) hiddenTotal.value = total.toFixed(2);
+
+  // Update the visible read-only GST display input
+  var displayGst = document.getElementById('gst_amount_display');
+  if (displayGst) displayGst.value = gstAmt.toFixed(2);
+
+  // Update summary box spans
+  document.getElementById('subtotal_display').textContent = subtotal.toFixed(2);
+  document.getElementById('gst_display').textContent      = gstAmt.toFixed(2);
+  document.getElementById('total_display').textContent    = total.toFixed(2);
+  document.getElementById('gst_rate_label').textContent   = gstRate + '%';
+}
+
+window.addEventListener('load', function() {
+  var subtotalEl = document.getElementById('id_subtotal');
+  var gstRateEl  = document.getElementById('gst_rate');
+  if (subtotalEl) subtotalEl.addEventListener('input',  calculateGST);
+  if (gstRateEl)  gstRateEl.addEventListener('change', calculateGST);
+
+  // Ensure hidden total/gst fields have a value on first load
+  calculateGST();
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Out — iSaral</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { background: white; border-radius: 16px; padding: 48px 40px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+        .icon { font-size: 56px; margin-bottom: 20px; }
+        h2 { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+        p { font-size: 14px; color: #6b7280; margin-bottom: 28px; line-height: 1.6; }
+        .btn-logout { display: block; width: 100%; padding: 13px; background: #e53935; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif; cursor: pointer; margin-bottom: 12px; transition: all 0.2s; }
+        .btn-logout:hover { background: #c62828; }
+        .btn-cancel { display: block; width: 100%; padding: 13px; background: #f3f4f6; color: #374151; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .btn-cancel:hover { background: #e5e7eb; }
+        .brand { font-family: 'Poppins', sans-serif; font-size: 13px; color: #9ca3af; margin-top: 24px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">👋</div>
+    <h2>Sign Out?</h2>
+    <p>Are you sure you want to sign out of your iSaral account?</p>
+    <form method="POST" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">Yes, Sign Me Out</button>
+    </form>
+    <a href="{% url 'accounts:dashboard' %}" class="btn-cancel">Cancel — Stay Signed In</a>
+    <p class="brand">iSaral Business Solutions</p>
+</div>
+</body>
+</html>

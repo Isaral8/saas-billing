@@ -1,0 +1,759 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your iSaral account — Smart GST Billing & Business Software for Indian SMEs">
+    <title>Sign Up — iSaral</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        /* ── TOKENS (identical to login) ──────── */
+        :root {
+            --ink:        #0C1A2E;
+            --ink-2:      #1E3A5F;
+            --ink-3:      #3A5573;
+            --ink-4:      #6B84A0;
+            --ink-5:      #A3B8CE;
+
+            --blue:       #1A56DB;
+            --blue-d:     #1143B0;
+            --blue-l:     #EBF3FF;
+            --blue-glow:  rgba(26,86,219,.18);
+
+            --teal:       #06B6D4;
+            --emerald:    #10B981;
+            --amber:      #F59E0B;
+            --red:        #EF4444;
+
+            --surface:    #ffffff;
+            --bg:         #F3F7FC;
+            --border:     #D9E6F2;
+            --border-l:   #EAF2FA;
+
+            --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+            --shadow-card: 0 1px 3px rgba(12,26,46,.06), 0 8px 32px rgba(12,26,46,.09);
+            --shadow-input: 0 0 0 3px rgba(26,86,219,.13);
+            --shadow-btn:   0 1px 3px rgba(12,26,46,.12), 0 4px 14px rgba(26,86,219,.30);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--ink-3);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.55;
+        }
+        a { text-decoration: none; color: inherit; }
+        img { display: block; max-width: 100%; }
+        input, button, select { font-family: inherit; }
+
+        /* ── LAYOUT ───────────────────────────── */
+        .shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* ── LEFT PANEL ───────────────────────── */
+        .panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 52px 44px;
+            background: linear-gradient(148deg, #0D2E6E 0%, #1143B0 42%, #1A56DB 75%, #2563EB 100%);
+            overflow: hidden;
+        }
+        .panel::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+            background-size: 44px 44px;
+            pointer-events: none;
+        }
+        .orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(60px); }
+        .orb-1 { top: -80px;    right: -80px;  width: 360px; height: 360px; background: rgba(6,182,212,.22); }
+        .orb-2 { bottom: -60px; left: -60px;   width: 280px; height: 280px; background: rgba(16,185,129,.16); }
+        .orb-3 { top: 50%;      left: 30%;     width: 200px; height: 200px; background: rgba(255,255,255,.05); transform: translateY(-50%); }
+
+        /* Panel brand */
+        .panel-brand {
+            position: relative; z-index: 2;
+            display: flex; align-items: center; gap: 11px;
+        }
+        .brand-mark {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.25);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-mark svg { width: 20px; height: 20px; fill: #fff; }
+        .brand-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -.2px;
+        }
+        .brand-tag {
+            font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.55);
+            letter-spacing: .6px; text-transform: uppercase; margin-top: 1px;
+        }
+
+        /* Panel hero */
+        .panel-hero {
+            position: relative; z-index: 2;
+            flex: 1;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 20px 0 28px;
+        }
+        .panel-eyebrow {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 100px; padding: 5px 12px;
+            font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.85);
+            letter-spacing: .4px; width: fit-content; margin-bottom: 22px;
+        }
+        .panel-eyebrow span {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--teal); display: inline-block;
+            animation: pulse 2s ease infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(.8)} }
+
+        .panel-headline {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 34px; font-weight: 800; line-height: 1.18;
+            color: #fff; letter-spacing: -.5px; margin-bottom: 16px;
+        }
+        .panel-headline em { font-style: normal; color: var(--teal); }
+
+        .panel-sub {
+            font-size: 14.5px; color: rgba(255,255,255,.65);
+            font-weight: 400; line-height: 1.7; max-width: 340px; margin-bottom: 36px;
+        }
+
+        /* Steps — left panel version */
+        .onboard-steps { display: flex; flex-direction: column; gap: 16px; }
+        .ostep {
+            display: flex; align-items: flex-start; gap: 14px;
+            animation: slideIn .5s ease both;
+        }
+        .ostep:nth-child(1){animation-delay:.1s}
+        .ostep:nth-child(2){animation-delay:.2s}
+        .ostep:nth-child(3){animation-delay:.3s}
+        @keyframes slideIn { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+
+        .ostep-num {
+            width: 32px; height: 32px; flex-shrink: 0;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; color: #fff;
+        }
+        .ostep-num.c1 { background: rgba(6,182,212,.3);  border: 1px solid rgba(6,182,212,.5); }
+        .ostep-num.c2 { background: rgba(16,185,129,.3); border: 1px solid rgba(16,185,129,.5); }
+        .ostep-num.c3 { background: rgba(245,158,11,.3); border: 1px solid rgba(245,158,11,.5); }
+        .ostep-body strong { display: block; font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .ostep-body span   { font-size: 12px; color: rgba(255,255,255,.5); }
+
+        /* Panel stats */
+        .panel-stats {
+            position: relative; z-index: 2;
+            display: flex; gap: 0;
+            border-top: 1px solid rgba(255,255,255,.1);
+            padding-top: 26px;
+        }
+        .stat { flex: 1; padding-right: 20px; }
+        .stat + .stat { padding-left: 20px; border-left: 1px solid rgba(255,255,255,.1); }
+        .stat-num {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 22px; font-weight: 800; color: #fff;
+            letter-spacing: -.3px; line-height: 1; margin-bottom: 4px;
+        }
+        .stat-label { font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,.5); letter-spacing: .2px; }
+
+        /* ── RIGHT PANEL ──────────────────────── */
+        .form-side {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-start;
+            padding: 36px 48px 40px;
+            background: var(--surface);
+            overflow-y: auto;
+        }
+
+        .form-side-top {
+            width: 100%; max-width: 420px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .form-side-top-logo {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .form-side-top-logo span {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px; font-weight: 800; color: var(--ink);
+        }
+        .signin-prompt { font-size: 13px; color: var(--ink-4); font-weight: 500; }
+        .signin-prompt a { color: var(--blue); font-weight: 700; }
+        .signin-prompt a:hover { color: var(--blue-d); }
+
+        /* Progress track */
+        .progress-track {
+            width: 100%; max-width: 420px;
+            display: flex; align-items: center;
+            margin-bottom: 24px; gap: 0;
+        }
+        .pt-step { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .pt-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11.5px; font-weight: 800; transition: all .25s;
+        }
+        .pt-dot.done   { background: var(--emerald); color: #fff; }
+        .pt-dot.active { background: var(--blue); color: #fff; box-shadow: 0 0 0 4px var(--blue-glow); }
+        .pt-dot.idle   { background: var(--border); color: var(--ink-5); }
+        .pt-label { font-size: 10.5px; font-weight: 600; color: var(--ink-5); white-space: nowrap; }
+        .pt-dot.active + .pt-label { color: var(--blue); }
+        .pt-dot.done  + .pt-label  { color: var(--emerald); }
+        .pt-line { flex: 1; height: 2px; background: var(--border); margin: 0 6px 14px; transition: background .25s; }
+        .pt-line.done { background: var(--emerald); }
+
+        .form-wrap { width: 100%; max-width: 420px; }
+
+        /* Form header */
+        .form-header { margin-bottom: 22px; }
+        .form-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--blue-l); border-radius: 100px;
+            padding: 4px 11px; font-size: 11px; font-weight: 700;
+            color: var(--blue); letter-spacing: .4px; text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .form-badge i { font-size: 10px; }
+        .form-header h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 24px; font-weight: 800; color: var(--ink);
+            letter-spacing: -.4px; line-height: 1.2; margin-bottom: 6px;
+        }
+        .form-header p { font-size: 13.5px; color: var(--ink-4); font-weight: 400; line-height: 1.6; }
+
+        /* Alerts */
+        .alert {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 12px 14px; border-radius: var(--r-md);
+            font-size: 13px; font-weight: 600; margin-bottom: 18px;
+            border: 1px solid;
+        }
+        .alert i { font-size: 15px; margin-top: .5px; flex-shrink: 0; }
+        .alert-error   { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+        .alert-success { background: #F0FDF4; color: #065F46; border-color: #BBF7D0; }
+
+        /* Social */
+        .social-row { display: flex; gap: 8px; margin-bottom: 18px; }
+        .btn-sso {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10.5px 12px;
+            border: 1.5px solid var(--border); border-radius: var(--r-md);
+            background: #fff; font-size: 13px; font-weight: 600; color: var(--ink-2);
+            cursor: pointer; transition: border-color .18s, background .18s, box-shadow .18s;
+            text-decoration: none;
+        }
+        .btn-sso:hover { border-color: var(--blue); background: var(--blue-l); box-shadow: 0 2px 10px rgba(26,86,219,.1); }
+
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 12px; color: var(--ink-5); font-weight: 600; margin-bottom: 18px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-l); }
+
+        /* Fields */
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .field { margin-bottom: 14px; }
+        .field label {
+            display: block; margin-bottom: 6px;
+            font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+        }
+        .field-wrap { position: relative; }
+        .field-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--ink-5); font-size: 14.5px; pointer-events: none;
+            transition: color .18s; z-index: 1;
+        }
+        .field-wrap input {
+            width: 100%;
+            padding: 11px 14px 11px 42px;
+            border: 1.5px solid var(--border); border-radius: var(--r-md);
+            background: #FAFCFF; font-size: 13.5px; font-weight: 500; color: var(--ink);
+            outline: none; transition: border-color .18s, box-shadow .18s, background .18s;
+            -webkit-appearance: none;
+appearance: none;
+        }
+        .field-wrap input::placeholder { color: var(--ink-5); font-weight: 400; }
+        .field-wrap input:hover:not(:focus) { border-color: #B8CFE8; }
+        .field-wrap input:focus {
+            border-color: var(--blue); background: #fff; box-shadow: var(--shadow-input);
+        }
+        .field-wrap:focus-within .field-icon { color: var(--blue); }
+        .field-wrap.error input { border-color: var(--red); background: #FFF5F5; box-shadow: 0 0 0 3px rgba(239,68,68,.1); }
+        .field-wrap.error .field-icon { color: var(--red); }
+        .field-error-msg { display: none; margin-top: 5px; font-size: 12px; font-weight: 600; color: var(--red); }
+        .field-wrap.error ~ .field-error-msg { display: block; }
+
+        .has-pw-toggle input { padding-right: 40px; }
+        .toggle-pw {
+            position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--ink-5); font-size: 14.5px; padding: 5px;
+            transition: color .18s; line-height: 1;
+        }
+        .toggle-pw:hover { color: var(--blue); }
+
+        /* Password strength */
+        .pw-strength { margin-top: 7px; }
+        .pw-bars { display: flex; gap: 3px; margin-bottom: 3px; }
+        .pw-bar { flex: 1; height: 3px; border-radius: 3px; background: var(--border); transition: background .25s; }
+        .pw-bar.weak   { background: var(--red); }
+        .pw-bar.fair   { background: var(--amber); }
+        .pw-bar.good   { background: #F59E0B; }
+        .pw-bar.strong { background: var(--emerald); }
+        .pw-txt { font-size: 11.5px; font-weight: 600; color: var(--ink-5); }
+
+        /* Submit */
+        .btn-primary {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 13px;
+            background: var(--blue); color: #fff; border: none;
+            border-radius: var(--r-md); font-size: 14.5px; font-weight: 700;
+            cursor: pointer; letter-spacing: .1px;
+            box-shadow: var(--shadow-btn);
+            transition: background .18s, box-shadow .18s, transform .1s;
+            position: relative; overflow: hidden; margin-top: 4px;
+        }
+        .btn-primary::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,.1) 0%, transparent 100%);
+        }
+        .btn-primary:hover { background: var(--blue-d); box-shadow: 0 2px 6px rgba(12,26,46,.15), 0 6px 20px rgba(26,86,219,.38); }
+        .btn-primary:active { transform: translateY(1px); }
+        .btn-primary .btn-icon { font-size: 15px; transition: transform .2s; }
+        .btn-primary:hover .btn-icon { transform: translateX(3px); }
+
+        /* Benefits chips */
+        .benefit-row {
+            display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+            margin-top: 14px;
+        }
+        .benefit-chip {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 11.5px; font-weight: 600; color: var(--ink-3);
+            padding: 4px 10px; border-radius: 100px;
+            background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.18);
+        }
+        .benefit-chip i { color: var(--emerald); font-size: 11px; }
+
+        /* Terms / footer */
+        .terms-note {
+            font-size: 11.5px; color: var(--ink-5); text-align: center;
+            margin-top: 14px; line-height: 1.65;
+        }
+        .terms-note a { color: var(--ink-4); font-weight: 600; }
+        .terms-note a:hover { color: var(--blue); }
+
+        .legal {
+            margin-top: 20px; text-align: center;
+            font-size: 11.5px; color: var(--ink-5); font-weight: 500;
+        }
+        .legal a { color: var(--ink-4); font-weight: 600; }
+        .legal a:hover { color: var(--blue); }
+
+        /* ── RESPONSIVE ───────────────────────── */
+        @media (max-width: 960px) {
+            .shell { grid-template-columns: 1fr; }
+            .panel { display: none; }
+            .form-side { padding: 32px 24px 40px; justify-content: flex-start; min-height: 100vh; }
+        }
+        @media (max-width: 520px) {
+            .form-grid-2 { grid-template-columns: 1fr; }
+            .social-row { flex-direction: column; }
+            .form-side { padding: 28px 16px 36px; }
+        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+        a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ─── LEFT PANEL ─────────────────────── -->
+    <aside class="panel">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+<div class="panel-brand">
+            <div class="brand-mark" style="background:rgba(255,255,255,.92);padding:8px;border-radius:8px;">
+    <img src="{% static 'images/logo.png' %}" alt="iSaral Logo" style="height: 80px; width: auto; object-fit: contain;">
+</div>
+           
+        </div>
+        <div class="panel-hero">
+            <div class="panel-eyebrow">
+                <span></span>
+                Free forever on Starter plan
+            </div>
+
+            <h2 class="panel-headline">
+                Set up in<br>
+                under <em>5 minutes</em>
+            </h2>
+
+            <p class="panel-sub">
+                Join 2.4 lakh+ Indian businesses already using iSaral to send GST invoices, track inventory, and file returns effortlessly.
+            </p>
+
+            <div class="onboard-steps">
+                <div class="ostep">
+                    <div class="ostep-num c1">1</div>
+                    <div class="ostep-body">
+                        <strong>Create your account</strong>
+                        <span>Enter your details — takes under a minute</span>
+                    </div>
+                </div>
+                <div class="ostep">
+                    <div class="ostep-num c2">2</div>
+                    <div class="ostep-body">
+                        <strong>Set up your business</strong>
+                        <span>Add GSTIN, business name and logo</span>
+                    </div>
+                </div>
+                <div class="ostep">
+                    <div class="ostep-num c3">3</div>
+                    <div class="ostep-body">
+                        <strong>Send your first invoice</strong>
+                        <span>GST-ready, professional, shareable in one click</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-stats">
+            <div class="stat">
+                <div class="stat-num">2.4L+</div>
+                <div class="stat-label">Businesses</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">₹840Cr+</div>
+                <div class="stat-label">Invoices raised</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">4.8 ★</div>
+                <div class="stat-label">App rating</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ─── RIGHT: FORM ────────────────────── -->
+    <main class="form-side">
+
+    <!-- Top Bar -->
+    <div class="form-side-top">
+
+        <div class="form-side-top-logo">
+
+            <div class="brand-mark"
+                 style="background:rgba(255,255,255,.92);
+                        padding:6px;
+                        border-radius:8px;
+                        width:50px;
+                        height:50px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;">
+
+                <img src="{% static 'images/logo.png' %}"
+                     alt="iSaral Logo"
+                     style="height:38px;
+                            width:auto;
+                            object-fit:contain;">
+            </div>
+
+            <div>
+                
+            </div>
+
+        </div>
+
+        <div class="signin-prompt">
+            Have an account?
+            <a href="{% url 'accounts:login' %}">
+                Sign in
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-track">
+            <div class="pt-step">
+                <div class="pt-dot active">1</div>
+                <span class="pt-label">Your details</span>
+            </div>
+            <div class="pt-line"></div>
+            <div class="pt-step">
+                <div class="pt-dot idle">2</div>
+                <span class="pt-label">Business info</span>
+            </div>
+            <div class="pt-line"></div>
+            <div class="pt-step">
+                <div class="pt-dot idle">3</div>
+                <span class="pt-label">First invoice</span>
+            </div>
+        </div>
+
+        <div class="form-wrap">
+
+            <div class="form-header">
+                <div class="form-badge"><i class="bi bi-stars"></i> Free forever on Starter</div>
+                <h1>Create your account</h1>
+                <p>No credit card required. Start sending invoices in minutes.</p>
+            </div>
+
+            <!-- Django messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="bi {% if message.tags == 'error' %}bi-exclamation-circle-fill{% else %}bi-check-circle-fill{% endif %}"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+          <!-- Social sign up -->
+<div class="social-row">
+<a href="/accounts/social/login/google/" class="btn-sso">
+        <svg width="16" height="16" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+    </a>
+   <a href="/accounts/social/login/microsoft/" class="btn-sso">
+        <i class="bi bi-microsoft" style="color:#0078D4;font-size:15px;"></i>
+        Continue with Microsoft
+    </a>
+</div>
+
+<div class="divider">or sign up with email</div>
+
+<form method="POST" action="{% url 'accounts:signup' %}" novalidate id="signupForm">
+    {% csrf_token %}
+
+    <!-- Company -->
+    <div class="field">
+        <label for="company_name">Company name</label>
+        <div class="field-wrap" id="companyWrap">
+            <i class="bi bi-building field-icon"></i>
+            <input type="text" id="company_name" name="company_name"
+                placeholder="Your Company Pvt Ltd" required autocomplete="organization">
+        </div>
+        <p class="field-error-msg" id="companyError">Enter your company name to continue.</p>
+    </div>
+
+    <!-- Name + Phone -->
+    <div class="form-grid-2">
+        <div class="field">
+            <label for="full_name">Full name</label>
+            <div class="field-wrap" id="nameWrap">
+                <i class="bi bi-person field-icon"></i>
+                <input type="text" id="full_name" name="first_name"
+                    placeholder="Your name" required autocomplete="name">
+            </div>
+            <p class="field-error-msg" id="nameError">Enter your full name.</p>
+        </div>
+        <div class="field">
+            <label for="phone">Phone <span style="color:var(--ink-5);font-weight:400">(optional)</span></label>
+            <div class="field-wrap">
+                <i class="bi bi-telephone field-icon"></i>
+                <input type="tel" id="phone" name="phone"
+                    placeholder="9876543210" autocomplete="tel">
+            </div>
+        </div>
+    </div>
+
+    <!-- Email -->
+    <div class="field">
+        <label for="email">Work email</label>
+        <div class="field-wrap" id="emailWrap">
+            <i class="bi bi-envelope field-icon"></i>
+            <input type="email" id="email" name="email"
+                placeholder="you@company.com" required autocomplete="email">
+        </div>
+        <p class="field-error-msg" id="emailError">Enter a valid email address.</p>
+    </div>
+
+    <!-- Password + Confirm -->
+    <div class="form-grid-2">
+        <div class="field">
+            <label for="password1">Password</label>
+            <div class="field-wrap has-pw-toggle" id="pw1Wrap">
+                <i class="bi bi-lock field-icon"></i>
+                <input type="password" id="password1" name="password"
+    placeholder="Min. 8 chars" required autocomplete="new-password">
+                <button type="button" class="toggle-pw" id="togglePw1" aria-label="Show password">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            <p class="field-error-msg" id="pw1Error">Use at least 8 characters.</p>
+            <div class="pw-strength" id="pwStrength" style="display:none">
+                <div class="pw-bars">
+                    <div class="pw-bar" id="bar1"></div>
+                    <div class="pw-bar" id="bar2"></div>
+                    <div class="pw-bar" id="bar3"></div>
+                    <div class="pw-bar" id="bar4"></div>
+                </div>
+                <span class="pw-txt" id="pwTxt"></span>
+            </div>
+        </div>
+        <div class="field">
+            <label for="password2">Confirm password</label>
+            <div class="field-wrap has-pw-toggle" id="pw2Wrap">
+                <i class="bi bi-lock field-icon"></i>
+                <input type="password" id="password2" name="password_confirm"
+    placeholder="Repeat password" required autocomplete="new-password">
+                <button type="button" class="toggle-pw" id="togglePw2" aria-label="Show password">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            <p class="field-error-msg" id="pw2Error">Passwords don't match.</p>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-primary" id="submitBtn">
+        Create free account
+        <i class="bi bi-arrow-right btn-icon"></i>
+    </button>
+</form>
+
+            <div class="benefit-row">
+                <span class="benefit-chip"><i class="bi bi-check-circle-fill"></i> Free forever</span>
+                <span class="benefit-chip"><i class="bi bi-check-circle-fill"></i> No credit card</span>
+                <span class="benefit-chip"><i class="bi bi-check-circle-fill"></i> GST compliant</span>
+            </div>
+
+            <p class="terms-note">
+                By creating an account you agree to iSaral's
+                <a href="https://isaral.in/terms-conditions/" target="_blank" rel="noopener">Terms of Service</a>
+                and <a href="https://isaral.in/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.
+            </p>
+
+            <p class="legal">
+                © 2026 iSaral Business Solutions Pvt. Ltd. ·
+                <a href="https://isaral.in/privacy-policy/" target="_blank" rel="noopener">Privacy</a> ·
+                <a href="https://isaral.in/terms-conditions/" target="_blank" rel="noopener">Terms</a>
+            </p>
+        </div>
+    </main>
+</div>
+
+<script>
+(function () {
+    // Auto-focus
+    const company = document.getElementById('company_name');
+    if (company) company.focus();
+
+    // Toggle password visibility
+    function initToggle(btnId, inputId) {
+        const btn = document.getElementById(btnId);
+        const inp = document.getElementById(inputId);
+        btn.addEventListener('click', () => {
+            const show = inp.type === 'password';
+            inp.type = show ? 'text' : 'password';
+            btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        });
+    }
+    initToggle('togglePw1', 'password1');
+    initToggle('togglePw2', 'password2');
+
+    // Password strength
+    const pw1      = document.getElementById('password1');
+    const strength = document.getElementById('pwStrength');
+    const pwTxt    = document.getElementById('pwTxt');
+    const bars     = [1,2,3,4].map(n => document.getElementById('bar' + n));
+
+    const levels = [
+        { cls: 'weak',   label: 'Weak',   color: '#EF4444', n: 1 },
+        { cls: 'fair',   label: 'Fair',   color: '#F59E0B', n: 2 },
+        { cls: 'good',   label: 'Good',   color: '#F59E0B', n: 3 },
+        { cls: 'strong', label: 'Strong', color: '#10B981', n: 4 },
+    ];
+
+    function score(pw) {
+        let s = 0;
+        if (pw.length >= 8) s++;
+        if (/[A-Z]/.test(pw)) s++;
+        if (/[0-9]/.test(pw)) s++;
+        if (/[^A-Za-z0-9]/.test(pw)) s++;
+        return s;
+    }
+
+    pw1.addEventListener('input', () => {
+        const v = pw1.value;
+        if (!v) { strength.style.display = 'none'; return; }
+        strength.style.display = 'block';
+        const lvl = levels[Math.max(1, score(v)) - 1];
+        bars.forEach((b, i) => { b.className = 'pw-bar'; if (i < lvl.n) b.classList.add(lvl.cls); });
+        pwTxt.textContent = lvl.label;
+        pwTxt.style.color = lvl.color;
+        setErr('pw1Wrap', 'pw1Error', true);
+    });
+
+    // Validation
+    const form     = document.getElementById('signupForm');
+    const nameInp  = document.getElementById('full_name');
+    const emailInp = document.getElementById('email');
+    const pw2      = document.getElementById('password2');
+
+    function setErr(wrapId, errId, valid) {
+        document.getElementById(wrapId).classList.toggle('error', !valid);
+        const errEl = document.getElementById(errId);
+        if (errEl) errEl.style.display = valid ? 'none' : 'block';
+    }
+
+    form.addEventListener('submit', e => {
+        const checks = [
+            { inp: company,  wrap: 'companyWrap', err: 'companyError', ok: company.value.trim().length > 0 },
+            { inp: nameInp,  wrap: 'nameWrap',    err: 'nameError',    ok: nameInp.value.trim().length > 0 },
+            { inp: emailInp, wrap: 'emailWrap',   err: 'emailError',   ok: emailInp.value.trim().length > 0 },
+            { inp: pw1,      wrap: 'pw1Wrap',     err: 'pw1Error',     ok: pw1.value.length >= 8 },
+        ];
+        let first = null;
+        checks.forEach(c => { setErr(c.wrap, c.err, c.ok); if (!c.ok && !first) first = c.inp; });
+
+        const match = pw1.value.length > 0 && pw1.value === pw2.value;
+        setErr('pw2Wrap', 'pw2Error', match);
+        if (!match && !first) first = pw2;
+
+        if (first) { e.preventDefault(); first.focus(); }
+    });
+
+    [[company, 'companyWrap', 'companyError'], [nameInp, 'nameWrap', 'nameError'], [emailInp, 'emailWrap', 'emailError']].forEach(([inp, w, e]) => {
+        inp.addEventListener('input', () => setErr(w, e, true));
+    });
+    pw2.addEventListener('input', () => setErr('pw2Wrap', 'pw2Error', true));
+})();
+</script>
+</body>
+</html>

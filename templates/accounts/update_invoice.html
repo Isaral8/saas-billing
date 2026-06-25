@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Invoice — iSaral{% endblock %}
+{% block page_title %}Edit Invoice{% endblock %}
+
+{% block content %}
+<div style="background-color: #f5f7fa; min-height: 100vh; padding: 30px 20px;">
+  <div style="max-width: 900px; margin: 0 auto;">
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 30px;">
+      <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0;">Edit Invoice</h1>
+      <p style="color: #666; font-size: 14px; margin: 8px 0 0 0;">Update invoice details</p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div style="margin-bottom: 16px; padding: 12px 16px; border-radius: 6px; border-left: 4px solid {% if message.tags == 'error' %}#e74c3c{% else %}#27ae60{% endif %}; background: {% if message.tags == 'error' %}#ffe8e8{% else %}#e8f8f5{% endif %}; color: {% if message.tags == 'error' %}#c0392b{% else %}#27ae60{% endif %}; font-size: 13px;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Container -->
+    <form method="POST" style="background: white; border-radius: 10px; border: 1px solid #e8e8e8; padding: 30px;">
+      {% csrf_token %}
+
+      <!-- Form Title -->
+      <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0 0 20px 0;">Invoice Details</h3>
+
+      <!-- Customer Section -->
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">Customer *</label>
+        <select name="customer" id="id_customer" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
+          <option value="">-- Select Customer --</option>
+          {% for customer in customers %}
+            <option value="{{ customer.id }}" {% if form.customer.value == customer.id %}selected{% endif %}>{{ customer.name }} ({{ customer.email }})</option>
+          {% endfor %}
+        </select>
+        {% if form.customer.errors %}
+          <span style="color: #e74c3c; font-size: 12px; margin-top: 4px; display: block;">{{ form.customer.errors.0 }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Invoice Number & Dates Row -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+        <!-- Invoice Number -->
+        <div>
+          <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">Invoice Number *</label>
+          <input type="text" name="invoice_number" value="{{ invoice.invoice_number }}" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;" readonly>
+        </div>
+        <!-- Issued Date -->
+        <div>
+          <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">Issued Date *</label>
+          <input type="date" name="issued_date" value="{{ invoice.issued_date|date:'Y-m-d' }}" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+        </div>
+        <!-- Due Date -->
+        <div>
+          <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">Due Date</label>
+          <input type="date" name="due_date" value="{{ invoice.due_date|date:'Y-m-d' }}" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <!-- Amount Section -->
+      <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 30px 0 20px 0;">Amount Details</h3>
+
+      <!-- Subtotal, GST, Total Row -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+        <!-- Subtotal -->
+        <div>
+          <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">Subtotal (₹) *</label>
+          <input type="number" id="id_subtotal" name="subtotal" value="{{ invoice.subtotal }}" step="0.01" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+        </div>
+        <!-- GST Rate -->
+        <div>
+          <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">GST Rate (%) *</label>
+          <input type="number" id="id_gst_rate" name="gst_rate" value="{{ invoice.gst_rate }}" step="0.01" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+        </div>
+        <!-- GST Amount (Read-only) -->
+        <div>
+          <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">GST Amount (₹)</label>
+          <input type="number" id="id_gst_amount" name="gst_amount" value="{{ invoice.gst_amount }}" step="0.01" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 14px; background: #f8f9fa; color: #999; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <!-- Total Amount Row -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px;">
+        <div></div>
+        <div>
+          <label style="display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; font-size: 14px;">Total Amount (₹) *</label>
+          <input type="number" id="id_total" name="total" value="{{ invoice.total }}" step="0.01" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; font-weight: 600; color: #0066cc; background: #f0f7ff; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <!-- Status Section -->
+      <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 30px 0 20px 0;">Invoice Status</h3>
+
+      <!-- Status -->
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; font-weight: 500; color: #333; margin-bottom: 8px; font-size: 14px;">Status *</label>
+        <select name="status" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
+          <option value="draft" {% if invoice.status == 'draft' %}selected{% endif %}>Draft</option>
+          <option value="issued" {% if invoice.status == 'issued' %}selected{% endif %}>Issued</option>
+          <option value="paid" {% if invoice.status == 'paid' %}selected{% endif %}>Paid</option>
+          <option value="overdue" {% if invoice.status == 'overdue' %}selected{% endif %}>Overdue</option>
+          <option value="cancelled" {% if invoice.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+
+      <!-- Form Actions -->
+      <div style="display: flex; gap: 12px; margin-top: 30px; padding-top: 24px; border-top: 1px solid #e8e8e8;">
+        <button type="submit" style="background: #0066cc; color: white; padding: 11px 24px; border-radius: 6px; border: none; font-weight: 500; font-size: 14px; cursor: pointer;">
+          💾 Update Invoice
+        </button>
+        <a href="{% url 'accounts:invoices' %}" style="display: inline-flex; align-items: center; background: #f0f2f5; color: #1a1a1a; padding: 11px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">
+          Cancel
+        </a>
+        <button type="button" onclick="if(confirm('Delete this invoice?')) { document.getElementById('delete-form').submit(); }" style="background: #ffe8e8; color: #e74c3c; padding: 11px 24px; border-radius: 6px; border: none; font-weight: 500; font-size: 14px; cursor: pointer; margin-left: auto;">
+          🗑️ Delete Invoice
+        </button>
+      </div>
+    </form>
+
+    <!-- Delete Form (Hidden) -->
+    <form id="delete-form" method="POST" action="{% url 'accounts:delete_invoice' invoice.id %}" style="display: none;">
+      {% csrf_token %}
+    </form>
+
+  </div>
+</div>
+
+<!-- Auto-calculate GST Amount and Total -->
+<script>
+  const subtotalInput = document.getElementById('id_subtotal');
+  const gstRateInput = document.getElementById('id_gst_rate');
+  const gstAmountInput = document.getElementById('id_gst_amount');
+  const totalInput = document.getElementById('id_total');
+
+  function calculateGST() {
+    const subtotal = parseFloat(subtotalInput.value) || 0;
+    const gstRate = parseFloat(gstRateInput.value) || 0;
+    const gstAmount = (subtotal * gstRate) / 100;
+    const total = subtotal + gstAmount;
+
+    gstAmountInput.value = gstAmount.toFixed(2);
+    totalInput.value = total.toFixed(2);
+  }
+
+  subtotalInput.addEventListener('input', calculateGST);
+  gstRateInput.addEventListener('input', calculateGST);
+</script>
+
+{% endblock %}

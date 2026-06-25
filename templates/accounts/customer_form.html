@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}{% if is_edit %}Edit Customer{% else %}Add New Customer{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+    /* ── FORM PAGE STYLES ──────────────────────────────────────────── */
+    .form-header {
+        margin-bottom: 32px;
+    }
+
+    .form-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0F172A;
+        letter-spacing: -0.4px;
+        margin-bottom: 8px;
+    }
+
+    .form-header p {
+        font-size: 14px;
+        color: #64748B;
+    }
+
+    /* ── FORM CONTAINER ────────────────────────────────────────────── */
+    .form-container {
+        max-width: 700px;
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-section {
+        margin-bottom: 28px;
+    }
+
+    .form-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0F172A;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #E2E8F0;
+    }
+
+    /* ── FORM FIELDS ────────────────────────────────────────────────── */
+    .field {
+        margin-bottom: 20px;
+    }
+
+    .field:last-child {
+        margin-bottom: 0;
+    }
+
+    .field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1F2937;
+        margin-bottom: 8px;
+        letter-spacing: 0.2px;
+    }
+
+    .field-required::after {
+        content: ' *';
+        color: #DC2626;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 8px;
+        background: #FAFCFF;
+        font-size: 14px;
+        font-weight: 500;
+        color: #0F172A;
+        outline: none;
+        transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+        font-family: inherit;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+        color: #94A3B8;
+        font-weight: 400;
+    }
+
+    .field input:hover:not(:focus),
+    .field textarea:hover:not(:focus),
+    .field select:hover:not(:focus) {
+        border-color: #B8CFE8;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+        border-color: #1A56DB;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* ── CHECKBOX FIELD ────────────────────────────────────────────── */
+    .field-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .field-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .field-checkbox label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    /* ── FORM ROWS ─────────────────────────────────────────────────── */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── FORM ACTIONS ──────────────────────────────────────────────── */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #E2E8F0;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: #1A56DB;
+        color: white;
+        flex: 1;
+        box-shadow: 0 1px 3px rgba(12,26,46,0.12), 0 4px 14px rgba(26,86,219,0.3);
+    }
+
+    .btn-primary:hover {
+        background: #1143B0;
+        box-shadow: 0 2px 6px rgba(12,26,46,0.15), 0 6px 20px rgba(26,86,219,0.38);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #1F2937;
+        border: 1.5px solid #E2E8F0;
+        flex: 1;
+    }
+
+    .btn-secondary:hover {
+        border-color: #B8CFE8;
+        background: #FAFCFF;
+        box-shadow: 0 2px 8px rgba(12,26,46,0.06);
+    }
+
+    /* ── FIELD ERRORS ──────────────────────────────────────────────── */
+    .field-error {
+        color: #DC2626;
+        font-size: 13px;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .field.has-error input,
+    .field.has-error textarea,
+    .field.has-error select {
+        border-color: #FCA5A5;
+        background: #FEF2F2;
+    }
+
+    .field.has-error input:focus,
+    .field.has-error textarea:focus,
+    .field.has-error select:focus {
+        border-color: #DC2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    /* ── HELP TEXT ──────────────────────────────────────────────────── */
+    .field-help {
+        font-size: 12px;
+        color: #64748B;
+        margin-top: 6px;
+    }
+
+    /* ── DIVIDER ────────────────────────────────────────────────────── */
+    .form-divider {
+        height: 1px;
+        background: #E2E8F0;
+        margin: 24px 0;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Header Section -->
+<div class="form-header">
+    <h1>{% if is_edit %}Edit Customer{{ customer.name|add:" - " }}{% else %}Add New Customer{% endif %}</h1>
+    <p>{% if is_edit %}Update customer information{% else %}Create a new customer in your system{% endif %}</p>
+</div>
+
+<!-- Form Container -->
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Contact Information Section -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-person" style="margin-right: 8px;"></i>Contact Information
+            </div>
+
+            <!-- Name & Email Row -->
+            <div class="form-row">
+                <div class="field">
+                    <label for="id_name" class="field-required">Customer Name</label>
+                    <input type="text" 
+                           id="id_name" 
+                           name="name" 
+                           placeholder="Full name"
+                           value="{{ customer.name|default:'' }}"
+                           required>
+                    {% if form.name.errors %}
+                        <span class="field-error">{{ form.name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_email" class="field-required">Email Address</label>
+                    <input type="email" 
+                           id="id_email" 
+                           name="email" 
+                           placeholder="customer@example.com"
+                           value="{{ customer.email|default:'' }}"
+                           required>
+                    {% if form.email.errors %}
+                        <span class="field-error">{{ form.email.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Phone & Company Row -->
+            <div class="form-row">
+                <div class="field">
+                    <label for="id_phone">Phone Number</label>
+                    <input type="tel" 
+                           id="id_phone" 
+                           name="phone" 
+                           placeholder="+91 98765 43210"
+                           value="{{ customer.phone|default:'' }}">
+                    <span class="field-help">Include country code for international numbers</span>
+                </div>
+
+                <div class="field">
+                    <label for="id_company">Company Name</label>
+                    <input type="text" 
+                           id="id_company" 
+                           name="company" 
+                           placeholder="Company or organization name"
+                           value="{{ customer.company|default:'' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- GST & Location Section -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-map" style="margin-right: 8px;"></i>Tax & Location
+            </div>
+
+            <!-- GSTIN & State Row -->
+            <div class="form-row">
+                <div class="field">
+                    <label for="id_gstin">GSTIN (Optional)</label>
+                    <input type="text" 
+                           id="id_gstin" 
+                           name="gstin" 
+                           placeholder="27AABCR1234G1Z0"
+                           value="{{ customer.gstin|default:'' }}"
+                           maxlength="15">
+                    <span class="field-help">15-digit GST number for GST-compliant invoices</span>
+                </div>
+
+                <div class="field">
+                    <label for="id_state">State</label>
+                    <input type="text" 
+                           id="id_state" 
+                           name="state" 
+                           placeholder="e.g. Karnataka, Mumbai, Delhi"
+                           value="{{ customer.state|default:'' }}">
+                    <span class="field-help">For CGST/SGST calculation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address & Notes Section -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-file-text" style="margin-right: 8px;"></i>Additional Details
+            </div>
+
+            <!-- Address -->
+            <div class="field">
+                <label for="id_address">Address</label>
+                <textarea id="id_address" 
+                          name="address" 
+                          placeholder="Full mailing address...">{{ customer.address|default:'' }}</textarea>
+                <span class="field-help">Include street, building, zip code</span>
+            </div>
+
+            <!-- Notes -->
+            <div class="field">
+                <label for="id_notes">Notes</label>
+                <textarea id="id_notes" 
+                          name="notes" 
+                          placeholder="Special instructions, credit terms, payment preferences, etc.">{{ customer.notes|default:'' }}</textarea>
+                <span class="field-help">Internal notes visible only to your team</span>
+            </div>
+
+            <!-- Active Status -->
+            <div class="field">
+                <div class="field-checkbox">
+                    <input type="checkbox" 
+                           id="id_is_active" 
+                           name="is_active" 
+                           {% if is_edit and customer.is_active %}checked{% elif not is_edit %}checked{% endif %}>
+                    <label for="id_is_active">Mark as Active</label>
+                </div>
+                <span class="field-help">Inactive customers won't appear in invoice creation</span>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i>
+                {% if is_edit %}Update Customer{% else %}Create Customer{% endif %}
+            </button>
+            <a href="{% url 'accounts:customer_list' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Form validation feedback
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const nameInput = document.getElementById('id_name');
+        const emailInput = document.getElementById('id_email');
+
+        if (!nameInput.value.trim()) {
+            e.preventDefault();
+            alert('Please enter customer name');
+            nameInput.focus();
+            return false;
+        }
+
+        if (!emailInput.value.trim() || !emailInput.value.includes('@')) {
+            e.preventDefault();
+            alert('Please enter a valid email address');
+            emailInput.focus();
+            return false;
+        }
+    });
+</script>
+
+{% endblock %}

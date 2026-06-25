@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ── ACCOUNTS GRID ──────────────────────── */
+    .accounts-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-header h1 {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--ink);
+        letter-spacing: -.4px;
+        margin-bottom: 8px;
+    }
+
+    .page-header p {
+        font-size: 14px;
+        color: var(--ink-4);
+    }
+
+    /* ── CARDS ──────────────────────────────── */
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 20px;
+        box-shadow: var(--shadow-card);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .card-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -.2px;
+    }
+
+    .card-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: var(--blue);
+        color: #fff;
+        border: none;
+        border-radius: var(--r-md);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .18s;
+        text-decoration: none;
+    }
+
+    .card-action:hover {
+        background: var(--blue-d);
+    }
+
+    /* ── TABLES ─────────────────────────────── */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+    }
+
+    th {
+        padding: 12px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink-4);
+        letter-spacing: .4px;
+        text-transform: uppercase;
+    }
+
+    td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-l);
+        font-size: 13px;
+        color: var(--ink-3);
+    }
+
+    tbody tr:hover {
+        background: var(--bg);
+    }
+
+    /* ── FORMS ──────────────────────────────── */
+    .field {
+        margin-bottom: 18px;
+    }
+
+    .field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink-2);
+        margin-bottom: 7px;
+    }
+
+    .field-wrap {
+        position: relative;
+    }
+
+    .field-wrap input,
+    .field-wrap textarea,
+    .field-wrap select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-md);
+        background: #FAFCFF;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        outline: none;
+        transition: border-color .18s, box-shadow .18s, background .18s;
+        font-family: inherit;
+    }
+
+    .field-wrap input::placeholder,
+    .field-wrap textarea::placeholder {
+        color: var(--ink-5);
+        font-weight: 400;
+    }
+
+    .field-wrap input:hover:not(:focus),
+    .field-wrap textarea:hover:not(:focus),
+    .field-wrap select:hover:not(:focus) {
+        border-color: #B8CFE8;
+    }
+
+    .field-wrap input:focus,
+    .field-wrap textarea:focus,
+    .field-wrap select:focus {
+        border-color: var(--blue);
+        background: #fff;
+        box-shadow: var(--shadow-input);
+    }
+
+    /* ── BUTTONS ────────────────────────────── */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: var(--r-md);
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .18s;
+        text-decoration: none;
+        letter-spacing: .1px;
+    }
+
+    .btn-primary {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 1px 3px rgba(12,26,46,.12), 0 4px 14px rgba(26,86,219,.3);
+    }
+
+    .btn-primary:hover {
+        background: var(--blue-d);
+        box-shadow: 0 2px 6px rgba(12,26,46,.15), 0 6px 20px rgba(26,86,219,.38);
+    }
+
+    .btn-secondary {
+        background: #fff;
+        color: var(--ink-2);
+        border: 1.5px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+        border-color: #B8CFE8;
+        background: #FAFCFF;
+        box-shadow: 0 2px 8px rgba(12,26,46,.06);
+    }
+
+    /* ── EMPTY STATE ────────────────────────── */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        color: var(--ink-5);
+        margin-bottom: 16px;
+    }
+
+    .empty-state h2 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        color: var(--ink-4);
+        margin-bottom: 20px;
+    }
+
+    /* ── USER DROPDOWN ──────────────────────── */
+    .user-dropdown {
+        position: relative;
+    }
+
+    .user-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        background: none;
+        cursor: pointer;
+    }
+
+   .user-btn img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+}
+.user-btn .user-initial {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #1d4ed8;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    border: 2px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+    .dropdown-menu {
+        position: absolute;
+        top: 55px;
+        right: 0;
+        width: 220px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.12);
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: .3s;
+        z-index: 9999;
+    }
+
+    .user-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-menu a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 18px;
+        color: #333;
+        text-decoration: none;
+        transition: .3s;
+    }
+
+    .dropdown-menu a:hover {
+        background: #f5f7ff;
+        color: #2563eb;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 20px;
+        }
+
+        .card-header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .card-action {
+            width: 100%;
+            justify-content: center;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 10px 8px;
+        }
+    }
+</style>
+
+<!-- User Dropdown -->
+<!-- User Dropdown -->
+<div class="user-dropdown">
+    <button class="user-btn">
+        {% if user.profile_photo %}
+            <img src="{{ user.profile_photo.url }}"
+                 alt="{{ user.get_full_name }}"
+                 style="width:42px;height:42px;border-radius:50%;
+                        object-fit:cover;border:2px solid #e5e7eb;">
+      {% else %}
+            <div style="width:42px;height:42px;border-radius:50%;
+                        background:#1d4ed8;
+                        display:flex;align-items:center;justify-content:center;
+                        border:2px solid #e5e7eb;flex-shrink:0;">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 24 24"
+                     width="24" height="24"
+                     fill="#ffffff">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+            </div>
+        {% endif %}
+        <i class="fas fa-chevron-down" style="font-size:11px;color:#6b7280;"></i>
+    </button>
+    <div class="dropdown-menu">
+      <a href="{% url 'accounts:settings' %}">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+        <a href="{% url 'accounts:settings' %}">
+            <i class="fas fa-cog"></i>
+            Account Preferences
+        </a>
+        <a href="{% url 'accounts:logout' %}">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+</div>
+
+<div class="accounts-wrapper">
+    {% block accounts_content %}{% endblock %}
+</div>
+
+{% endblock %}

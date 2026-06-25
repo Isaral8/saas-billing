@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Support Ticket — iSaral{% endblock %}
+{% block content %}
+<div style="padding: 40px 20px; background: #f8f9fa; min-height: 100vh;">
+  <div style="max-width: 700px; margin: 0 auto; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h1 style="font-size: 28px; font-weight: 700; color: #1a56db; margin-bottom: 8px;">Create Support Ticket</h1>
+    <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">Get help from our support team. We'll respond within 24 hours.</p>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid {% if message.tags == 'error' %}#dc2626{% else %}#16a34a{% endif %}; background: {% if message.tags == 'error' %}#fef2f2{% else %}#f0fdf4{% endif %}; color: {% if message.tags == 'error' %}#991b1b{% else %}#15803d{% endif %};">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" style="display: flex; flex-direction: column; gap: 24px;">
+      {% csrf_token %}
+
+      <!-- Product / Service (from form) -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Product / Service *</label>
+        {{ form.product }}
+        {% if form.product.errors %}<span style="color: #dc2626; font-size: 12px; margin-top: 4px; display: block;">{{ form.product.errors.0 }}</span>{% endif %}
+      </div>
+
+      <!-- Tally Serial Number (conditional) -->
+      <div id="sno-group" style="display: none;">
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Tally Serial Number</label>
+        <input type="text" name="tally_sno" id="id_tally_sno" placeholder="e.g., TSL-xxxxxx" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+      </div>
+
+      <!-- Other Product Name (conditional) -->
+      <div id="other-product-group" style="display: none;">
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Please specify the product / issue *</label>
+        <input type="text" name="other_product_name" id="id_other_product_name" placeholder="e.g., Integration, Feature Request" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+      </div>
+
+      <!-- Subject -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Subject *</label>
+        <input type="text" name="subject" id="id_subject" required placeholder="Brief description of your issue" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        {% if form.subject.errors %}<span style="color: #dc2626; font-size: 12px; margin-top: 4px; display: block;">{{ form.subject.errors.0 }}</span>{% endif %}
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Description *</label>
+        <textarea name="description" id="id_description" required rows="6" placeholder="Provide detailed information about your issue" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: monospace;"></textarea>
+        {% if form.description.errors %}<span style="color: #dc2626; font-size: 12px; margin-top: 4px; display: block;">{{ form.description.errors.0 }}</span>{% endif %}
+      </div>
+
+      <!-- Priority -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Priority *</label>
+        <select name="priority" id="id_priority" required style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          <option value="">-- Select priority --</option>
+          <option value="low">🟢 Low - Can wait</option>
+          <option value="medium" selected>🟡 Medium - Needs attention soon</option>
+          <option value="high">🔴 High - Urgent</option>
+        </select>
+      </div>
+
+      <!-- Customer Name -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Full Name *</label>
+        <input type="text" name="customer_name" id="id_customer_name" required placeholder="Your full name" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        {% if form.customer_name.errors %}<span style="color: #dc2626; font-size: 12px; margin-top: 4px; display: block;">{{ form.customer_name.errors.0 }}</span>{% endif %}
+      </div>
+
+      <!-- Customer Email -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Email Address *</label>
+        <input type="email" name="customer_email" id="id_customer_email" required placeholder="your@company.com" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        {% if form.customer_email.errors %}<span style="color: #dc2626; font-size: 12px; margin-top: 4px; display: block;">{{ form.customer_email.errors.0 }}</span>{% endif %}
+      </div>
+
+      <!-- Customer Mobile -->
+      <div>
+        <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 14px;">Phone Number (optional)</label>
+        <input type="tel" name="customer_mobile" id="id_customer_mobile" placeholder="9876543210" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+      </div>
+
+      <!-- Pro Tip -->
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 6px; font-size: 13px;">
+        <strong>Pro Tip:</strong> Provide product serial numbers and detailed error messages to help us resolve faster!
+      </div>
+
+      <!-- Buttons -->
+      <div style="display: flex; gap: 12px;">
+        <button type="submit" style="flex: 1; background: #1a56db; color: white; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none;">✓ Create Ticket</button>
+        <a href="{% url 'accounts:tickets' %}" style="flex: 1; background: #e5e7eb; color: #374151; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; text-align: center;">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const productSelect = document.getElementById('id_product');
+  const snoGroup = document.getElementById('sno-group');
+  const otherProductGroup = document.getElementById('other-product-group');
+
+  function updateFieldVisibility() {
+    const value = productSelect.value;
+   snoGroup.style.display = (value === 'tally_prime') ? 'block' : 'none';
+    otherProductGroup.style.display = value === 'others' ? 'block' : 'none';
+  }
+
+  productSelect.addEventListener('change', updateFieldVisibility);
+  updateFieldVisibility();
+});
+</script>
+{% endblock %}

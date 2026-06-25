@@ -1,0 +1,1823 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="iSaral — India's #1 GST Billing, CRM, Order Management & Customer Support software for Indian SMEs. 100% GST-compliant invoices, Razorpay payments, UPI collection. Trusted by 5,000+ businesses. Start free today.">
+  <meta name="keywords" content="GST billing software India, GST invoice software, CRM for Indian SMEs, billing software India, Razorpay billing, UPI payment software, customer support software India, order management India, small business software India, saas billing India">
+  <meta name="author" content="iSaral Business Solutions Pvt. Ltd.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="iSaral — Smart GST Billing & Business Software for Indian SMEs">
+  <meta property="og:description" content="GST billing, CRM, order management, Razorpay payments and support tickets — all in one platform built for Indian businesses.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.isaral.in">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="iSaral — GST Billing & Business Software for India">
+  <meta name="twitter:description" content="India's leading all-in-one GST billing, CRM, and customer support software for SMEs.">
+  <link rel="canonical" href="https://www.isaral.in">
+  <title>iSaral — GST Billing & Business Software for Indian SMEs | CRM, Orders, Support</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "iSaral",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "All-in-one GST billing, CRM, order management and customer support software for Indian SMEs.",
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "INR",
+      "lowPrice": "999",
+      "highPrice": "4999"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "1200"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════ */
+    :root {
+      --primary:       #1A56DB;
+      --primary-dark:  #1143B0;
+      --primary-light: #EBF2FF;
+      --primary-mid:   #BDD3FF;
+      --accent:        #FF5C28;
+      --accent-light:  #FFF0EB;
+      --green:         #0BA759;
+      --green-light:   #DCFCE7;
+      --orange:        #F59E0B;
+      --red:           #EF4444;
+      --text:          #0F1B2D;
+      --text-2:        #1E2F45;
+      --text-3:        #2D4563;
+      --text-4:        #5A6D82;
+      --text-5:        #8B96A8;
+      --border:        #E0E9F2;
+      --border-2:      #F2F7FB;
+      --bg:            #FFFFFF;
+      --bg-2:          #F5F9FE;
+      --bg-3:          #EBF2FF;
+      --bg-dark:       #0B1622;
+      --bg-dark-2:     #132033;
+      --max-w:         1240px;
+      --r-sm:          6px;
+      --r-md:          10px;
+      --r-lg:          16px;
+      --r-xl:          24px;
+      --topbar-h:      40px;
+      --nav-h:         68px;
+      --shadow-sm:     0 1px 3px rgba(15,27,45,0.06), 0 1px 2px rgba(15,27,45,0.04);
+      --shadow-md:     0 4px 16px rgba(15,27,45,0.08), 0 2px 6px rgba(15,27,45,0.05);
+      --shadow-lg:     0 16px 48px rgba(15,27,45,0.10), 0 6px 16px rgba(15,27,45,0.06);
+    }
+
+    /* ═══════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+      font-size: 16px;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ═══════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════ */
+.wrap {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+    .section { padding: 88px 0; }
+    .section-sm { padding: 60px 0; }
+    .bg-gray { background: var(--bg-2); }
+    .bg-dark { background: var(--bg-dark); }
+
+    /* ═══════════════════════════════════════
+       TYPOGRAPHY
+    ═══════════════════════════════════════ */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 800; color: var(--primary);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 14px;
+      background: var(--primary-light);
+      padding: 6px 16px; border-radius: 50px;
+      border: 1px solid var(--primary-mid);
+    }
+    .h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -1.5px; color: var(--text);
+    }
+    .h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -1px; color: var(--text);
+    }
+    .h3 { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      font-size: 26px; 
+      font-weight: 900; 
+      line-height: 1.3; 
+      color: var(--text); 
+    }
+    .lead { 
+      font-size: 17px; 
+      font-weight: 500;
+      color: var(--text-2); 
+      line-height: 1.75; 
+    }
+    .body-text { 
+      font-size: 15px; 
+      font-weight: 500;
+      color: var(--text-2); 
+      line-height: 1.8; 
+    }
+    .center { text-align: center; }
+    .max-660 { max-width: 660px; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+
+    /* ═══════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 24px; border-radius: var(--r-md);
+      font-size: 15px; font-weight: 800; line-height: 1;
+      transition: all 0.18s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap; cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--primary); color: #fff;
+      box-shadow: 0 2px 10px rgba(26,86,219,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark); color: #fff;
+      box-shadow: 0 6px 22px rgba(26,86,219,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #fff; color: var(--text-2);
+      border: 1.5px solid var(--border);
+      font-weight: 700;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-accent {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 2px 10px rgba(255,92,40,0.3);
+    }
+    .btn-accent:hover {
+      background: #e64d1e; color: #fff;
+      box-shadow: 0 6px 22px rgba(255,92,40,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-lg { 
+      padding: 14px 32px; 
+      font-size: 16px; 
+      font-weight: 800;
+      border-radius: var(--r-lg); 
+    }
+    .btn-ghost { 
+      color: var(--text-2); 
+      padding: 12px 18px; 
+      font-weight: 700; 
+    }
+    .btn-ghost:hover { color: var(--primary); background: var(--primary-light); }
+    .btn-outline-white { border: 1.5px solid rgba(255,255,255,0.4); color: #fff; background: rgba(255,255,255,0.08); }
+    .btn-outline-white:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* ═══════════════════════════════════════
+       ANNOUNCEMENT BAR
+    ═══════════════════════════════════════ */
+    .announcement-bar {
+      background: linear-gradient(90deg, var(--primary-dark), #2563EB, var(--primary-dark));
+      background-size: 200% 100%;
+      animation: slide-bg 6s linear infinite;
+      padding: 8px 24px; text-align: center;
+      font-size: 13px; font-weight: 600; color: #fff;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      position: relative; z-index: 1001;
+    }
+    @keyframes slide-bg {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .announcement-bar a { color: #FDE68A; text-decoration: underline; }
+    .announcement-bar .ann-badge {
+      background: rgba(255,255,255,0.2); border-radius: 50px;
+      padding: 2px 10px; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .ann-close {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .ann-close:hover { color: #fff; }
+
+    /* ═══════════════════════════════════════
+       TOP BAR
+    ═══════════════════════════════════════ */
+    .topbar {
+      height: var(--topbar-h);
+      background: var(--bg-dark);
+      display: flex; align-items: center;
+      position: sticky; top: 0; z-index: 1000;
+    }
+    .topbar-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 20px; }
+    .topbar-item {
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7);
+      display: flex; align-items: center; gap: 6px; transition: color 0.15s;
+    }
+    .topbar-item:hover { color: #fff; }
+    .topbar-item svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .topbar-div { width: 1px; height: 14px; background: rgba(255,255,255,0.12); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-badge {
+      font-size: 12px; font-weight: 900; color: var(--bg-dark);
+      background: var(--accent); padding: 3px 12px; border-radius: 50px;
+    }
+    .topbar-links { display: flex; gap: 14px; }
+    .topbar-links a { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); transition: color 0.15s; }
+    .topbar-links a:hover { color: #fff; }
+
+    /* ═══════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════ */
+    .navbar {
+      position: sticky;
+      top: var(--topbar-h);
+      z-index: 999;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: var(--nav-h);
+      transition: box-shadow 0.2s;
+    }
+    .navbar.scrolled { box-shadow: var(--shadow-md); }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+      height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .nav-logo img { height: 48px; width: auto; object-fit: contain; }
+    .nav-logo-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 24px; font-weight: 900; color: var(--text);
+      letter-spacing: -0.7px;
+    }
+    .nav-logo-text span { color: var(--primary); }
+    .nav-links {
+      display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center;
+    }
+    .nav-item { position: relative; }
+    .nav-item > a, .nav-item > button {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 15px; border-radius: var(--r-sm);
+      font-size: 15px; font-weight: 700; color: var(--text-2);
+      transition: all 0.15s; background: none; border: none;
+    }
+    .nav-item > a:hover, .nav-item > button:hover { background: var(--bg-2); color: var(--text); }
+    .nav-item > a.active, .nav-item > button.active { color: var(--primary); font-weight: 800; }
+    .nav-chevron { width: 14px; height: 14px; transition: transform 0.2s; }
+    .nav-item:hover .nav-chevron { transform: rotate(180deg); }
+    .nav-dropdown {
+      position: absolute; top: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: 8px;
+      min-width: 260px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0; pointer-events: none;
+      transition: all 0.2s ease; z-index: 500;
+    }
+    .nav-item:hover .nav-dropdown { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: var(--r-md); transition: background 0.15s; cursor: pointer;
+    }
+    .dropdown-item:hover { background: var(--bg-2); }
+    .dropdown-icon {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .dropdown-text strong { display: block; font-size: 14px; font-weight: 800; color: var(--text); }
+    .dropdown-text span { font-size: 13px; color: var(--text-4); font-weight: 500; }
+    .nav-ctas { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      padding: 9px; border-radius: var(--r-sm); cursor: pointer;
+      background: var(--bg-2);
+    }
+    .nav-hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px; transition: all 0.25s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed;
+      top: calc(var(--topbar-h) + var(--nav-h));
+      left: 0; right: 0; bottom: 0;
+      background: #fff; overflow-y: auto;
+      padding: 20px 20px 48px; z-index: 998;
+      flex-direction: column; gap: 2px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mob-label {
+      font-size: 12px; font-weight: 800; color: var(--text-5);
+      text-transform: uppercase; letter-spacing: 1.2px;
+      margin: 20px 0 8px 12px;
+    }
+    .mob-label:first-child { margin-top: 6px; }
+    .mobile-menu a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px; border-radius: var(--r-lg);
+      font-size: 15px; font-weight: 700; color: var(--text-2);
+      transition: background 0.15s;
+    }
+    .mobile-menu a:hover { background: var(--bg-2); }
+    .mob-divider { height: 1px; background: var(--border); margin: 14px 0; }
+    .mob-ctas { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .mob-ctas .btn { justify-content: center; padding: 14px; font-size: 16px; font-weight: 800; }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    .hero {
+      padding: 80px 0 0;
+      background: linear-gradient(155deg, #EBF2FF 0%, #FFFFFF 55%);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden; position: relative;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -220px; right: -180px;
+      width: 680px; height: 680px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,86,219,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: 0; left: -100px;
+      width: 500px; height: 200px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,92,40,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; }
+    .hero-content { max-width: 760px; margin: 0 auto; text-align: center; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fff; color: var(--primary);
+      font-size: 12px; font-weight: 700;
+      padding: 6px 16px 6px 8px; border-radius: 50px;
+      margin-bottom: 28px;
+      border: 1px solid var(--primary-mid);
+      box-shadow: var(--shadow-sm);
+    }
+    .badge-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+      animation: pulse-g 2.5s infinite;
+    }
+    @keyframes pulse-g {
+      0%,100% { opacity:1; transform:scale(1); box-shadow: 0 0 0 0 rgba(11,167,89,0.4); }
+      50% { opacity:0.8; transform:scale(0.9); box-shadow: 0 0 0 5px rgba(11,167,89,0); }
+    }
+    .hero-title { margin-bottom: 22px; }
+    .hero-title .blue { color: var(--primary); }
+    .hero-title .orange { color: var(--accent); }
+    .hero-sub {
+      color: var(--text-3); font-size: 18px; line-height: 1.75;
+      margin-bottom: 38px; max-width: 580px; margin-left: auto; margin-right: auto;
+    }
+    .hero-actions {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .hero-trust {
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      flex-wrap: wrap; font-size: 13px; color: var(--text-4);
+    }
+    .trust-item { display: flex; align-items: center; gap: 5px; }
+    .trust-check { color: var(--green); font-weight: 800; font-size: 13px; }
+    .hero-stats {
+      display: flex; align-items: stretch; justify-content: center;
+      margin-top: 52px;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--r-xl); overflow: hidden;
+      max-width: 740px; margin-left: auto; margin-right: auto;
+      box-shadow: var(--shadow-md);
+    }
+    .stat-item { flex: 1; padding: 24px 20px; text-align: center; position: relative; }
+    .stat-item + .stat-item::before {
+      content: ''; position: absolute; left: 0; top: 20%; height: 60%;
+      width: 1px; background: var(--border);
+    }
+    .stat-num {
+      font-family: 'Nunito', sans-serif;
+      font-size: 32px; font-weight: 900; color: var(--text);
+      letter-spacing: -1.5px; line-height: 1; margin-bottom: 6px;
+    }
+    .stat-num span { font-size: 18px; color: var(--primary); }
+    .stat-lbl { font-size: 12px; color: var(--text-4); font-weight: 500; }
+
+    /* Hero App Preview */
+    .hero-app {
+      margin-top: 52px; position: relative;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      overflow: hidden;
+      max-width: 900px; margin-left: auto; margin-right: auto;
+      box-shadow: 0 -4px 40px rgba(26,86,219,0.08), 0 0 0 1px var(--border);
+    }
+    .app-topbar {
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 12px 18px; display: flex; align-items: center; gap: 8px;
+    }
+    .app-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .app-layout { display: grid; grid-template-columns: 200px 1fr; min-height: 320px; }
+    .app-sidebar {
+      background: #fff; border-right: 1px solid var(--border);
+      padding: 14px 10px;
+    }
+    .app-sb-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-radius: var(--r-md);
+      font-size: 12px; font-weight: 600; color: var(--text-2);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .app-sb-item.active { background: var(--primary-light); color: var(--primary); }
+    .app-main { padding: 18px; }
+    .app-cards-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+    .app-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 14px;
+    }
+    .app-card-label { font-size: 11px; color: var(--text-4); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+    .app-card-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -0.7px;
+    }
+    .app-card-num span { font-size: 12px; color: var(--green); font-weight: 800; }
+    .app-table { background: #fff; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+    .app-table-head { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; padding: 12px 16px; background: var(--bg-2); }
+    .app-th { font-size: 11px; font-weight: 800; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.6px; }
+    .app-table-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; padding: 12px 16px; border-top: 1px solid var(--border-2); }
+    .app-td { font-size: 13px; color: var(--text-2); font-weight: 600; }
+    .pill {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px;
+    }
+    .pill-g { background: var(--green-light); color: #065F46; }
+    .pill-o { background: #FEF3C7; color: #92400E; }
+    .pill-b { background: var(--primary-light); color: var(--primary-dark); }
+
+    /* ═══════════════════════════════════════
+       TRUSTED LOGOS
+    ═══════════════════════════════════════ */
+    .trusted { padding: 44px 0; border-bottom: 1px solid var(--border); overflow: hidden; }
+    .trusted-label {
+      font-size: 12px; font-weight: 700; color: var(--text-5);
+      text-transform: uppercase; letter-spacing: 1.2px;
+      text-align: center; margin-bottom: 28px;
+    }
+    .trusted-track {
+      display: flex; gap: 48px;
+      animation: marquee 22s linear infinite;
+      width: max-content;
+    }
+    .trusted-logos-wrap {
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .trusted-logo {
+      font-size: 13px; font-weight: 700; color: var(--text);
+      opacity: 0.7; display: flex; align-items: center; gap: 8px;
+      transition: opacity 0.2s; white-space: nowrap;
+    }
+    .trusted-logo:hover { opacity: 0.95; }
+    .logo-sq { width: 26px; height: 26px; border-radius: 6px; background: var(--bg-3); flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════
+       FEATURE HIGHLIGHTS BAND
+    ═══════════════════════════════════════ */
+    .highlights { padding: 52px 0; border-bottom: 1px solid var(--border); background: #fff; }
+    .highlights-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+    .hl-item {
+      padding: 28px 28px; text-align: center;
+      border-right: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .hl-item:last-child { border-right: none; }
+    .hl-item:hover { background: var(--bg-2); }
+    .hl-icon {
+      font-size: 32px; margin-bottom: 12px;
+      filter: drop-shadow(0 2px 4px rgba(26,86,219,0.15));
+      transition: transform 0.2s;
+    }
+    .hl-item:hover .hl-icon { transform: scale(1.15); }
+    .hl-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .hl-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; font-weight: 500; }
+
+    /* ═══════════════════════════════════════
+       WHY ISARAL (3-COLUMN GRID)
+    ═══════════════════════════════════════ */
+    .why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 52px; }
+    .why-card {
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: var(--r-xl); padding: 28px;
+      transition: all 0.2s;
+    }
+    .why-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: var(--primary-mid); }
+    .why-icon {
+      width: 48px; height: 48px; border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 16px;
+    }
+    .why-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .why-desc { font-size: 14px; color: var(--text-3); line-height: 1.7; }
+
+    /* ═══════════════════════════════════════
+       INTEGRATIONS SECTION
+    ═══════════════════════════════════════ */
+    .integrations { padding: 80px 0; background: var(--bg-dark); }
+    .integrations-head { text-align: center; margin-bottom: 52px; }
+    .integrations-head .eyebrow { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+    .integrations-head .h2 { color: #fff; }
+    .integrations-head .lead { color: rgba(255,255,255,0.5); }
+    .int-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .int-card {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--r-xl); padding: 24px 20px; text-align: center;
+      transition: all 0.2s;
+    }
+    .int-card:hover {
+      background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+    .int-logo { font-size: 36px; margin-bottom: 10px; }
+    .int-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .int-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    .int-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      background: var(--green-light); color: #065F46;
+      padding: 2px 8px; border-radius: 50px; margin-top: 8px;
+    }
+
+    /* ═══════════════════════════════════════
+       PRICING
+    ═══════════════════════════════════════ */
+    .pricing-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      margin: 36px 0;
+    }
+    .toggle-label { font-size: 15px; font-weight: 700; color: var(--text-2); }
+    .toggle-save {
+      font-size: 12px; font-weight: 800; color: var(--green);
+      background: var(--green-light); padding: 4px 12px; border-radius: 50px;
+    }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+    .plan-card {
+      border: 1.5px solid var(--border); border-radius: var(--r-xl);
+      padding: 32px; background: #fff; position: relative; transition: all 0.2s;
+    }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .plan-card.featured { border-color: var(--primary); box-shadow: 0 8px 40px rgba(26,86,219,0.12); }
+    .plan-popular {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      font-size: 12px; font-weight: 900; color: #fff;
+      background: var(--primary); padding: 5px 18px; border-radius: 50px; white-space: nowrap;
+    }
+    .plan-name { font-size: 13px; font-weight: 900; color: var(--text-4); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+    .plan-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+    .plan-cur { font-size: 22px; font-weight: 800; color: var(--text-2); }
+    .plan-amt {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 52px; font-weight: 900; color: var(--text); letter-spacing: -2px; line-height: 1;
+    }
+    .plan-per { font-size: 14px; color: var(--text-4); font-weight: 600; }
+    .plan-note { font-size: 13px; color: var(--text-4); margin-bottom: 20px; font-weight: 500; }
+    .plan-desc { font-size: 15px; color: var(--text-2); margin-bottom: 20px; line-height: 1.6; font-weight: 500; }
+    .plan-hr { height: 1px; background: var(--border); margin: 20px 0; }
+    .plan-feats { display: flex; flex-direction: column; gap: 12px; margin-bottom: 26px; }
+    .plan-feat {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: 15px; color: var(--text-2); font-weight: 500;
+    }
+    .plan-feat::before { content: '✓'; color: var(--green); font-weight: 900; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+    .plan-cta {
+      display: block; width: 100%; padding: 14px;
+      border-radius: var(--r-md); text-align: center;
+      font-size: 15px; font-weight: 800; transition: all 0.2s;
+    }
+    .plan-cta.pri { background: var(--primary); color: #fff; }
+    .plan-cta.pri:hover { background: var(--primary-dark); color: #fff; }
+    .plan-cta.out { border: 1.5px solid var(--border); color: var(--text-2); font-weight: 700; }
+    .plan-cta.out:hover { border-color: var(--primary); color: var(--primary); }
+    .plan-gst { text-align: center; font-size: 13px; color: var(--text-5); margin-top: 12px; font-weight: 500; }
+
+/* ===================================
+   PREMIUM TESTIMONIALS SECTION
+=================================== */
+.testimonials-section{
+    padding:100px 0;
+    background:#f8fbff;
+}
+
+.testi-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:30px;
+    margin-top:60px;
+}
+
+.testi-card{
+    background:#fff;
+    border-radius:24px;
+    padding:32px;
+    border:1px solid #e5edf7;
+    box-shadow:0 10px 30px rgba(0,0,0,.04);
+    transition:.3s ease;
+}
+
+.testi-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 25px 50px rgba(0,0,0,.08);
+}
+
+.testi-stars{
+    color:#f59e0b;
+    margin-bottom:15px;
+    font-size:15px;
+    letter-spacing:2px;
+}
+
+.testi-text{
+    font-size:15px;
+    line-height:1.8;
+    color:#475569;
+    margin-bottom:25px;
+}
+
+.testi-author{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.testi-photo{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.testi-name{
+    font-weight:800;
+    font-size:15px;
+}
+
+.testi-role{
+    font-size:13px;
+    color:#64748b;
+}
+
+.testi-company{
+    display:inline-block;
+    margin-top:5px;
+    color:#2563eb;
+    font-size:12px;
+    font-weight:700;
+}
+
+.testi-result{
+    display:inline-block;
+    margin-top:8px;
+    background:#ecfdf5;
+    color:#059669;
+    padding:6px 12px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:700;
+}
+
+@media(max-width:992px){
+    .testi-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:768px){
+    .testi-grid{
+        grid-template-columns:1fr;
+    }
+
+    .testi-card{
+        padding:24px;
+    }
+}
+ /* ═══════════════════════════════════════
+       COMPARISON TABLE
+    ═══════════════════════════════════════ */
+    .comparison { padding: 80px 0; background: var(--bg-2); }
+    .comp-table { width: 100%; border-collapse: collapse; margin-top: 48px; background: #fff; border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--border); }
+    .comp-table th {
+      padding: 18px 20px; font-size: 14px; font-weight: 800;
+      background: var(--primary); color: #fff; text-align: left;
+    }
+    .comp-table th:first-child { background: var(--bg-2); color: var(--text-4); font-weight: 800; }
+    .comp-table td {
+      padding: 15px 20px; font-size: 14px; color: var(--text-2); font-weight: 500;
+      border-top: 1px solid var(--border-2);
+    }
+    .comp-table tr:nth-child(even) td { background: var(--bg-2); }
+    .comp-check { color: var(--green); font-weight: 900; font-size: 18px; }
+    .comp-cross { color: var(--text-5); font-size: 16px; }
+
+    /* ═══════════════════════════════════════
+       FAQ
+    ═══════════════════════════════════════ */
+    .faq-list { max-width: 780px; margin: 44px auto 0; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      width: 100%; text-align: left; padding: 20px 0;
+      font-size: 16px; font-weight: 700; color: var(--text);
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      transition: color 0.15s;
+    }
+    .faq-q:hover { color: var(--primary); }
+    .faq-q.open { color: var(--primary); }
+    .faq-icon {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--bg-2); display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--text-3); flex-shrink: 0; transition: all 0.2s;
+    }
+    .faq-q.open .faq-icon { background: var(--primary-light); color: var(--primary); transform: rotate(45deg); }
+    .faq-a {
+      font-size: 15px; color: var(--text-2); line-height: 1.8; font-weight: 500;
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.35s; padding-bottom: 0;
+    }
+    .faq-a.open { max-height: 200px; padding-bottom: 18px; }
+
+    /* ═══════════════════════════════════════
+       CTA SECTION
+    ═══════════════════════════════════════ */
+    .cta-band {
+      padding: 96px 0;
+      background: linear-gradient(140deg, #0B1D4D 0%, #1A56DB 60%, #1A73E8 100%);
+      position: relative; overflow: hidden;
+    }
+    .cta-band::before {
+      content: ''; position: absolute; top: -200px; right: -200px;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .cta-band::after {
+      content: ''; position: absolute; bottom: -100px; left: -120px;
+      width: 450px; height: 450px; border-radius: 50%;
+      background: rgba(255,92,40,0.08);
+    }
+    .cta-inner { position: relative; z-index: 1; text-align: center; }
+    .cta-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(32px, 5vw, 52px); font-weight: 900;
+      color: #fff; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px;
+    }
+    .cta-sub { 
+      font-size: 18px; 
+      font-weight: 500;
+      color: rgba(255,255,255,0.85); 
+      margin-bottom: 36px; 
+    }
+    .cta-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .cta-btn-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fff; color: var(--primary);
+      padding: 16px 32px; border-radius: var(--r-lg);
+      font-size: 16px; font-weight: 900;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2); transition: all 0.2s;
+    }
+    .cta-btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+    .cta-btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.9); padding: 16px 28px;
+      border-radius: var(--r-lg); font-size: 16px; font-weight: 800;
+      border: 1.5px solid rgba(255,255,255,0.3); transition: all 0.2s;
+    }
+    .cta-btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .cta-trust {
+      display: flex; align-items: center; justify-content: center; gap: 24px;
+      margin-top: 24px; flex-wrap: wrap;
+    }
+    .cta-trust span {
+      font-size: 14px; color: rgba(255,255,255,0.75); font-weight: 500;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .cta-trust span::before { content: '✓'; color: rgba(255,255,255,0.95); font-weight: 900; }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    .footer { background: var(--bg-dark); padding: 64px 0 0; }
+    .footer-top {
+      display: grid; grid-template-columns: 280px 1fr 1fr 1fr 1fr; gap: 40px;
+      padding-bottom: 52px; border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .footer-logo img { height: 40px; width: auto; border-radius: 9px; object-fit: contain; }
+    .footer-logo-txt {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px; font-weight: 900; color: #fff;
+    }
+    .footer-logo-txt span { color: var(--primary); }
+    .footer-desc { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.75; margin-bottom: 18px; font-weight: 500; }
+    .footer-socials { display: flex; gap: 8px; }
+    .social-btn {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.5);
+      transition: all 0.15s;
+    }
+    .social-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(26,86,219,0.1); }
+    .footer-col h5 {
+      font-size: 12px; font-weight: 900; color: rgba(255,255,255,0.95);
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block; font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 500;
+      margin-bottom: 12px; transition: color 0.15s;
+    }
+    .footer-col a:hover { color: rgba(255,255,255,0.85); }
+    .footer-bottom {
+      padding: 24px 0; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 13px; color: rgba(255,255,255,0.35); font-weight: 500; }
+    .footer-legal { display: flex; gap: 18px; }
+    .footer-legal a { font-size: 13px; color: rgba(255,255,255,0.35); font-weight: 500; transition: color 0.15s; }
+    .footer-legal a:hover { color: rgba(255,255,255,0.65); }
+    .footer-badges { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    .footer-badge {
+      font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
+      padding: 5px 12px; display: flex; align-items: center; gap: 5px;
+    }
+    .footer-badge svg { width: 12px; height: 12px; opacity: 0.7; }
+
+    /* ═══════════════════════════════════════
+       SECTION HEADERS
+    ═══════════════════════════════════════ */
+    .sec-head { margin-bottom: 16px; }
+    .sec-head.center { text-align: center; }
+
+    /* ═══════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.55s ease both; }
+    .fade-up-1 { animation-delay: 0.1s; }
+    .fade-up-2 { animation-delay: 0.2s; }
+    .fade-up-3 { animation-delay: 0.3s; }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE — TABLET
+    ═══════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .showcase { grid-template-columns: 1fr; gap: 36px; }
+      .showcase.rev > *:first-child { order: 0; }
+      .showcase.rev > *:last-child { order: 0; }
+      .pricing-grid { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr 1fr; }
+      .benefits-grid { grid-template-columns: repeat(2,1fr); }
+      .why-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .app-cards-row { grid-template-columns: repeat(2,1fr); }
+      .highlights-grid { grid-template-columns: repeat(2,1fr); }
+      .highlights-grid .hl-item:nth-child(2) { border-right: none; }
+      .highlights-grid .hl-item:nth-child(3) { border-right: 1px solid var(--border); }
+      .int-grid { grid-template-columns: repeat(2,1fr); }
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE — MOBILE
+    ═══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .topbar { display: none; }
+      :root { --topbar-h: 0px; }
+    }
+    @media (max-width: 768px) {
+      .section { padding: 56px 0; }
+      .section-sm { padding: 40px 0; }
+      .nav-links, .nav-ctas { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero { padding: 44px 0 0; }
+      .hero-stats { display: none; }
+      .app-sidebar { display: none; }
+      .app-cards-row { grid-template-columns: 1fr 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .benefits-grid { grid-template-columns: repeat(2,1fr); }
+      .why-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .hero-sub { font-size: 16px; }
+      .highlights-grid { grid-template-columns: 1fr 1fr; }
+      .highlights-grid .hl-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .int-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 540px) {
+      .h1 { font-size: 28px; letter-spacing: -0.8px; }
+      .app-cards-row { grid-template-columns: 1fr; }
+      .benefits-grid { grid-template-columns: 1fr; }
+      .bene-item + .bene-item::before { display: none; }
+      .bene-item { border-bottom: 1px solid rgba(255,255,255,0.1); }
+      .bene-item:last-child { border-bottom: none; }
+      .footer-top { grid-template-columns: 1fr; }
+      .trusted-logos { gap: 18px; }
+      .feat-tabs { gap: 6px; }
+      .feat-tab { font-size: 13px; padding: 8px 14px; }
+      .wrap { padding: 0 16px; }
+      .plan-card { padding: 24px; }
+      .highlights-grid { grid-template-columns: 1fr; }
+      .int-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .trusted-track { animation: none; }
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .isaral-logo{
+    height:70px !important;
+    width:auto !important;
+    display:block !important;
+    object-fit:contain;
+}
+
+.footer-isaral-logo{
+    height:60px !important;
+    width:auto !important;
+    display:block !important;
+    object-fit:contain;
+}
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     ANNOUNCEMENT BAR
+════════════════════════════════════════ -->
+<div class="announcement-bar" id="annBar">
+  <span class="ann-badge">New</span>
+  🎉 iSaral Pro now includes AI-powered invoice matching & auto-reconciliation —
+  <a href="https://isaral.in/">Try it free →</a>
+  <span class="ann-close" onclick="document.getElementById('annBar').style.display='none'">&times;</span>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     TOP BAR
+════════════════════════════════════════ -->
+<div class="topbar" role="banner">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <a href="tel:+918000000000" class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 012 2.18 2 2 0 013.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        +91 80-0000-0000
+      </a>
+      <div class="topbar-div"></div>
+      <a href="mailto:support@isaral.in" class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        support@isaral.in
+      </a>
+      <div class="topbar-div"></div>
+      <span class="topbar-item">Made for Indian SMEs 🇮🇳</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-badge">GST Compliant</span>
+      <div class="topbar-links">
+        <a href="#">Blog</a>
+        <a href="#">Careers</a>
+        <a href="#">Partner Program</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PRIMARY NAVBAR
+════════════════════════════════════════ -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Primary Navigation">
+  <div class="nav-inner">
+  <a href="/" class="nav-logo" aria-label="iSaral Home">
+<img src="{% static 'images/logo.png' %}" alt="Logo" class="isaral-logo">
+</a>
+
+    <div class="nav-links">
+      <!-- Products dropdown - UPDATED with actual links -->
+      <div class="nav-item">
+        <button aria-haspopup="true" aria-expanded="false">
+          Products
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown" role="menu">
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#EBF2FF">🧾</div>
+            <div class="dropdown-text"><strong>GST Billing</strong><span>Invoices, e-Way bills, GSTR</span></div>
+          </a>
+          <a href="https://isaral.in/hrms-software/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F0FDF4">👥</div>
+            <div class="dropdown-text"><strong>HRMS & Payroll</strong><span>Employee management, salary</span></div>
+          </a>
+          <a href="https://isaral.in/digital-signature/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF7ED">🔐</div>
+            <div class="dropdown-text"><strong>Digital Signature</strong><span>DSC services, e-signature</span></div>
+          </a>
+          <a href="https://isaral.ai/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF0F0">🤖</div>
+            <div class="dropdown-text"><strong>AI Solutions</strong><span>AI-powered business tools</span></div>
+          </a>
+          <a href="https://isaralgurukula.com/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F5F3FF">🎓</div>
+            <div class="dropdown-text"><strong>iSaral Gurukula</strong><span>Training & courses</span></div>
+          </a>
+          <a href="https://tallysoftware.shop/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#E8F5E9">📊</div>
+            <div class="dropdown-text"><strong>Tally Software</strong><span>Accounting & ERP</span></div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Solutions dropdown -->
+      <div class="nav-item">
+        <button>
+          Solutions
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown" role="menu">
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#EBF2FF">🏭</div>
+            <div class="dropdown-text"><strong>Manufacturing</strong><span>Production, BOM, cost tracking</span></div>
+          </a>
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F0FDF4">🛍️</div>
+            <div class="dropdown-text"><strong>Retail & Trading</strong><span>POS, stock, purchase orders</span></div>
+          </a>
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF7ED">🔧</div>
+            <div class="dropdown-text"><strong>Services & Consulting</strong><span>Time tracking, retainers, projects</span></div>
+          </a>
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF0F0">🌾</div>
+            <div class="dropdown-text"><strong>Agriculture & FMCG</strong><span>Mandi billing, agri compliance</span></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="https://isaral.in/">Pricing</a></div>
+      <div class="nav-item"><a href="https://isaral.in/">Customers</a></div>
+
+      <!-- Resources dropdown -->
+      <div class="nav-item">
+        <button>
+          Resources
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown" role="menu">
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#EBF2FF">📖</div>
+            <div class="dropdown-text"><strong>Documentation</strong><span>Setup guides, API docs</span></div>
+          </a>
+          <a href="https://isaralgurukula.com/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F0FDF4">🎓</div>
+            <div class="dropdown-text"><strong>Webinars & Tutorials</strong><span>Learn from experts</span></div>
+          </a>
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#FFF7ED">📰</div>
+            <div class="dropdown-text"><strong>GST Updates</strong><span>Latest circular, rate changes</span></div>
+          </a>
+          <a href="https://isaral.in/" class="dropdown-item" role="menuitem">
+            <div class="dropdown-icon" style="background:#F5F3FF">❓</div>
+            <div class="dropdown-text"><strong>FAQs</strong><span>Common questions answered</span></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="mailto:sales@isaral.in">Contact</a></div>
+    </div>
+
+    <div class="nav-ctas">
+      <a href="https://isaral.in/" class="btn btn-ghost">Login</a>
+      <a href="https://isaral.in/" class="btn btn-primary">Start Free →</a>
+    </div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile Navigation">
+  <div class="mob-label">Products</div>
+  <a href="https://isaral.in/" onclick="closeMenu()">🧾 &nbsp;GST Billing</a>
+  <a href="https://isaral.in/hrms-software/" onclick="closeMenu()">👥 &nbsp;HRMS & Payroll</a>
+  <a href="https://isaral.in/digital-signature/" onclick="closeMenu()">🔐 &nbsp;Digital Signature</a>
+  <a href="https://isaral.ai/" onclick="closeMenu()">🤖 &nbsp;AI Solutions</a>
+  <a href="https://isaralgurukula.com/" onclick="closeMenu()">🎓 &nbsp;iSaral Gurukula</a>
+  <a href="https://tallysoftware.shop/" onclick="closeMenu()">📊 &nbsp;Tally Software</a>
+  <div class="mob-label">Solutions</div>
+  <a href="https://isaral.in/" onclick="closeMenu()">🏭 Manufacturing</a>
+  <a href="https://isaral.in/" onclick="closeMenu()">🛍️ Retail &amp; Trading</a>
+  <a href="https://isaral.in/" onclick="closeMenu()">🔧 Services &amp; Consulting</a>
+  <div class="mob-label">Navigate</div>
+  <a href="https://isaral.in/" onclick="closeMenu()">Pricing</a>
+  <a href="https://isaral.in/" onclick="closeMenu()">Customers</a>
+  <a href="https://isaral.in/" onclick="closeMenu()">Contact Sales</a>
+  <div class="mob-divider"></div>
+  <div class="mob-ctas">
+    <a href="https://isaral.in/" class="btn btn-secondary" onclick="closeMenu()">Login</a>
+    <a href="https://isaral.in/" class="btn btn-primary" onclick="closeMenu()">Start Free Today →</a>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-inner wrap">
+    <div class="hero-content">
+      <div class="hero-badge fade-up">
+        <span class="badge-dot"></span>
+        Trusted by 5,000+ Indian businesses
+      </div>
+      <h1 class="h1 hero-title fade-up fade-up-1">
+        The smarter way to run<br>
+        your <span class="blue">Indian business</span>
+      </h1>
+      <p class="hero-sub fade-up fade-up-2">
+        GST billing, CRM, order management, Razorpay payments and customer support — all in one platform built specifically for Indian SMEs. Save 8+ hours every week on paperwork.
+      </p>
+      <div class="hero-actions fade-up fade-up-3">
+        <a href="https://isaral.in/" class="btn btn-primary btn-lg">Start Free Today →</a>
+        <a href="https://isaral.in/" class="btn btn-secondary btn-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="#fff"/></svg>
+          Watch Demo
+        </a>
+      </div>
+      <div class="hero-trust fade-up fade-up-3">
+        <span class="trust-item"><span class="trust-check">✓</span> No credit card needed</span>
+        <span class="trust-item"><span class="trust-check">✓</span> 100% GST compliant</span>
+        <span class="trust-item"><span class="trust-check">✓</span> Go live in 1 day</span>
+        <span class="trust-item"><span class="trust-check">✓</span> Razorpay &amp; UPI ready</span>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="hero-stats" role="list" aria-label="Key statistics">
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">5<span>K+</span></div>
+        <div class="stat-lbl">Active businesses</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">12<span>L+</span></div>
+        <div class="stat-lbl">Invoices generated</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">₹480<span>Cr+</span></div>
+        <div class="stat-lbl">Transactions processed</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">4.8<span>★</span></div>
+        <div class="stat-lbl">Average rating</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">99<span>%</span></div>
+        <div class="stat-lbl">Uptime SLA</div>
+      </div>
+    </div>
+
+    <!-- App preview mockup -->
+    <div class="hero-app" role="img" aria-label="iSaral dashboard preview">
+      <div class="app-topbar">
+        <div class="app-dot" style="background:#FF5F57"></div>
+        <div class="app-dot" style="background:#FEBC2E"></div>
+        <div class="app-dot" style="background:#28C840"></div>
+        <span style="font-size:11px;color:var(--text);margin-left:10px;font-weight:600">iSaral — Dashboard</span>
+      </div>
+      <div class="app-layout">
+        <div class="app-sidebar">
+          <div class="app-sb-item active">🏠 &nbsp;Dashboard</div>
+          <div class="app-sb-item">🧾 &nbsp;Billing</div>
+          <div class="app-sb-item">👥 &nbsp;CRM</div>
+          <div class="app-sb-item">📦 &nbsp;Orders</div>
+          <div class="app-sb-item">🎫 &nbsp;Support</div>
+          <div class="app-sb-item">📊 &nbsp;Reports</div>
+          <div class="app-sb-item">⚙️ &nbsp;Settings</div>
+        </div>
+        <div class="app-main">
+          <div class="app-cards-row">
+            <div class="app-card">
+              <div class="app-card-label">Revenue (Jun)</div>
+              <div class="app-card-num">₹4.2L <span>↑ 18%</span></div>
+            </div>
+            <div class="app-card">
+              <div class="app-card-label">Invoices sent</div>
+              <div class="app-card-num">142 <span>↑ 12%</span></div>
+            </div>
+            <div class="app-card">
+              <div class="app-card-label">Open tickets</div>
+              <div class="app-card-num">7</div>
+            </div>
+            <div class="app-card">
+              <div class="app-card-label">New leads</div>
+              <div class="app-card-num">31 <span>↑ 24%</span></div>
+            </div>
+          </div>
+          <div class="app-table">
+            <div class="app-table-head">
+              <div class="app-th">Customer</div>
+              <div class="app-th">Amount</div>
+              <div class="app-th">Status</div>
+              <div class="app-th">Date</div>
+            </div>
+            <div class="app-table-row">
+              <div class="app-td">Ravi Textiles Pvt Ltd</div>
+              <div class="app-td">₹18,400</div>
+              <div class="app-td"><span class="pill pill-g">Paid</span></div>
+              <div class="app-td">10 Jun</div>
+            </div>
+            <div class="app-table-row">
+              <div class="app-td">Mehta Exports</div>
+              <div class="app-td">₹52,000</div>
+              <div class="app-td"><span class="pill pill-o">Pending</span></div>
+              <div class="app-td">09 Jun</div>
+            </div>
+            <div class="app-table-row">
+              <div class="app-td">SunTech Solutions</div>
+              <div class="app-td">₹9,750</div>
+              <div class="app-td"><span class="pill pill-b">Sent</span></div>
+              <div class="app-td">09 Jun</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     TRUSTED BY (Scrolling Marquee)
+════════════════════════════════════════ -->
+<section class="trusted" aria-label="Trusted by">
+  <div class="wrap" style="margin-bottom:0;max-width:100%;">
+    <p class="trusted-label">Trusted by 5,000+ businesses across India</p>
+  </div>
+  <div class="trusted-logos-wrap">
+    <div class="trusted-track">
+      <!-- First set -->
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>Ravi Textiles</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>Mehta Exports</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>SunTech Solutions</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>Kapoor Traders</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>Sharma Industries</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #30cfd0 0%, #330867 100%);"></div>AgroPlus Foods</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>Verma Engineering</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);"></div>Mumbai Pharma</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #2e2e78 0%, #662d8c 100%);"></div>Delhi Deco Ltd</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);"></div>Jain Auto Parts</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>Ravi Textiles</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>Mehta Exports</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>SunTech Solutions</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>Kapoor Traders</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>Sharma Industries</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #30cfd0 0%, #330867 100%);"></div>AgroPlus Foods</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>Verma Engineering</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);"></div>Mumbai Pharma</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #2e2e78 0%, #662d8c 100%);"></div>Delhi Deco Ltd</span>
+      <span class="trusted-logo"><div class="logo-sq" style="background:linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);"></div>Jain Auto Parts</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     FEATURE HIGHLIGHTS
+════════════════════════════════════════ -->
+<section class="highlights" aria-label="Feature highlights">
+  <div class="wrap">
+    <div class="highlights-grid">
+      <div class="hl-item">
+        <div class="hl-icon">⚡</div>
+        <div class="hl-title">Invoice in 30 seconds</div>
+        <div class="hl-desc">Auto GST calculation, HSN code lookup, and PDF generation — all before your chai gets cold.</div>
+      </div>
+      <div class="hl-item">
+        <div class="hl-icon">🇮🇳</div>
+        <div class="hl-title">100% GST compliant</div>
+        <div class="hl-desc">CGST/SGST/IGST, e-Way bills, GSTR-1, GSTR-3B — always up to date with GST Council rules.</div>
+      </div>
+      <div class="hl-item">
+        <div class="hl-icon">📱</div>
+        <div class="hl-title">UPI &amp; Razorpay built-in</div>
+        <div class="hl-desc">Send payment links with every invoice. Customers pay via UPI, card, or netbanking in one tap.</div>
+      </div>
+      <div class="hl-item">
+        <div class="hl-icon">🤝</div>
+        <div class="hl-title">Hindi + English support</div>
+        <div class="hl-desc">Chat, email, phone — real humans in Indian time zones who understand your business context.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     WHY ISARAL
+════════════════════════════════════════ -->
+<section class="section bg-gray" aria-labelledby="why-heading">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="eyebrow">Why iSaral</div>
+      <h2 class="h2" id="why-heading">Everything your Indian SME needs, in one platform</h2>
+      <p class="lead max-660 mx-auto" style="margin-top:12px">Stop juggling spreadsheets, WhatsApp, and separate tools. iSaral brings GST billing, customer management, orders, and support under one roof — starting at ₹999/month.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon" style="background:#EBF2FF">🇮🇳</div>
+        <div class="why-title">Built for India, first</div>
+        <p class="why-desc">GST compliance, Indian tax rules (CGST/SGST/IGST), INR billing, Razorpay UPI, mandi receipts — everything is designed for how Indian businesses actually operate.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="background:#F0FDF4">⚡</div>
+        <div class="why-title">Go live in under a day</div>
+        <p class="why-desc">Import your customers from Excel, add your GSTIN, and send your first GST invoice within hours — not weeks. No lengthy implementation roadmap required.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="background:#FFF7ED">💰</div>
+        <div class="why-title">Fraction of the cost</div>
+        <p class="why-desc">Starting at ₹999/month — a fraction of what enterprise software costs. No hidden charges, no per-user fees on lower plans, no surprise bills.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="background:#FFF0F0">🔒</div>
+        <div class="why-title">Your data stays in India</div>
+        <p class="why-desc">Data hosted on AWS Mumbai region. RBI-friendly, DPDP Act compliant, daily encrypted backups. Your customer data, invoices never leave Indian soil.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="background:#F5F3FF">📞</div>
+        <div class="why-title">Real support in Hindi &amp; English</div>
+        <p class="why-desc">Our support team works in Indian time zones, 9 AM – 9 PM IST. Real humans in Hindi and English — not a chatbot, not an overseas call centre.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="background:#ECFDF5">📱</div>
+        <div class="why-title">Works on any device</div>
+        <p class="why-desc">Full-featured mobile experience for Android and iOS. Create invoices, track orders, and resolve tickets from your smartphone anywhere, anytime.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+```html
+<section class="section" id="testimonials" aria-labelledby="testi-heading">
+
+  <div class="wrap">
+
+    <div class="sec-head center">
+      <div class="eyebrow">Customer Success Stories</div>
+      <h2 class="h2" id="testi-heading">
+        5,000+ Indian businesses trust iSaral
+      </h2>
+
+      <p class="lead max-660 mx-auto" style="margin-top:12px">
+        From consultants and service providers to growing SMEs —
+        businesses across India use iSaral to simplify billing,
+        CRM, support, and collections.
+      </p>
+    </div>
+
+    <div class="testi-grid">
+
+      <!-- Testimonial 1 -->
+
+      <div class="testi-card">
+
+        <div class="testi-stars">★★★★★</div>
+
+        <p class="testi-text">
+          "We switched from Excel-based invoicing to iSaral.
+          Invoice creation now takes less than a minute and our
+          payment collections improved dramatically through Razorpay integration."
+        </p>
+
+        <div class="testi-author">
+
+          <img
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80"
+            alt="Rahul Khanna"
+            class="testi-photo"
+          >
+
+          <div>
+            <div class="testi-name">Rahul Khanna</div>
+
+            <div class="testi-role">
+              Founder & CEO
+            </div>
+
+            <div class="testi-company">
+              TechFlow Solutions · Bangalore
+            </div>
+
+            <div class="testi-result">
+              ↑ 70% Faster Collections
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Testimonial 2 -->
+
+      <div class="testi-card">
+
+        <div class="testi-stars">★★★★★</div>
+
+        <p class="testi-text">
+          "The CRM pipeline transformed our sales process.
+          Automated follow-ups and lead tracking helped us
+          improve conversion rates and never miss an opportunity."
+        </p>
+
+        <div class="testi-author">
+
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80"
+            alt="Priya Mehta"
+            class="testi-photo"
+          >
+
+          <div>
+            <div class="testi-name">Priya Mehta</div>
+
+            <div class="testi-role">
+              Sales Director
+            </div>
+
+            <div class="testi-company">
+              GrowthEdge Technologies · Hyderabad
+            </div>
+
+            <div class="testi-result">
+              ↑ 35% Higher Conversion Rate
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Testimonial 3 -->
+
+      <div class="testi-card">
+
+        <div class="testi-stars">★★★★★</div>
+
+        <p class="testi-text">
+          "The onboarding experience was excellent.
+          GST billing, CRM, support tickets and customer management
+          are now handled from a single dashboard."
+        </p>
+
+        <div class="testi-author">
+
+          <img
+            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80"
+            alt="Arjun Sharma"
+            class="testi-photo"
+          >
+
+          <div>
+            <div class="testi-name">Arjun Sharma</div>
+
+            <div class="testi-role">
+              Managing Director
+            </div>
+
+            <div class="testi-company">
+              Nexus Trading Pvt Ltd · Mumbai
+            </div>
+
+            <div class="testi-result">
+              ↑ 60% Faster Operations
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+<!-- ════════════════════════════════════════
+     PRICING
+════════════════════════════════════════ -->
+<section class="section bg-gray" id="pricing" aria-labelledby="pricing-heading">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="eyebrow">Pricing</div>
+      <h2 class="h2" id="pricing-heading">Simple, transparent pricing for Indian businesses</h2>
+      <p class="lead max-660 mx-auto" style="margin-top:12px">No hidden charges. All prices exclude 18% GST.</p>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- Starter -->
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">
+          <span class="plan-cur">₹</span>
+          <span class="plan-amt">999</span>
+          <span class="plan-per">/month</span>
+        </div>
+        <p class="plan-desc">Perfect for freelancers, consultants, and solo entrepreneurs getting started with GST billing.</p>
+        <div class="plan-hr"></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Up to 100 invoices/month</div>
+          <div class="plan-feat">GST-compliant invoices</div>
+          <div class="plan-feat">1 user account</div>
+          <div class="plan-feat">Razorpay payment links</div>
+          <div class="plan-feat">Basic reports &amp; PDF export</div>
+        </div>
+        <a href="https://isaral.in/" class="plan-cta out">Get Started Free</a>
+        <p class="plan-gst">14-day free trial. No credit card.</p>
+      </div>
+
+      <!-- Pro (featured) -->
+      <div class="plan-card featured">
+        <div class="plan-popular">⭐ Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">
+          <span class="plan-cur">₹</span>
+          <span class="plan-amt">2,499</span>
+          <span class="plan-per">/month</span>
+        </div>
+        <p class="plan-desc">For growing businesses that need CRM, order management, and customer support alongside billing.</p>
+        <div class="plan-hr"></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Unlimited invoices</div>
+          <div class="plan-feat">All Starter features</div>
+          <div class="plan-feat">Up to 5 users</div>
+          <div class="plan-feat">CRM &amp; lead management</div>
+          <div class="plan-feat">Order management &amp; inventory</div>
+          <div class="plan-feat">Support ticket system</div>
+          <div class="plan-feat">GSTR-1 &amp; GSTR-3B export</div>
+        </div>
+        <a href="https://isaral.in/" class="plan-cta pri">Start Pro Trial →</a>
+        <p class="plan-gst">14-day free trial. No credit card.</p>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="plan-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price">
+          <span class="plan-cur">₹</span>
+          <span class="plan-amt">4,999</span>
+          <span class="plan-per">/month</span>
+        </div>
+        <p class="plan-desc">For established businesses needing unlimited users, API access, and dedicated support.</p>
+        <div class="plan-hr"></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Everything in Pro</div>
+          <div class="plan-feat">Unlimited users &amp; branches</div>
+          <div class="plan-feat">REST API access</div>
+          <div class="plan-feat">Custom templates</div>
+          <div class="plan-feat">Dedicated account manager</div>
+          <div class="plan-feat">SLA-backed phone support</div>
+          <div class="plan-feat">Tally sync</div>
+        </div>
+        <a href="mailto:sales@isaral.in" class="plan-cta out">Contact Sales</a>
+        <p class="plan-gst">Custom contracts available.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     CTA SECTION
+════════════════════════════════════════ -->
+<section class="cta-band" aria-labelledby="cta-heading">
+  <div class="wrap cta-inner">
+    <h2 class="cta-title" id="cta-heading">Your business deserves better software.</h2>
+    <p class="cta-sub">Stop managing your business in spreadsheets and WhatsApp groups.<br>Join 5,000+ Indian SMEs who run smarter on iSaral.</p>
+    <div class="cta-actions">
+      <a href="https://isaral.in/" class="cta-btn-white">Start Free Today →</a>
+      <a href="mailto:sales@isaral.in" class="cta-btn-ghost">Talk to Sales</a>
+    </div>
+    <div class="cta-trust">
+      <span>No credit card needed</span>
+      <span>14-day free trial</span>
+      <span>Go live in 1 day</span>
+      <span>Cancel anytime</span>
+      <span>Data stays in India</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     FOOTER - UPDATED WITH PRODUCT LINKS
+════════════════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+       <div class="footer-logo">
+    <img src="{% static 'images/logo.png' %}" alt="iSaral Logo" class="footer-isaral-logo">
+
+        </div>
+        <p class="footer-desc">Smart business software for Indian SMEs. GST billing, CRM, orders, and customer support — all in one platform. Made with ❤️ in India, hosted in India.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com" class="social-btn" title="LinkedIn" aria-label="LinkedIn">in</a>
+          <a href="https://twitter.com" class="social-btn" title="Twitter/X" aria-label="Twitter">𝕏</a>
+          <a href="https://wa.me/918000000000" class="social-btn" title="WhatsApp" aria-label="WhatsApp">W</a>
+          <a href="https://youtube.com" class="social-btn" title="YouTube" aria-label="YouTube">▶</a>
+          <a href="https://instagram.com" class="social-btn" title="Instagram" aria-label="Instagram">◎</a>
+        </div>
+        <div class="footer-badges">
+          <span class="footer-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            GST Compliant
+          </span>
+          <span class="footer-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            256-bit SSL
+          </span>
+          <span class="footer-badge">🇮🇳 Data in India</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h5>Products</h5>
+   <a href="https://isaral.in/">iSaral Billing</a>
+        <a href="https://isaral.in/hrms-software/">HRMS & Payroll</a>
+        <a href="https://isaral.in/digital-signature/">Digital Signature</a>
+        <a href="https://isaral.ai/">AI Solutions</a>
+        <a href="https://isaralgurukula.com/">iSaral Gurukula</a>
+        <a href="https://tallysoftware.shop/">Tally Software</a>
+      </div>
+
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="https://isaral.in/">Documentation</a>
+        <a href="https://isaral.in/">API Reference</a>
+        <a href="https://isaralgurukula.com/">Webinars</a>
+        <a href="https://isaral.in/">GST Updates</a>
+        <a href="https://isaral.in/">Blog</a>
+        <a href="https://isaral.in/">FAQs</a>
+      </div>
+
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="https://isaral.in/">About Us</a>
+        <a href="mailto:sales@isaral.in">Contact Sales</a>
+        <a href="mailto:support@isaral.in">Customer Support</a>
+        <a href="https://isaral.in/">Careers</a>
+        <a href="https://isaral.in/">Partner Program</a>
+        <a href="https://isaral.in/">Press Kit</a>
+      </div>
+
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <a href="https://isaral.in/">Privacy Policy</a>
+        <a href="https://isaral.in/">Terms of Service</a>
+        <a href="https://isaral.in/">Refund Policy</a>
+        <a href="https://isaral.in/">Cookie Policy</a>
+        <a href="https://isaral.in/">DPDP Compliance</a>
+        <a href="https://isaral.in/">Security</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2015–2026 iSaral Business Solutions Pvt. Ltd. · Made in India 🇮🇳</div>
+      <div class="footer-legal">
+        <a href="https://isaral.in/">Privacy</a>
+        <a href="https://isaral.in/">Terms</a>
+        <a href="https://isaral.in/">Refunds</a>
+        <a href="https://isaral.in/">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════ -->
+<script>
+  /* ── Navbar scroll shadow ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 8);
+  }, { passive: true });
+
+  /* ── Mobile menu ── */
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const ham  = document.getElementById('hamburger');
+    const open = menu.classList.toggle('open');
+    ham.classList.toggle('open', open);
+    ham.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* ── FAQ accordion ── */
+  function toggleFaq(btn) {
+    const isOpen = btn.classList.contains('open');
+    document.querySelectorAll('.faq-q').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    if (!isOpen) {
+      btn.classList.add('open');
+      btn.nextElementSibling.classList.add('open');
+    }
+  }
+
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.10 });
+
+  document.querySelectorAll('.why-card, .testi-card, .plan-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>

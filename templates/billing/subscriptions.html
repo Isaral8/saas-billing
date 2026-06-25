@@ -1,0 +1,55 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Subscriptions — iSaral{% endblock %}
+{% block page_title %}My Subscriptions{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:24px">
+  <h2 style="font-size:20px;font-weight:700">Subscriptions</h2>
+  <p style="color:var(--text-light);font-size:14px;margin-top:4px">Your active plan and billing history</p>
+</div>
+
+{% if subscriptions %}
+<div style="background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden">
+  <table style="width:100%;border-collapse:collapse">
+    <thead>
+      <tr style="background:#f9fafb;border-bottom:1px solid var(--border)">
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Plan</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Status</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Period Start</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Period End</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sub in subscriptions %}
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:14px 18px;font-size:14px;font-weight:600">{{ sub.plan.name }}</td>
+        <td style="padding:14px 18px">
+          <span style="padding:3px 10px;border-radius:50px;font-size:11px;font-weight:700;
+            {% if sub.status == 'active' %}background:#dcfce7;color:#166534
+            {% elif sub.status == 'past_due' %}background:#fee2e2;color:#991b1b
+            {% else %}background:#f3f4f6;color:#6b7280{% endif %}">
+            {{ sub.get_status_display }}
+          </span>
+        </td>
+        <td style="padding:14px 18px;font-size:13px;color:var(--text-light)">
+          {% if sub.current_period_start %}{{ sub.current_period_start|date:"d M Y" }}{% else %}—{% endif %}
+        </td>
+        <td style="padding:14px 18px;font-size:13px;color:var(--text-light)">
+          {% if sub.current_period_end %}{{ sub.current_period_end|date:"d M Y" }}{% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div style="background:#fff;border-radius:16px;border:1px solid var(--border);padding:60px 24px;text-align:center">
+  <div style="font-size:48px;margin-bottom:12px">📋</div>
+  <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">No active subscription</h3>
+  <p style="color:var(--text-light);font-size:14px;margin-bottom:20px">Choose a plan to get started.</p>
+  <a href="{% url 'accounts:plans' %}" style="background:var(--blue);color:#fff;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px">
+    View Plans
+  </a>
+</div>
+{% endif %}
+{% endblock %}

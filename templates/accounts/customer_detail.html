@@ -1,0 +1,628 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}Customer - {{ customer.name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* ── DETAIL PAGE STYLES ────────────────────────────────────────── */
+    .detail-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .detail-header-info h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0F172A;
+        letter-spacing: -0.4px;
+        margin-bottom: 4px;
+    }
+
+    .detail-header-info p {
+        font-size: 14px;
+        color: #64748B;
+    }
+
+    .detail-header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #1A56DB;
+        color: white;
+        box-shadow: 0 1px 3px rgba(12,26,46,0.12), 0 4px 14px rgba(26,86,219,0.3);
+    }
+
+    .btn-primary:hover {
+        background: #1143B0;
+        box-shadow: 0 2px 6px rgba(12,26,46,0.15), 0 6px 20px rgba(26,86,219,0.38);
+    }
+
+    .btn-secondary {
+        background: #fff;
+        color: #1F2937;
+        border: 1.5px solid #E2E8F0;
+    }
+
+    .btn-secondary:hover {
+        border-color: #B8CFE8;
+        background: #FAFCFF;
+    }
+
+    .btn-danger {
+        background: #FEE2E2;
+        color: #DC2626;
+        border: 1.5px solid #FECACA;
+    }
+
+    .btn-danger:hover {
+        background: #FEF2F2;
+        border-color: #FCA5A5;
+    }
+
+    /* ── MAIN GRID ─────────────────────────────────────────────────── */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+    @media (max-width: 1024px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── CARDS ─────────────────────────────────────────────────────── */
+    .card {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        padding: 18px;
+        border-bottom: 1px solid #E2E8F0;
+        background: #F8FAFC;
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0F172A;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 18px;
+    }
+
+    /* ── CUSTOMER INFO ─────────────────────────────────────────────── */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 14px 0;
+        border-bottom: 1px solid #E2E8F0;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+        min-width: 120px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        color: #1F2937;
+        font-weight: 500;
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
+    }
+
+    .info-value.link {
+        color: #1A56DB;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .info-value.link:hover {
+        text-decoration: underline;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #ECFDF5;
+        color: #065F46;
+    }
+
+    .status-active::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #059669;
+        border-radius: 50%;
+    }
+
+    .status-inactive {
+        background: #F3F4F6;
+        color: #6B7280;
+    }
+
+    .status-inactive::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #9CA3AF;
+        border-radius: 50%;
+    }
+
+    /* ── METRICS GRID ──────────────────────────────────────────────── */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .metric-card {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        padding: 14px;
+        text-align: center;
+    }
+
+    .metric-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748B;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+    }
+
+    .metric-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #0F172A;
+    }
+
+    /* ── TABLES ────────────────────────────────────────────────────── */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #F8FAFC;
+        border-bottom: 1px solid #E2E8F0;
+    }
+
+    th {
+        padding: 12px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #E2E8F0;
+        font-size: 13px;
+        color: #1F2937;
+    }
+
+    tbody tr:hover {
+        background: #F8FAFC;
+    }
+
+    .table-link {
+        color: #1A56DB;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .table-link:hover {
+        text-decoration: underline;
+    }
+
+    .status-paid {
+        background: #ECFDF5;
+        color: #065F46;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: #FEF3C7;
+        color: #B45309;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-overdue {
+        background: #FEE2E2;
+        color: #DC2626;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* ── EMPTY STATE ────────────────────────────────────────────────── */
+    .empty-table {
+        padding: 40px 20px;
+        text-align: center;
+        color: #94A3B8;
+        font-size: 14px;
+    }
+
+    .empty-table i {
+        font-size: 32px;
+        color: #E2E8F0;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+        .detail-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .detail-header-actions {
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .info-value {
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 8px;
+        }
+    }
+</style>
+
+<!-- Header -->
+<div class="detail-header">
+    <div class="detail-header-info">
+        <h1>{{ customer.name }}</h1>
+        <p>{{ customer.company|default:"Individual" }} · Joined {{ customer.created_at|date:"M d, Y" }}</p>
+    </div>
+    <div class="detail-header-actions">
+        <a href="{% url 'accounts:customer_edit' customer.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i>
+            Edit
+        </a>
+        <a href="{% url 'accounts:create_invoice' %}?customer={{ customer.id }}" class="btn btn-primary">
+            <i class="bi bi-file-earmark-plus"></i>
+            Create Invoice
+        </a>
+        <a href="{% url 'accounts:customer_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="detail-grid">
+    <!-- Left Column: Invoices & Tickets -->
+    <div>
+        <!-- Customer Contact Information Card -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-person-circle"></i>
+                    Contact Information
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <a href="mailto:{{ customer.email }}" class="info-value link">{{ customer.email }}</a>
+                </div>
+                {% if customer.phone %}
+                <div class="info-row">
+                    <span class="info-label">Phone</span>
+                    <a href="tel:{{ customer.phone }}" class="info-value link">{{ customer.phone }}</a>
+                </div>
+                {% endif %}
+                {% if customer.company %}
+                <div class="info-row">
+                    <span class="info-label">Company</span>
+                    <span class="info-value">{{ customer.company }}</span>
+                </div>
+                {% endif %}
+                {% if customer.gstin %}
+                <div class="info-row">
+                    <span class="info-label">GSTIN</span>
+                    <span class="info-value">{{ customer.gstin }}</span>
+                </div>
+                {% endif %}
+                {% if customer.state %}
+                <div class="info-row">
+                    <span class="info-label">State</span>
+                    <span class="info-value">{{ customer.state }}</span>
+                </div>
+                {% endif %}
+                {% if customer.address %}
+                <div class="info-row">
+                    <span class="info-label">Address</span>
+                    <span class="info-value">{{ customer.address }}</span>
+                </div>
+                {% endif %}
+                {% if customer.notes %}
+                <div class="info-row">
+                    <span class="info-label">Notes</span>
+                    <span class="info-value">{{ customer.notes }}</span>
+                </div>
+                {% endif %}
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    {% if customer.is_active %}
+                        <span class="status-badge status-active">Active</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoices Card -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-file-earmark-text"></i>
+                    Recent Invoices ({{ total_invoices }})
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if invoices %}
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in invoices %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'accounts:update_invoice' invoice.id %}" class="table-link">
+                                        {{ invoice.invoice_number }}
+                                    </a>
+                                </td>
+                                <td>₹{{ invoice.total|floatformat:2 }}</td>
+                                <td>
+                                    {% if invoice.status == 'paid' %}
+                                        <span class="status-paid">Paid</span>
+                                    {% elif invoice.status == 'overdue' %}
+                                        <span class="status-overdue">Overdue</span>
+                                    {% else %}
+                                        <span class="status-pending">{{ invoice.status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ invoice.issued_date|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 12px; text-align: right;">
+                    <a href="{% url 'accounts:invoices' %}?customer={{ customer.id }}" style="color: #1A56DB; text-decoration: none; font-size: 13px; font-weight: 600;">
+                        View all invoices →
+                    </a>
+                </div>
+                {% else %}
+                <div class="empty-table">
+                    <i class="bi bi-inbox"></i>
+                    No invoices created yet for this customer
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Support Tickets Card -->
+        {% if tickets %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-chat-dots"></i>
+                    Support Tickets
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket #</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'accounts:ticket_detail' ticket.id %}" class="table-link">
+                                        {{ ticket.ticket_number }}
+                                    </a>
+                                </td>
+                                <td>{{ ticket.subject }}</td>
+                                <td>
+                                    <span class="status-pending">{{ ticket.status|title }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Metrics & Quick Stats -->
+    <div>
+        <!-- Billing Metrics Card -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-graph-up"></i>
+                    Billing Metrics
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Invoices</div>
+                        <div class="metric-value">{{ total_invoices }}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Paid</div>
+                        <div class="metric-value" style="color: #059669;">{{ paid_invoices }}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Pending</div>
+                        <div class="metric-value" style="color: #B45309;">{{ pending_invoices }}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Total Spent</div>
+                        <div class="metric-value">₹{{ total_spent|floatformat:0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-lightning"></i>
+                    Quick Actions
+                </h3>
+            </div>
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="{% url 'accounts:create_invoice' %}?customer={{ customer.id }}" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    New Invoice
+                </a>
+                <a href="{% url 'accounts:customer_edit' customer.id %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                    <i class="bi bi-pencil"></i>
+                    Edit Info
+                </a>
+                <form method="POST" action="{% url 'accounts:delete_customer' customer.id %}" style="margin: 0;" onsubmit="return confirm('Delete this customer? This cannot be undone if they have no invoices.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center;">
+                        <i class="bi bi-trash"></i>
+                        Delete Customer
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- System Info Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-info-circle"></i>
+                    System Information
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">Created</span>
+                    <span class="info-value">{{ customer.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Last Updated</span>
+                    <span class="info-value">{{ customer.updated_at|date:"M d, Y H:i" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Customer ID</span>
+                    <span class="info-value" style="font-size: 11px; font-family: 'Courier New';">{{ customer.id }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

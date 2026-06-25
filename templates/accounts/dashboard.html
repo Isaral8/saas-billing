@@ -1,0 +1,494 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #1A56DB;
+        --primary-dark: #1143B0;
+        --success: #059669;
+        --warning: #D97706;
+        --danger: #DC2626;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-400: #9CA3AF;
+        --gray-500: #6B7280;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+        --gray-900: #111827;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--gray-50); color: var(--gray-700); }
+
+    .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 32px 20px; }
+
+    /* ════ FOUNDER BANNER ════ */
+    .founder-banner {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: linear-gradient(135deg, #0f1f3d 0%, #1A56DB 100%);
+        border-radius: 14px;
+        padding: 20px 28px;
+        margin-bottom: 32px;
+        box-shadow: 0 4px 20px rgba(26, 86, 219, 0.25);
+        flex-wrap: wrap;
+    }
+
+    .founder-photo-wrap {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .founder-photo {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255,255,255,0.35);
+        display: block;
+    }
+
+    .founder-online-dot {
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+        width: 14px;
+        height: 14px;
+        background: #22c55e;
+        border-radius: 50%;
+        border: 2px solid #0f1f3d;
+    }
+
+    .founder-info {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .founder-name {
+        font-size: 17px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 3px;
+    }
+
+    .founder-role {
+        font-size: 13px;
+        color: rgba(255,255,255,0.65);
+        margin-bottom: 6px;
+    }
+
+    .founder-tagline {
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
+        font-style: italic;
+    }
+
+    .founder-linkedin {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #0A66C2;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.25s;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    .founder-linkedin:hover {
+        background: #0A66C2;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(10,102,194,0.45);
+    }
+
+    .founder-linkedin svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+        flex-shrink: 0;
+    }
+
+    .linkedin-followers {
+        font-size: 11px;
+        font-weight: 400;
+        opacity: 0.75;
+        margin-left: 2px;
+    }
+
+    /* ════ HEADER ════ */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-title h1 { font-size: 36px; font-weight: 900; color: var(--gray-900); margin-bottom: 8px; }
+    .dashboard-title p  { font-size: 15px; color: var(--gray-500); font-weight: 500; }
+    .dashboard-actions  { display: flex; gap: 12px; }
+
+    .btn-primary {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--primary); color: white; padding: 11px 20px;
+        border-radius: 8px; border: none; font-size: 14px; font-weight: 600;
+        cursor: pointer; text-decoration: none; transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(26, 86, 219, 0.2);
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(26, 86, 219, 0.3); }
+
+    /* ════ KPI GRID ════ */
+    .kpi-section { margin-bottom: 48px; }
+    .section-title { font-size: 16px; font-weight: 700; color: var(--gray-600); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+
+    .kpi-card {
+        background: white; border: 1px solid var(--gray-200); border-radius: 12px;
+        padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: all 0.3s ease;
+    }
+    .kpi-card:hover { border-color: var(--primary); box-shadow: 0 8px 20px rgba(26,86,219,0.12); transform: translateY(-4px); }
+    .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .kpi-label { font-size: 12px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--gray-100); }
+    .kpi-value { font-size: 32px; font-weight: 900; color: var(--gray-900); margin-bottom: 12px; line-height: 1; }
+    .kpi-growth { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; color: var(--success); }
+
+    /* ════ CHARTS ════ */
+    .charts-section { margin-bottom: 48px; }
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: 24px; }
+    .chart-card { background: white; border: 1px solid var(--gray-200); border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+    .chart-card h3 { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--gray-100); }
+    .chart-wrapper { position: relative; height: 350px; width: 100%; flex: 1; }
+    canvas { max-height: 100% !important; }
+
+    /* ════ ACTIVITY ════ */
+    .activity-section { margin-bottom: 48px; }
+    .activity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 24px; }
+    .activity-card { background: white; border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; flex-direction: column; max-height: 500px; }
+    .activity-header { padding: 20px 24px; border-bottom: 2px solid var(--gray-100); background: var(--gray-50); }
+    .activity-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-900); margin: 0; }
+    .activity-body { overflow-y: auto; flex: 1; }
+    .activity-item { padding: 16px 24px; border-bottom: 1px solid var(--gray-100); transition: background 0.2s; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: var(--gray-50); }
+    .activity-title { font-size: 14px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+    .activity-meta { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+    .activity-status { display: inline-block; padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .status-paid     { background: #ECFDF5; color: var(--success); }
+    .status-pending  { background: #FEF3C7; color: var(--warning); }
+    .status-overdue  { background: #FEE2E2; color: var(--danger); }
+    .status-open     { background: #DBEAFE; color: var(--primary); }
+    .status-resolved { background: #ECFDF5; color: var(--success); }
+    .empty-state { padding: 40px 20px; text-align: center; color: var(--gray-400); font-size: 14px; }
+
+    /* ════ TOP CUSTOMERS ════ */
+    .customers-section { margin-bottom: 48px; }
+    .table-card { background: white; border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .table-header { padding: 20px 24px; border-bottom: 2px solid var(--gray-100); background: var(--gray-50); }
+    .table-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-900); margin: 0; }
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+    th { padding: 14px 24px; text-align: left; font-weight: 700; color: var(--gray-600); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 14px 24px; border-bottom: 1px solid var(--gray-100); }
+    tbody tr:hover { background: var(--gray-50); }
+    .rank-badge { font-weight: 900; color: var(--primary); font-size: 15px; }
+    .customer-name { font-weight: 700; color: var(--gray-900); }
+    .revenue-badge { background: var(--primary); color: white; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; display: inline-block; }
+
+    /* ════ RESPONSIVE ════ */
+    @media (max-width: 1024px) { .charts-grid { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+        .dashboard-container { padding: 20px 16px; }
+        .dashboard-header { flex-direction: column; align-items: flex-start; margin-bottom: 30px; }
+        .dashboard-title h1 { font-size: 28px; }
+        .kpi-grid, .activity-grid, .charts-grid { grid-template-columns: 1fr; }
+        .chart-wrapper { height: 300px; }
+        .founder-banner { gap: 14px; padding: 16px 18px; }
+    }
+</style>
+
+<div class="dashboard-container">
+
+    <!-- ════ FOUNDER BANNER ════ -->
+    <div class="founder-banner">
+        <div class="founder-photo-wrap">
+            <img
+                src="{% static 'images/founder.png.jpeg' %}"
+                alt="Founder photo"
+                class="founder-photo"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='none'; this.parentElement.innerHTML='<div style=\'width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:28px;\'>👤</div>';"
+            />
+            <span class="founder-online-dot"></span>
+        </div>
+        <div class="founder-info">
+            <div class="founder-name">Bhagyashree</div>
+            <div class="founder-role">Founder &amp; CEO · iSaral Business Solutions</div>
+            <div class="founder-tagline">Building smarter tools for growing businesses</div>
+        </div>
+        <a
+            href="https://www.linkedin.com/company/isaral-business-solutions-pvt-ltd/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="founder-linkedin"
+        >
+            <!-- LinkedIn logo SVG -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            Follow us on LinkedIn
+            <span class="linkedin-followers">· iSaral</span>
+        </a>
+    </div>
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>Dashboard</h1>
+            <p>Welcome, <strong>{{ user.email }}</strong></p>
+        </div>
+        <div class="dashboard-actions">
+            <a href="{% url 'accounts:create_invoice' %}" class="btn-primary">
+                <i class="bi bi-file-earmark-plus"></i> Create Invoice
+            </a>
+            <a href="{% url 'accounts:create_customer' %}" class="btn-primary">
+                <i class="bi bi-person-plus"></i> Add Customer
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-section">
+        <h2 class="section-title">📊 Key Performance Indicators</h2>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Total Customers</span>
+                    <div class="kpi-icon" style="background:#F0F4FF;color:var(--primary);"><i class="bi bi-people-fill"></i></div>
+                </div>
+                <div class="kpi-value">{{ total_customers }}</div>
+                <div class="kpi-growth"><i class="bi bi-arrow-up-short"></i>{{ this_month_customers }} this month</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Active Customers</span>
+                    <div class="kpi-icon" style="background:#ECFDF5;color:var(--success);"><i class="bi bi-check-circle-fill"></i></div>
+                </div>
+                <div class="kpi-value">{{ active_customers }}</div>
+                <div class="kpi-growth"><i class="bi bi-percent"></i>{{ customer_growth }} growth</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Total Revenue</span>
+                    <div class="kpi-icon" style="background:#F0F4FF;color:var(--primary);"><i class="bi bi-currency-rupee"></i></div>
+                </div>
+                <div class="kpi-value">₹{{ total_revenue }}</div>
+                <div class="kpi-growth"><i class="bi bi-arrow-up"></i>{{ revenue_growth }}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Total Paid</span>
+                    <div class="kpi-icon" style="background:#ECFDF5;color:var(--success);"><i class="bi bi-check2-all"></i></div>
+                </div>
+                <div class="kpi-value">₹{{ total_paid }}</div>
+                <div class="kpi-growth"><i class="bi bi-check-circle"></i>{{ paid_invoices }} invoices</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">GST Collected</span>
+                    <div class="kpi-icon" style="background:#FEF3C7;color:var(--warning);"><i class="bi bi-percent"></i></div>
+                </div>
+                <div class="kpi-value">₹{{ gst_collected }}</div>
+                <div class="kpi-growth" style="color:var(--gray-500);"><i class="bi bi-info-circle"></i>18% of revenue</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Pending Invoices</span>
+                    <div class="kpi-icon" style="background:#FEF3C7;color:var(--warning);"><i class="bi bi-hourglass-split"></i></div>
+                </div>
+                <div class="kpi-value">{{ pending_invoices }}</div>
+                <div class="kpi-growth" style="color:var(--gray-500);"><i class="bi bi-info-circle"></i>{{ overdue_invoices }} overdue</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Total Invoices</span>
+                    <div class="kpi-icon" style="background:#F0F4FF;color:var(--primary);"><i class="bi bi-file-text-fill"></i></div>
+                </div>
+                <div class="kpi-value">{{ total_invoices }}</div>
+                <div class="kpi-growth"><i class="bi bi-arrow-right"></i>{{ paid_invoices }} paid</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Support Tickets</span>
+                    <div class="kpi-icon" style="background:#DBEAFE;color:var(--primary);"><i class="bi bi-chat-dots-fill"></i></div>
+                </div>
+                <div class="kpi-value">{{ total_tickets }}</div>
+                <div class="kpi-growth"><i class="bi bi-check-circle"></i>{{ resolved_tickets }} resolved</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-section">
+        <h2 class="section-title">📈 Analytics &amp; Trends</h2>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>💰 Monthly Revenue (Last 12 Months)</h3>
+                <div class="chart-wrapper"><canvas id="revenueChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3>📊 Customer Growth (Last 12 Months)</h3>
+                <div class="chart-wrapper"><canvas id="customerGrowthChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3>🧾 Invoice Status Distribution</h3>
+                <div class="chart-wrapper"><canvas id="invoiceStatusChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3>🎫 Support Ticket Status</h3>
+                <div class="chart-wrapper"><canvas id="ticketStatusChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="activity-section">
+        <h2 class="section-title">📱 Recent Activity</h2>
+        <div class="activity-grid">
+            <div class="activity-card">
+                <div class="activity-header"><h3>👥 Recent Customers</h3></div>
+                <div class="activity-body">
+                    {% if recent_customers %}
+                        {% for customer in recent_customers %}
+                        <div class="activity-item">
+                            <div class="activity-title">{{ customer.name }}</div>
+                            <div class="activity-meta">📧 {{ customer.email }}</div>
+                            {% if customer.company %}<div class="activity-meta">🏢 {{ customer.company }}</div>{% endif %}
+                            <div class="activity-meta">📅 {{ customer.created_at|date:"d M Y" }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}<div class="empty-state">No customers yet</div>{% endif %}
+                </div>
+            </div>
+            <div class="activity-card">
+                <div class="activity-header"><h3>📄 Recent Invoices</h3></div>
+                <div class="activity-body">
+                    {% if recent_invoices %}
+                        {% for invoice in recent_invoices %}
+                        <div class="activity-item">
+                            <div class="activity-title">{{ invoice.invoice_number }}</div>
+                            <div class="activity-meta">{{ invoice.customer.name|default:"No Customer" }} · ₹{{ invoice.total }}</div>
+                            <span class="activity-status {% if invoice.status == 'paid' %}status-paid{% elif invoice.status == 'overdue' %}status-overdue{% else %}status-pending{% endif %}">
+                                {{ invoice.status|title }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}<div class="empty-state">No invoices yet</div>{% endif %}
+                </div>
+            </div>
+            <div class="activity-card">
+                <div class="activity-header"><h3>🎫 Recent Tickets</h3></div>
+                <div class="activity-body">
+                    {% if recent_tickets %}
+                        {% for ticket in recent_tickets %}
+                        <div class="activity-item">
+                            <div class="activity-title">{{ ticket.ticket_number }}</div>
+                            <div class="activity-meta">{{ ticket.subject }}</div>
+                            <div class="activity-meta">👤 {{ ticket.customer_name }}</div>
+                            <span class="activity-status {% if ticket.status == 'open' %}status-open{% elif ticket.status == 'resolved' %}status-resolved{% else %}status-pending{% endif %}">
+                                {{ ticket.status|title }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}<div class="empty-state">No tickets yet</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP CUSTOMERS -->
+    <div class="customers-section">
+        <h2 class="section-title">⭐ Top Customers</h2>
+        <div class="table-card">
+            <div class="table-header"><h3>Top 10 Customers by Revenue</h3></div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th><th>Customer Name</th><th>Email</th><th>Total Revenue</th><th>Invoices</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if top_customers %}
+                            {% for customer in top_customers %}
+                            <tr>
+                                <td><span class="rank-badge">#{{ forloop.counter }}</span></td>
+                                <td class="customer-name">{{ customer.name }}</td>
+                                <td>{{ customer.email }}</td>
+                                <td><span class="revenue-badge">₹{{ customer.total_revenue|default:"0" }}</span></td>
+                                <td style="font-weight:700;color:var(--gray-700);">{{ customer.total_invoices }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-400);">No customer data yet</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: {{ monthly_revenue_labels|safe }},
+                datasets: [{ label: 'Revenue', data: {{ monthly_revenue_values|safe }}, borderColor: '#1A56DB', backgroundColor: 'rgba(26,86,219,0.08)', borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#1A56DB', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: { size: 12, weight: 600 }, padding: 16, usePointStyle: true } } }, scales: { y: { beginAtZero: true, grid: { color: '#F3F4F6' }, ticks: { callback: v => '₹' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v), font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } } }
+        });
+    }
+    const customerCtx = document.getElementById('customerGrowthChart');
+    if (customerCtx) {
+        new Chart(customerCtx, {
+            type: 'bar',
+            data: { labels: {{ monthly_customers_labels|safe }}, datasets: [{ label: 'New Customers', data: {{ monthly_customers_values|safe }}, backgroundColor: '#059669', borderRadius: 8, hoverBackgroundColor: '#047857' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: { size: 12, weight: 600 }, padding: 16, usePointStyle: true } } }, scales: { y: { beginAtZero: true, grid: { color: '#F3F4F6' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } } }
+        });
+    }
+    const invoiceCtx = document.getElementById('invoiceStatusChart');
+    if (invoiceCtx) {
+        new Chart(invoiceCtx, {
+            type: 'doughnut',
+            data: { labels: ['Paid','Pending','Overdue','Draft'], datasets: [{ data: [{{ invoice_status_counts.paid }},{{ invoice_status_counts.pending }},{{ invoice_status_counts.overdue }},{{ invoice_status_counts.draft }}], backgroundColor: ['#059669','#D97706','#DC2626','#9CA3AF'], borderColor: '#fff', borderWidth: 3, hoverOffset: 10 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 12, weight: 600 }, padding: 20, usePointStyle: true } } } }
+        });
+    }
+    const ticketCtx = document.getElementById('ticketStatusChart');
+    if (ticketCtx) {
+        new Chart(ticketCtx, {
+            type: 'doughnut',
+            data: { labels: ['Open','In Progress','Resolved','Closed'], datasets: [{ data: [{{ ticket_status_counts.open }},{{ ticket_status_counts.in_progress }},{{ ticket_status_counts.resolved }},{{ ticket_status_counts.closed }}], backgroundColor: ['#1A56DB','#D97706','#059669','#9CA3AF'], borderColor: '#fff', borderWidth: 3, hoverOffset: 10 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 12, weight: 600 }, padding: 20, usePointStyle: true } } } }
+        });
+    }
+</script>
+{% endblock %}

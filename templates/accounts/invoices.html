@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoices — iSaral{% endblock %}
+{% block page_title %}Invoices{% endblock %}
+
+{% block content %}
+<div style="background-color: #f5f7fa; min-height: 100vh; padding: 30px 20px;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0;">Invoices</h1>
+        <p style="color: #666; font-size: 14px; margin: 0;">Manage all your invoices</p>
+      </div>
+      <a href="{% url 'accounts:create_invoice' %}" style="display: inline-flex; align-items: center; gap: 8px; background: #0066cc; color: white; padding: 11px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px;">
+        <i class="fa-solid fa-plus"></i> New Invoice
+      </a>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div style="margin-bottom: 16px; padding: 12px 16px; border-radius: 6px; border-left: 4px solid {% if message.tags == 'error' %}#e74c3c{% else %}#27ae60{% endif %}; background: {% if message.tags == 'error' %}#ffe8e8{% else %}#e8f8f5{% endif %}; color: {% if message.tags == 'error' %}#c0392b{% else %}#27ae60{% endif %}; font-size: 13px;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Filter Bar -->
+    <div style="background: white; border-radius: 10px; border: 1px solid #e8e8e8; padding: 16px 20px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+
+      <!-- Search -->
+      <div style="display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 180px;">
+        <label style="font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em;">Customer</label>
+        <div style="position: relative;">
+          <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 12px;"></i>
+          <input id="f-search" type="text" placeholder="Search by name…"
+            style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #1a1a1a; outline: none;"
+            oninput="applyFilters()" />
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 140px;">
+        <label style="font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em;">Status</label>
+        <select id="f-status"
+          style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #1a1a1a; background: white; outline: none; cursor: pointer;"
+          onchange="applyFilters()">
+          <option value="">All statuses</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+
+      <!-- Amount range -->
+      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 160px;">
+        <label style="font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em;">Amount</label>
+        <select id="f-amount"
+          style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #1a1a1a; background: white; outline: none; cursor: pointer;"
+          onchange="applyFilters()">
+          <option value="">Any amount</option>
+          <option value="0-10000">Under ₹10,000</option>
+          <option value="10000-50000">₹10,000 – ₹50,000</option>
+          <option value="50000-999999999">Above ₹50,000</option>
+        </select>
+      </div>
+
+      <!-- Date From -->
+      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 140px;">
+        <label style="font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em;">From date</label>
+        <input id="f-from" type="date"
+          style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #1a1a1a; outline: none;"
+          onchange="applyFilters()" />
+      </div>
+
+      <!-- Date To -->
+      <div style="display: flex; flex-direction: column; gap: 5px; min-width: 140px;">
+        <label style="font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em;">To date</label>
+        <input id="f-to" type="date"
+          style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #1a1a1a; outline: none;"
+          onchange="applyFilters()" />
+      </div>
+
+      <!-- Clear button -->
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-size: 11px; color: transparent;">.</label>
+        <button onclick="clearFilters()"
+          style="padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #666; background: #f5f7fa; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-xmark"></i> Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Active filter chips -->
+    <div id="chip-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; min-height: 4px;"></div>
+
+    <!-- Invoices Table -->
+    <div style="background: white; border-radius: 10px; border: 1px solid #e8e8e8; overflow: hidden;">
+
+      {% if invoices %}
+        <div style="overflow-x: auto;">
+          <table id="invoice-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="background-color: #f8f9fa; border-bottom: 1px solid #e8e8e8;">
+                <th onclick="sortTable('inv')" style="padding: 12px 20px; text-align: left; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; cursor: pointer; user-select: none; white-space: nowrap;">
+                  Invoice # <span id="sort-inv" style="opacity:0.4;">↕</span>
+                </th>
+                <th onclick="sortTable('customer')" style="padding: 12px 20px; text-align: left; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; cursor: pointer; user-select: none; white-space: nowrap;">
+                  Customer <span id="sort-customer" style="opacity:0.4;">↕</span>
+                </th>
+                <th onclick="sortTable('amount')" style="padding: 12px 20px; text-align: left; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; cursor: pointer; user-select: none; white-space: nowrap;">
+                  Amount <span id="sort-amount" style="opacity:0.4;">↕</span>
+                </th>
+                <th onclick="sortTable('status')" style="padding: 12px 20px; text-align: left; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; cursor: pointer; user-select: none; white-space: nowrap;">
+                  Status <span id="sort-status" style="opacity:0.4;">↕</span>
+                </th>
+                <th onclick="sortTable('date')" style="padding: 12px 20px; text-align: left; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; cursor: pointer; user-select: none; white-space: nowrap;">
+                  Date <span id="sort-date" style="opacity:0.4;">↕</span>
+                </th>
+                <th style="padding: 12px 20px; text-align: center; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoice-body">
+              {% for invoice in invoices %}
+                <tr class="invoice-row"
+                  data-customer="{% if invoice.customer %}{{ invoice.customer.name|lower }}{% endif %}"
+                  data-status="{{ invoice.status }}"
+                  data-amount="{{ invoice.total }}"
+                  data-date="{{ invoice.issued_date|date:'Y-m-d' }}"
+                  style="border-bottom: 1px solid #f0f0f0;">
+                  <td style="padding: 12px 20px;">
+                    <span style="font-weight: 600; color: #0066cc; font-family: monospace; font-size: 12px;">{{ invoice.invoice_number }}</span>
+                  </td>
+                  <td style="padding: 12px 20px; color: #1a1a1a;">
+                    {% if invoice.customer %}{{ invoice.customer.name }}{% else %}<span style="color:#999;">—</span>{% endif %}
+                  </td>
+                  <td style="padding: 12px 20px; color: #1a1a1a; font-weight: 500;">₹{{ invoice.total }}</td>
+                  <td style="padding: 12px 20px;">
+                    {% if invoice.status == 'paid' %}
+                      <span style="background:#e8f8f5;color:#27ae60;padding:4px 10px;border-radius:4px;font-weight:500;font-size:12px;">✓ Paid</span>
+                    {% elif invoice.status == 'issued' or invoice.status == 'draft' or invoice.status == 'pending' %}
+                      <span style="background:#fff8e8;color:#ff9800;padding:4px 10px;border-radius:4px;font-weight:500;font-size:12px;">⏱ Pending</span>
+                    {% elif invoice.status == 'overdue' %}
+                      <span style="background:#ffe8e8;color:#e74c3c;padding:4px 10px;border-radius:4px;font-weight:500;font-size:12px;">⚠ Overdue</span>
+                    {% else %}
+                      <span style="background:#f0f0f0;color:#666;padding:4px 10px;border-radius:4px;font-weight:500;font-size:12px;">{{ invoice.status }}</span>
+                    {% endif %}
+                  </td>
+                  <td style="padding: 12px 20px; color: #666; font-size: 12px;">{{ invoice.issued_date|date:"d M, Y" }}</td>
+                  <td style="padding: 12px 20px; text-align: center;">
+                    <div style="display: flex; gap: 8px; justify-content: center;">
+                      <a href="{% url 'accounts:invoice_pdf' invoice.id %}" style="background:#f0f2f5;color:#0066cc;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;">
+                        📥 Download
+                      </a>
+                      <a href="{% url 'accounts:email_invoice' invoice.id %}" style="background:#e8f4ff;color:#0066cc;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;" onclick="return confirm('Send invoice to {{ invoice.customer.email }}?')">
+                        📧 Email
+                      </a>
+                      <a href="{% url 'accounts:update_invoice' invoice.id %}" style="background:#f0f2f5;color:#1a1a1a;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;">
+                        Edit
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No results row (hidden by default) -->
+        <div id="no-results" style="display: none; padding: 50px 20px; text-align: center;">
+          <div style="font-size: 36px; margin-bottom: 12px; color: #ddd;">🔍</div>
+          <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0 0 6px 0;">No invoices match your filters</h3>
+          <p style="color: #999; font-size: 13px; margin: 0 0 14px 0;">Try adjusting or clearing your filters</p>
+          <button onclick="clearFilters()" style="background:#0066cc;color:white;padding:9px 18px;border-radius:6px;border:none;font-size:13px;cursor:pointer;font-weight:500;">Clear filters</button>
+        </div>
+
+      {% else %}
+        <div style="padding: 60px 20px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px; color: #ddd;">📄</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 8px 0;">No invoices yet</h3>
+          <p style="color: #999; font-size: 14px; margin: 0 0 20px 0;">Create your first invoice to get started</p>
+          <a href="{% url 'accounts:create_invoice' %}" style="display:inline-block;background:#0066cc;color:white;padding:11px 20px;border-radius:6px;text-decoration:none;font-weight:500;font-size:14px;">
+            <i class="fa-solid fa-plus"></i> Create Invoice
+          </a>
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Stats Section -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 30px;">
+      <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e8e8e8; text-align: center;">
+        <p style="color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; font-weight: 600;">Total Invoices</p>
+        <h3 id="stat-count" style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0;">{{ total_invoices_count }}</h3>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e8e8e8; text-align: center;">
+        <p style="color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; font-weight: 600;">Total Amount</p>
+        <h3 id="stat-total" style="font-size: 28px; font-weight: 700; color: #0066cc; margin: 0;">₹{{ total_amount }}</h3>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e8e8e8; text-align: center;">
+        <p style="color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; font-weight: 600;">Paid</p>
+        <h3 id="stat-paid" style="font-size: 28px; font-weight: 700; color: #27ae60; margin: 0;">₹{{ paid_amount }}</h3>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  table tbody tr.invoice-row:hover { background-color: #f8f9fa; }
+  #f-search:focus, #f-status:focus, #f-amount:focus, #f-from:focus, #f-to:focus {
+    border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+  }
+  .filter-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #e8f0ff; color: #0055bb; font-size: 12px; font-weight: 500;
+    padding: 4px 10px; border-radius: 99px;
+  }
+  .filter-chip button {
+    background: none; border: none; color: #0055bb; cursor: pointer;
+    font-size: 14px; line-height: 1; padding: 0; margin-left: 2px;
+  }
+</style>
+
+<script>
+  let sortKey = 'date';
+  let sortDir = -1;
+
+  function applyFilters() {
+    const q      = document.getElementById('f-search').value.trim().toLowerCase();
+    const status = document.getElementById('f-status').value;
+    const amount = document.getElementById('f-amount').value;
+    const from   = document.getElementById('f-from').value;
+    const to     = document.getElementById('f-to').value;
+
+    const rows = document.querySelectorAll('.invoice-row');
+    let visibleCount = 0;
+    let visibleTotal = 0;
+    let visiblePaid  = 0;
+
+    rows.forEach(row => {
+      const customer = row.dataset.customer || '';
+      const rowStatus = row.dataset.status || '';
+      const rowAmount = parseFloat(row.dataset.amount) || 0;
+      const rowDate   = row.dataset.date || '';
+
+      // Normalise statuses: draft/issued/pending → pending
+      const normStatus = (rowStatus === 'draft' || rowStatus === 'issued') ? 'pending' : rowStatus;
+
+      let show = true;
+
+      if (q && !customer.includes(q)) show = false;
+
+      if (status && normStatus !== status) show = false;
+
+      if (amount) {
+        const [lo, hi] = amount.split('-').map(Number);
+        if (rowAmount < lo || rowAmount > hi) show = false;
+      }
+
+      if (from && rowDate < from) show = false;
+      if (to   && rowDate > to)   show = false;
+
+      row.style.display = show ? '' : 'none';
+
+      if (show) {
+        visibleCount++;
+        visibleTotal += rowAmount;
+        if (rowStatus === 'paid') visiblePaid += rowAmount;
+      }
+    });
+
+    // Show/hide no-results message
+    const noResults = document.getElementById('no-results');
+    if (noResults) noResults.style.display = visibleCount === 0 ? '' : 'none';
+
+    // Update stat cards
+    document.getElementById('stat-count').textContent = visibleCount;
+    document.getElementById('stat-total').textContent = '₹' + visibleTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('stat-paid').textContent  = '₹' + visiblePaid.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    renderChips(q, status, amount, from, to);
+  }
+
+  function renderChips(q, status, amount, from, to) {
+    const row = document.getElementById('chip-row');
+    row.innerHTML = '';
+
+    function addChip(label, clearFn) {
+      const chip = document.createElement('span');
+      chip.className = 'filter-chip';
+      chip.innerHTML = label + ' <button onclick="' + clearFn + '">×</button>';
+      row.appendChild(chip);
+    }
+
+    if (q) addChip('Customer: ' + q, "document.getElementById('f-search').value=''; applyFilters()");
+    if (status) addChip('Status: ' + status, "document.getElementById('f-status').value=''; applyFilters()");
+    if (amount) {
+      const labels = {'0-10000':'Under ₹10,000','10000-50000':'₹10,000–₹50,000','50000-999999999':'Above ₹50,000'};
+      addChip('Amount: ' + (labels[amount] || amount), "document.getElementById('f-amount').value=''; applyFilters()");
+    }
+    if (from) addChip('From: ' + from, "document.getElementById('f-from').value=''; applyFilters()");
+    if (to)   addChip('To: '   + to,   "document.getElementById('f-to').value=''; applyFilters()");
+  }
+
+  function clearFilters() {
+    document.getElementById('f-search').value  = '';
+    document.getElementById('f-status').value  = '';
+    document.getElementById('f-amount').value  = '';
+    document.getElementById('f-from').value    = '';
+    document.getElementById('f-to').value      = '';
+    applyFilters();
+  }
+
+  function sortTable(key) {
+    if (sortKey === key) sortDir *= -1;
+    else { sortKey = key; sortDir = 1; }
+
+    // Reset all sort icons
+    ['inv','customer','amount','status','date'].forEach(k => {
+      const el = document.getElementById('sort-' + k);
+      if (el) { el.textContent = '↕'; el.style.opacity = '0.4'; }
+    });
+    const activeIcon = document.getElementById('sort-' + key);
+    if (activeIcon) {
+      activeIcon.textContent = sortDir === 1 ? '↑' : '↓';
+      activeIcon.style.opacity = '1';
+    }
+
+    const tbody = document.getElementById('invoice-body');
+    const rows  = Array.from(tbody.querySelectorAll('.invoice-row'));
+
+    rows.sort((a, b) => {
+      let av, bv;
+      if (key === 'amount') {
+        av = parseFloat(a.dataset.amount) || 0;
+        bv = parseFloat(b.dataset.amount) || 0;
+        return sortDir * (av - bv);
+      }
+      if (key === 'date') {
+        av = a.dataset.date || '';
+        bv = b.dataset.date || '';
+        return sortDir * av.localeCompare(bv);
+      }
+      if (key === 'customer') {
+        av = a.dataset.customer || '';
+        bv = b.dataset.customer || '';
+        return sortDir * av.localeCompare(bv);
+      }
+      if (key === 'status') {
+        av = a.dataset.status || '';
+        bv = b.dataset.status || '';
+        return sortDir * av.localeCompare(bv);
+      }
+      // inv number
+      av = a.querySelector('td span').textContent;
+      bv = b.querySelector('td span').textContent;
+      return sortDir * av.localeCompare(bv);
+    });
+
+    rows.forEach(r => tbody.appendChild(r));
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Invoices — iSaral{% endblock %}
+{% block page_title %}Invoices{% endblock %}
+
+{% block extra_head %}
+<style>
+  .badge-paid     { background:#dcfce7; color:#166534; }
+  .badge-unpaid   { background:#fef9c3; color:#854d0e; }
+  .badge-default  { background:#f3f4f6; color:#6b7280; }
+  .badge {
+    padding: 3px 10px; border-radius: 50px;
+    font-size: 11px; font-weight: 700; display: inline-block;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:24px">
+  <h2 style="font-size:20px;font-weight:700">Invoices</h2>
+  <p style="color:var(--text-light);font-size:14px;margin-top:4px">All your GST-compliant invoices</p>
+</div>
+
+{% if invoices %}
+<div style="background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden">
+  <table style="width:100%;border-collapse:collapse">
+    <thead>
+      <tr style="background:#f9fafb;border-bottom:1px solid var(--border)">
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Invoice #</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Subtotal</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">GST</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Total</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Status</th>
+        <th style="padding:14px 18px;text-align:left;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inv in invoices %}
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:14px 18px;font-size:14px;font-weight:600">{{ inv.invoice_number }}</td>
+        <td style="padding:14px 18px;font-size:14px">₹{{ inv.subtotal }}</td>
+        <td style="padding:14px 18px;font-size:13px;color:var(--text-light)">₹{{ inv.gst_total }}</td>
+        <td style="padding:14px 18px;font-size:14px;font-weight:700">₹{{ inv.total }}</td>
+        <td style="padding:14px 18px">
+          <span class="badge {% if inv.status == 'paid' %}badge-paid{% elif inv.status == 'unpaid' %}badge-unpaid{% else %}badge-default{% endif %}">
+            {{ inv.get_status_display }}
+          </span>
+        </td>
+        <td style="padding:14px 18px;font-size:13px;color:var(--text-light)">{{ inv.created_at|date:"d M Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div style="background:#fff;border-radius:16px;border:1px solid var(--border);padding:60px 24px;text-align:center">
+  <div style="font-size:48px;margin-bottom:12px">🧾</div>
+  <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">No invoices yet</h3>
+  <p style="color:var(--text-light);font-size:14px">Invoices will appear here after your first payment.</p>
+</div>
+{% endif %}
+{% endblock %}
