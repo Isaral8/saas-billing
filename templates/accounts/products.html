@@ -1,0 +1,518 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products — iSaral{% endblock %}
+{% block page_title %}Products{% endblock %}
+
+{% block content %}
+
+<style>
+  .prod-page {
+    padding: 1.75rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .prod-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .prod-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .prod-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .prod-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 0;
+  }
+
+  .prod-btn-primary {
+    height: 38px;
+    padding: 0 18px;
+    background: #185FA5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .12s;
+  }
+
+  .prod-btn-primary:hover {
+    background: #0C447C;
+  }
+
+  .prod-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .prod-stat-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .prod-stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: #185FA5;
+    margin: 0;
+  }
+
+  .prod-stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 4px 0 0;
+  }
+
+  .prod-search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.75rem;
+  }
+
+  .prod-search-bar input {
+    flex: 1;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fff;
+  }
+
+  .prod-search-bar input:focus {
+    border-color: #378ADD;
+    box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+    outline: none;
+  }
+
+  .prod-search-btn {
+    height: 38px;
+    padding: 0 16px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+
+  .prod-search-btn:hover {
+    background: #e5e7eb;
+  }
+
+  .prod-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .prod-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .prod-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .prod-table thead {
+    background: #f8fafd;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .prod-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .prod-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #111827;
+  }
+
+  .prod-table tbody tr:hover {
+    background: #f9fafb;
+  }
+
+  .prod-name {
+    font-weight: 600;
+    color: #185FA5;
+  }
+
+  .prod-description {
+    font-size: 12px;
+    color: #6b7280;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .prod-price {
+    font-weight: 600;
+    color: #059669;
+  }
+
+  .prod-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .prod-badge-active {
+    background: #ECFDF5;
+    color: #047857;
+  }
+
+  .prod-badge-inactive {
+    background: #F3F4F6;
+    color: #6B7280;
+  }
+
+  .prod-badge-hsn {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  .prod-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .prod-action-btn {
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .12s;
+    color: #374151;
+  }
+
+  .prod-action-btn:hover {
+    background: #f3f4f6;
+  }
+
+  .prod-action-btn-delete {
+    border-color: #fca5a5;
+    background: #FEF2F2;
+    color: #A32D2D;
+  }
+
+  .prod-action-btn-delete:hover {
+    background: #FFEBEE;
+  }
+
+  .prod-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .prod-empty-icon {
+    font-size: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .prod-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+  }
+
+  .prod-empty-text {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 1rem;
+  }
+
+  .prod-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 1rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .prod-pagination a,
+  .prod-pagination span {
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .prod-pagination a {
+    background: #fff;
+    color: #374151;
+    transition: all .12s;
+  }
+
+  .prod-pagination a:hover {
+    background: #f3f4f6;
+  }
+
+  .prod-pagination .current {
+    background: #185FA5;
+    color: #fff;
+    border-color: #185FA5;
+  }
+
+  .alerts-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .alert-success {
+    background: #ECFDF5;
+    color: #047857;
+    border: 1px solid #D1FAE5;
+  }
+
+  .alert-danger {
+    background: #FEF2F2;
+    color: #A32D2D;
+    border: 1px solid #FCA5A5;
+  }
+
+  @media (max-width: 768px) {
+    .prod-page {
+      padding: 1rem;
+    }
+    .prod-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .prod-stats {
+      grid-template-columns: 1fr;
+    }
+    .prod-search-bar {
+      flex-direction: column;
+    }
+    .prod-table {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="prod-page">
+
+  <!-- Header -->
+  <div class="prod-header">
+    <div class="prod-header-left">
+      <div>
+        <h1>Products</h1>
+        <p>Manage your product/service master list</p>
+      </div>
+    </div>
+    <a href="{% url 'accounts:create_product' %}" class="prod-btn-primary">
+      <i class="fa-solid fa-plus"></i> Add Product
+    </a>
+  </div>
+
+  <!-- Alerts -->
+  {% if messages %}
+    <div class="alerts-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+          <button type="button" onclick="this.parentElement.style.display='none';" style="float:right; background:none; border:none; cursor:pointer; font-size:16px;">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Stats -->
+  <div class="prod-stats">
+    <div class="prod-stat-card">
+      <p class="prod-stat-value">{{ total_products }}</p>
+      <p class="prod-stat-label">Total Products</p>
+    </div>
+    <div class="prod-stat-card">
+      <p class="prod-stat-value" style="color: #059669;">{{ active_products }}</p>
+      <p class="prod-stat-label">Active</p>
+    </div>
+    <div class="prod-stat-card">
+      <p class="prod-stat-value" style="color: #6b7280;">{{ total_products|add:"-"|add:active_products }}</p>
+      <p class="prod-stat-label">Inactive</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="prod-search-bar">
+    <form method="GET" style="display: flex; gap: 8px; flex: 1;">
+      <input type="text" name="search" placeholder="Search by name, description, or HSN/SAC..."
+             value="{{ search_query }}" style="flex: 1;">
+      <button type="submit" class="prod-search-btn">
+        <i class="fa-solid fa-search"></i> Search
+      </button>
+      {% if search_query %}
+        <a href="{% url 'accounts:products_list' %}" class="prod-search-btn" style="text-decoration:none;">
+          <i class="fa-solid fa-xmark"></i> Clear
+        </a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Products Table -->
+  {% if products %}
+    <div class="prod-card">
+      <div class="prod-table-wrapper">
+        <table class="prod-table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Description</th>
+              <th>HSN/SAC</th>
+              <th>Price (₹)</th>
+              <th>GST Rate</th>
+              <th>Status</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+              <tr>
+                <td>
+                  <div class="prod-name">{{ product.name }}</div>
+                </td>
+                <td>
+                  <div class="prod-description">{{ product.description|default:"—" }}</div>
+                </td>
+                <td>
+                  {% if product.hsn_sac %}
+                    <span class="prod-badge prod-badge-hsn">{{ product.hsn_sac }}</span>
+                  {% else %}
+                    <span style="color: #9ca3af;">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="prod-price">₹{{ product.price|floatformat:2 }}</span>
+                </td>
+                <td>
+                  <span>{{ product.gst_rate|floatformat:2 }}%</span>
+                </td>
+                <td>
+                  {% if product.is_active %}
+                    <span class="prod-badge prod-badge-active">✓ Active</span>
+                  {% else %}
+                    <span class="prod-badge prod-badge-inactive">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="prod-actions" style="justify-content: center;">
+                    <a href="{% url 'accounts:edit_product' product.id %}" class="prod-action-btn">
+                      <i class="fa-solid fa-pencil"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'accounts:delete_product' product.id %}"
+                          style="display:inline;" onsubmit="return confirm('Delete this product?');">
+                      {% csrf_token %}
+                      <button type="submit" class="prod-action-btn prod-action-btn-delete">
+                        <i class="fa-solid fa-trash"></i> Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+        <div class="prod-pagination">
+          {% if page_obj.has_previous %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">« First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">‹ Prev</a>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <span class="current">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last »</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="prod-card">
+      <div class="prod-empty">
+        <div class="prod-empty-icon">📦</div>
+        <p class="prod-empty-title">No products found</p>
+        <p class="prod-empty-text">
+          {% if search_query %}
+            No products match your search. Try different keywords.
+          {% else %}
+            Start by creating your first product to use in invoices.
+          {% endif %}
+        </p>
+        <a href="{% url 'accounts:create_product' %}" class="prod-btn-primary">
+          <i class="fa-solid fa-plus"></i> Create First Product
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1461,16 +1461,17 @@
 }
 
 
-/* =================================
-   INTEGRATIONS SECTION - DYNAMIC SPLIT LAYOUT
-================================= */
+/* ==========================================================================
+   DYNAMIC INTEGRATIONS MODULE STYLING
+   ========================================================================== */
 .integrations-section {
   padding: 120px 0;
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   position: relative;
   overflow: hidden;
 }
+
 .integrations-section::before {
   content: '';
   position: absolute;
@@ -1481,6 +1482,7 @@
   pointer-events: none;
   z-index: 0;
 }
+
 .integrations-inner {
   position: relative;
   z-index: 1;
@@ -1489,6 +1491,7 @@
   gap: 80px;
   align-items: center;
 }
+
 .integrations-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -1504,6 +1507,7 @@
   border-radius: 50px;
   border: 1px solid var(--primary-mid);
 }
+
 .integrations-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(26px, 3.2vw, 40px);
@@ -1513,7 +1517,11 @@
   color: var(--text);
   margin-bottom: 14px;
 }
-.integrations-title .blue { color: var(--primary); }
+
+.integrations-title .blue {
+  color: var(--primary);
+}
+
 .integrations-subtitle {
   font-size: 16px;
   font-weight: 500;
@@ -1521,16 +1529,19 @@
   line-height: 1.75;
   margin-bottom: 36px;
 }
+
+/* Integrations Pill Grid Layout */
 .integrations-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+
 .integ-pill {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #fff;
+  background: #ffffff;
   border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 14px 18px;
@@ -1538,17 +1549,19 @@
   font-weight: 700;
   color: var(--text);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 .integ-pill:hover {
   border-color: var(--primary);
-  box-shadow: 0 8px 24px rgba(26,86,219,0.15);
+  box-shadow: 0 8px 24px rgba(26, 86, 219, 0.15);
   transform: translateY(-4px) scale(1.02);
   color: var(--primary);
   background: var(--primary-light);
 }
+
 .integ-logo {
   width: 32px;
   height: 32px;
@@ -1560,613 +1573,260 @@
   font-size: 18px;
   overflow: hidden;
 }
-/* ==========================================================
-   INTEGRATION VISUAL
-========================================================== */
 
-.integrations-right{
-    position:relative;
-    min-height:650px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-}
-
-/* Center */
-
-.center-orbit{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    width:220px;
-    height:220px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:10;
-}
-
-/* Glow */
-
-.center-orbit::before{
-    content:"";
-    position:absolute;
-    width:360px;
-    height:360px;
-    border-radius:50%;
-    background:radial-gradient(circle,
-        rgba(26,86,219,.16),
-        rgba(26,86,219,.06),
-        transparent 72%);
-    filter:blur(18px);
-}
-
-/* Rings */
-
-.orbit-ring{
-    position:absolute;
-    border-radius:50%;
-    border:2px dashed rgba(26,86,219,.18);
-}
-
-.ring1{
-    width:140px;
-    height:140px;
-    animation:rotateRing 14s linear infinite;
-}
-
-.ring2{
-    width:220px;
-    height:220px;
-    animation:rotateRing 22s linear infinite reverse;
-}
-
-.ring3{
-    width:300px;
-    height:300px;
-    animation:rotateRing 30s linear infinite;
-}
-
-@keyframes rotateRing{
-
-from{transform:rotate(0deg);}
-to{transform:rotate(360deg);}
-
-}
-
-/* Logo */
-
-.orbit-logo{
-
-    width:90px;
-    height:90px;
-    border-radius:22px;
-    background:#fff;
-    padding:15px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    box-shadow:
-    0 20px 45px rgba(26,86,219,.16),
-    0 0 0 10px rgba(26,86,219,.05);
-
-    animation:pulseLogo 3s ease-in-out infinite;
-}
-
-.orbit-logo img{
-
-    width:60px;
-    height:auto;
-
-}
-
-@keyframes pulseLogo{
-
-0%,100%{
-
-transform:scale(1);
-
-}
-
-50%{
-
-transform:scale(1.08);
-
-}
-
-}
-
-/* Floating Cards */
-
-.float-card{
-
-    position:absolute;
-    width:245px;
-    background:#fff;
-    border-radius:18px;
-    padding:16px 18px;
-
-    display:flex;
-    align-items:center;
-    gap:14px;
-
-    border:1px solid #E5E7EB;
-
-    box-shadow:
-    0 15px 45px rgba(15,23,42,.08);
-
-    transition:.35s ease;
-    animation:floatCard 5s ease-in-out infinite;
-}
-
-.float-card:hover{
-
-    transform:translateY(-8px);
-    box-shadow:
-    0 25px 60px rgba(26,86,219,.18);
-
-}
-
-/* Floating Animation */
-
-@keyframes floatCard{
-
-0%,100%{
-
-transform:translateY(0px);
-
-}
-
-50%{
-
-transform:translateY(-12px);
-
-}
-
-}
-
-/* Positions */
-
-.payment{
-
-top:35px;
-left:30px;
-
-}
-
-.gst{
-
-top:110px;
-right:10px;
-
-}
-
-.tally{
-
-bottom:120px;
-left:20px;
-
-}
-
-.reminder{
-
-bottom:30px;
-right:30px;
-
-}
-
-/* Connector Lines */
-
-.float-card::after{
-
-content:"";
-position:absolute;
-height:2px;
-width:70px;
-background:linear-gradient(90deg,#1A56DB,transparent);
-
-}
-
-.payment::after{
-
-left:100%;
-top:50%;
-
-}
-
-.gst::after{
-
-right:100%;
-top:50%;
-transform:rotate(180deg);
-
-}
-
-.tally::after{
-
-left:100%;
-top:50%;
-
-}
-
-.reminder::after{
-
-right:100%;
-top:50%;
-transform:rotate(180deg);
-
-}
-
-/* Icon */
-
-.float-icon{
-
-width:48px;
-height:48px;
-border-radius:14px;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-font-size:22px;
-
-flex-shrink:0;
-
-}
-
-/* Text */
-
-.float-text{
-
-flex:1;
-
-}
-
-.float-text strong{
-
-display:block;
-font-size:15px;
-font-weight:800;
-color:#111827;
-margin-bottom:2px;
-
-}
-
-.float-text span{
-
-font-size:12px;
-color:#6B7280;
-
-}
-
-/* Badge */
-
-.float-badge{
-
-margin-left:auto;
-padding:5px 10px;
-
-font-size:11px;
-font-weight:700;
-
-border-radius:20px;
-
-white-space:nowrap;
-
-}
-
-.badge-green{
-
-background:#ECFDF5;
-color:#059669;
-
-}
-
-.badge-blue{
-
-background:#EFF6FF;
-color:#2563EB;
-
-}
-
-.badge-orange{
-
-background:#FFF7ED;
-color:#EA580C;
-
-}
-
-/* Responsive */
-
-@media(max-width:991px){
-
-.integrations-inner{
-
-grid-template-columns:1fr;
-gap:60px;
-
-}
-
-.integrations-right{
-
-min-height:760px;
-
-}
-
-.float-card{
-
-width:220px;
-
-}
-
-.payment{
-
-top:0;
-left:50%;
-transform:translateX(-50%);
-
-}
-
-.gst{
-
-top:170px;
-right:0;
-
-}
-
-.tally{
-
-bottom:180px;
-left:0;
-
-}
-
-.reminder{
-
-bottom:20px;
-left:50%;
-right:auto;
-transform:translateX(-50%);
-
-}
-
-}
-
-@media(max-width:600px){
-
-.integrations-list{
-
-grid-template-columns:1fr;
-
-}
-
-.integrations-right{
-
-display:none;
-
-}
-
-}
-    /* ===============================
-   PREMIUM WHY ISARAL
-================================*/
-
-.section.bg-gray{
-    position:relative;
-    overflow:hidden;
-    padding:110px 0;
-    background:
-        radial-gradient(circle at top left,#dbeafe 0%,transparent 35%),
-        radial-gradient(circle at bottom right,#eff6ff 0%,transparent 35%),
-        linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-}
-
-.section.bg-gray::before{
-    content:"";
-    position:absolute;
-    width:260px;
-    height:260px;
-    border-radius:50%;
-    background:rgba(59,130,246,.08);
-    top:-120px;
-    right:-80px;
-    filter:blur(20px);
-}
-
-.section.bg-gray::after{
-    content:"";
-    position:absolute;
-    width:220px;
-    height:220px;
-    border-radius:50%;
-    background:rgba(14,165,233,.08);
-    bottom:-100px;
-    left:-80px;
-    filter:blur(30px);
-}
-
-.why-grid{
-
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:30px;
-    margin-top:70px;
-
-}
-
-.why-card{
-
-    position:relative;
-
-    background:rgba(255,255,255,.78);
-
-    backdrop-filter:blur(18px);
-
-    border:1px solid rgba(255,255,255,.6);
-
-    border-radius:24px;
-
-    padding:36px;
-
-    transition:.35s cubic-bezier(.4,0,.2,1);
-
-    box-shadow:
-        0 10px 35px rgba(15,23,42,.06),
-        0 2px 8px rgba(15,23,42,.04);
-
-    overflow:hidden;
-
-}
-
-.why-card::before{
-
-    content:"";
-
-    position:absolute;
-
-    inset:0;
-
-    background:linear-gradient(
-        135deg,
-        rgba(37,99,235,.08),
-        transparent 45%
-    );
-
-    opacity:0;
-
-    transition:.35s;
-
-}
-
-.why-card:hover{
-
-    transform:translateY(-10px);
-
-    box-shadow:
-        0 30px 70px rgba(37,99,235,.18);
-
-    border-color:#3b82f6;
-
-}
-
-.why-card:hover::before{
-
-    opacity:1;
-
-}
-
-.why-icon{
-
-    width:70px;
-
-    height:70px;
-
-    border-radius:20px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:34px;
-
-    margin-bottom:24px;
-
-    background:linear-gradient(135deg,#2563eb,#60a5fa);
-
-    color:#fff;
-
-    box-shadow:0 12px 24px rgba(37,99,235,.25);
-
-    transition:.35s;
-
-}
-
-.why-card:nth-child(2) .why-icon{
-background:linear-gradient(135deg,#10b981,#6ee7b7);
-}
-
-.why-card:nth-child(3) .why-icon{
-background:linear-gradient(135deg,#f59e0b,#fcd34d);
-}
-
-.why-card:nth-child(4) .why-icon{
-background:linear-gradient(135deg,#8b5cf6,#c084fc);
-}
-
-.why-card:nth-child(5) .why-icon{
-background:linear-gradient(135deg,#ec4899,#f9a8d4);
-}
-
-.why-card:nth-child(6) .why-icon{
-background:linear-gradient(135deg,#06b6d4,#67e8f9);
-}
-
-.why-card:hover .why-icon{
-
-    transform:rotate(-8deg) scale(1.08);
-
-}
-
-.why-title{
-
-    font-size:22px;
-
-    font-weight:800;
-
-    color:#0f172a;
-
-    margin-bottom:14px;
-
-}
-
-.why-desc{
-
-    color:#475569;
-
-    line-height:1.8;
-
-    font-size:15px;
-
-}
-
-@media(max-width:992px){
-
-.why-grid{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
-@media(max-width:768px){
-
-.section.bg-gray{
-
-padding:70px 0;
-
-}
-
-.why-grid{
-
-grid-template-columns:1fr;
-
-gap:20px;
-
-}
-
-.why-card{
-
-padding:28px;
-
-}
+/* Right Dashboard Column Workspace */
+.integrations-right {
+  position: relative;
+  height: 460px;
+}
+
+/* Floating Status Cards Core Structure */
+.float-card {
+  position: absolute;
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 240px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Unified Layout Anchors for Dynamic Loops & Fallbacks */
+.float-card:nth-child(1) { top: 20px;  left: 8%;  animation: floatA 4s ease-in-out infinite; }
+.float-card:nth-child(2) { top: 140px; left: 44%; animation: floatB 4.5s ease-in-out infinite; animation-delay: 0.8s; }
+.float-card:nth-child(3) { top: 260px; left: 4%;  animation: floatA 5s ease-in-out infinite; animation-delay: 1.4s; }
+.float-card:nth-child(4) { top: 360px; left: 40%; animation: floatB 4s ease-in-out infinite; animation-delay: 0.3s; }
+
+/* Micro-Interaction Clean Fallback for Layout Emojis */
+.float-icon-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 22px;
+  background: var(--bg-2);
+}
+
+.float-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.float-text span {
+  font-size: 12px;
+  color: var(--text-4);
+  font-weight: 500;
+}
+
+.float-badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Badge Color Maps */
+.badge-green  { background: var(--green-light); color: var(--green); }
+.badge-blue   { background: var(--primary-light); color: var(--primary); }
+.badge-orange { background: #FFF7ED; color: #D97706; }
+
+/* Interactive Focus Halts */
+.float-card:hover {
+  box-shadow: 0 20px 50px rgba(26, 86, 219, 0.15);
+  animation-play-state: paused !important;
+  background-color: var(--bg-2);
+  transform: scale(1.02) !important;
+}
+
+/* Interpolated Animation Directives */
+@keyframes floatA {
+  0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
+  50%      { transform: translateY(-12px) rotate(0.5deg); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: translateY(0px) rotate(0.5deg); }
+  50%      { transform: translateY(-10px) rotate(-0.5deg); }
+}
+
+/* Responsive Media Queries Layout Pipelines */
+@media (max-width: 1024px) {
+  .integrations-inner {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+  .integrations-right {
+    height: 340px;
+  }
+  .float-card:nth-child(1) { top: 0;    left: 2%; }
+  .float-card:nth-child(2) { top: 90px; left: 42%; }
+  .float-card:nth-child(3) { top: 190px; left: 2%; }
+  .float-card:nth-child(4) { top: 270px; left: 42%; }
+}
 
+@media (max-width: 600px) {
+  .integrations-list {
+    grid-template-columns: 1fr;
+  }
+  .integrations-right {
+    display: none;
+  }
+  .integrations-section {
+    padding: 60px 0;
+  }
+}
+    /* WHY iSaral SECTION - UPDATED WITH PREMIUM CMS EFFECT PIPELINES */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 52px;
+}
+
+.why-card {
+  position: relative;
+  /* Glassmorphism Surface Token */
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 28px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+
+  /* Hardware-Accelerated Stagger Fade Layer */
+  opacity: 0;
+  transform: translateY(30px);
+  animation: cmsFadeUpId 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--stagger-delay, 1) * 0.1s);
+  
+  /* Smooth transitions for lift effect and color changes */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.3s ease,
+              background 0.3s ease;
+}
+
+/* Hover Lift Animation & Interactive Glow Shadow */
+.why-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 20px 40px rgba(15, 27, 45, 0.08), 
+              0 1px 3px rgba(26, 86, 219, 0.04);
+}
+
+/* Dynamic Gradient Border Layer (Activates seamlessly on card hover) */
+.why-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-xl);
+  padding: 1.5px; /* Border thickness metric */
+  background: linear-gradient(135deg, var(--primary), #06b6d4);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.why-card:hover::before {
+  opacity: 1;
+}
+
+/* Animated Icon Base Interface */
+.why-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  
+  /* Micro-interaction setup */
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.3s ease;
+}
+
+/* Micro-Interaction Vector/Emoji Scale on Hover */
+.why-card:hover .why-icon {
+  transform: scale(1.12) rotate(4deg);
+  box-shadow: var(--shadow-md);
+}
+
+.why-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 3;
+}
+
+.why-desc {
+  font-size: 14px;
+  color: var(--text-3);
+  line-height: 1.7;
+  position: relative;
+  z-index: 3;
+}
+
+/* Action Container to cleanly hold optional elements built in Step 6 */
+.why-card-action-row {
+  margin-top: auto; /* Systematically locks button row elements directly to bottom baseline */
+  padding-top: 16px;
+  position: relative;
+  z-index: 3;
+}
+
+/* Stagger Animation Timelines keyframe maps */
+@keyframes cmsFadeUpId {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Clean Responsiveness Retained and Maintained */
+@media (max-width: 1024px) {
+  .why-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 20px;
+  }
+}
+
+@media (max-width: 540px) {
+  .why-grid { 
+    grid-template-columns: 1fr; 
+    gap: 16px;
+  }
+  .why-card {
+    padding: 24px;
+  }
 }
    /* =================================
    STATS TICKER SECTION - CORRECTED
@@ -4160,58 +3820,6 @@ opacity:.7;
   100% { transform: translateX(-50%); }
 }
 
-@media(max-width:991px){
-
-.integrations-inner{
-
-grid-template-columns:1fr;
-
-}
-
-.integrations-right{
-
-margin-top:70px;
-
-min-height:450px;
-
-}
-
-.payment{
-
-top:0;
-
-left:50%;
-
-transform:translateX(-50%);
-
-}
-
-.gst{
-
-top:120px;
-
-right:0;
-
-}
-
-.tally{
-
-left:0;
-
-bottom:120px;
-
-}
-
-.reminder{
-
-right:20px;
-
-bottom:0;
-
-}
-
-}
-
 </style>
 </head>
 <body>
@@ -4227,10 +3835,7 @@ bottom:0;
 <!-- TOP BAR -->
 <div class="topbar" role="banner">
   <div class="topbar-inner">
-
     <div class="topbar-left">
-
-      <!-- Email 1 -->
       <a href="mailto:info@isaral.in" class="topbar-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -4238,32 +3843,15 @@ bottom:0;
         </svg>
         info@isaral.in
       </a>
-
       <div class="topbar-div"></div>
-
-      <!-- Email 2 -->
-      <a href="mailto:support@isaral.in" class="topbar-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-          <polyline points="22,6 12,13 2,6"/>
-        </svg>
-        support@isaral.in
-      </a>
-
-      <div class="topbar-div"></div>
-
-      <!-- Phone 1 -->
       <a href="tel:+919109024198" class="topbar-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 012 2.18 2 2 0 013.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
         </svg>
         +91 91090 24198
       </a>
-
-      <div class="topbar-div"></div>
-
-    
     </div>
+
 
   </div>
 </div>
@@ -4945,209 +4533,219 @@ bottom:0;
   </div>
 </section>
 
-<!-- WHY iSaral -->
-<section class="section bg-gray" aria-labelledby="why-heading">
+<section class="section bg-gray" aria-labelledby="why-heading" id="why-isaral-section">
   <div class="wrap">
     <div class="sec-head center">
       <div class="eyebrow">Why iSaral</div>
-      <h2 class="h2" id="why-heading">Built for India. Loved by SMEs.</h2>
+      <h2 class="h2" id="why-heading">
+        {% if why_section %}{{ why_section.title }}{% else %}Built for India. Loved by SMEs.{% endif %}
+      </h2>
       <p class="lead max-660 mx-auto" style="margin-top:12px;">
-        Every feature is designed for how Indian businesses actually operate — from GST circulars to UPI to Hindi support.
+        {% if why_section and why_section.subtitle %}{{ why_section.subtitle }}{% else %}Every feature is designed for how Indian businesses actually operate — from GST circulars to UPI to Hindi support.{% endif %}
       </p>
     </div>
-    <div class="why-grid">
-      <div class="why-card animate-fade-up">
-        <div class="why-icon" style="background:#EBF2FF">🏪</div>
-        <div class="why-title">Built for India, first</div>
-        <p class="why-desc">GST compliance, Indian tax rules (CGST/SGST/IGST), INR billing, Razorpay UPI — everything designed for Indian businesses.</p>
-      </div>
-      <div class="why-card animate-fade-up">
-        <div class="why-icon" style="background:#F0FDF4">⚡</div>
-        <div class="why-title">Go live in under a day</div>
-        <p class="why-desc">Import customers from Excel, add GSTIN, send first GST invoice within hours — not weeks.</p>
-      </div>
-      <div class="why-card animate-fade-up">
-        <div class="why-icon" style="background:#FFF7ED">💰</div>
-        <div class="why-title">Fraction of the cost</div>
-        <p class="why-desc">Starting at ₹999/month. No hidden charges, no per-user fees on lower plans.</p>
-      </div>
-      <div class="why-card animate-fade-up">
-        <div class="why-icon" style="background:#FFF0F0">🔐</div>
-        <div class="why-title">Your data stays in India</div>
-        <p class="why-desc">AWS Mumbai hosted, DPDP Act compliant, daily encrypted backups.</p>
-      </div>
-      <div class="why-card animate-fade-up">
-        <div class="why-icon" style="background:#F5F3FF">📞</div>
-        <div class="why-title">Real support in Hindi & English</div>
-        <p class="why-desc">9 AM – 9 PM IST support in Indian time zones. Real humans, no chatbots.</p>
-      </div>
-      <div class="why-card animate-fade-up">
-        <div class="why-icon" style="background:#ECFDF5">📱</div>
-        <div class="why-title">Works on any device</div>
-        <p class="why-desc">Full mobile experience for Android and iOS.</p>
-      </div>
+
+    <div class="why-grid context-cms-grid">
+      {% if why_features %}
+        {% for feature in why_features %}
+          <div class="why-card dynamic-cms-card" style="--stagger-delay: {{ forloop.index }}">
+            <div class="why-card-border-gradient"></div>
+            <div class="why-card-glass-body">
+              <div class="why-icon animated-icon-wrap" style="background: {{ feature.icon_background }}">
+                {% if "bi-" in feature.icon %}
+                  <i class="bi {{ feature.icon }} cms-vector-icon"></i>
+                {% else %}
+                  <span class="cms-emoji-icon">{{ feature.icon }}</span>
+                {% endif %}
+              </div>
+              <h3 class="why-title">{{ feature.title }}</h3>
+              <p class="why-desc">{{ feature.description }}</p>
+              
+              {% if feature.button_text and feature.button_link %}
+                <div class="why-card-action-row">
+                  <a href="{{ feature.button_link }}" class="btn btn-secondary btn-sm alignment-link">
+                    {{ feature.button_text }} →
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="why-card fallback-static-card" style="--stagger-delay: 1">
+          <div class="why-card-border-gradient"></div>
+          <div class="why-card-glass-body">
+            <div class="why-icon animated-icon-wrap" style="background:#EBF2FF">🏪</div>
+            <h3 class="why-title">Built for India, first</h3>
+            <p class="why-desc">GST compliance, Indian tax rules (CGST/SGST/IGST), INR billing, Razorpay UPI — everything designed for Indian businesses.</p>
+          </div>
+        </div>
+        <div class="why-card fallback-static-card" style="--stagger-delay: 2">
+          <div class="why-card-border-gradient"></div>
+          <div class="why-card-glass-body">
+            <div class="why-icon animated-icon-wrap" style="background:#F0FDF4">⚡</div>
+            <h3 class="why-title">Go live in under a day</h3>
+            <p class="why-desc">Import customers from Excel, add GSTIN, send first GST invoice within hours — not weeks.</p>
+          </div>
+        </div>
+        <div class="why-card fallback-static-card" style="--stagger-delay: 3">
+          <div class="why-card-border-gradient"></div>
+          <div class="why-card-glass-body">
+            <div class="why-icon animated-icon-wrap" style="background:#FFF7ED">💰</div>
+            <h3 class="why-title">Fraction of the cost</h3>
+            <p class="why-desc">Starting at ₹999/month. No hidden charges, no per-user fees on lower plans.</p>
+          </div>
+        </div>
+        <div class="why-card fallback-static-card" style="--stagger-delay: 4">
+          <div class="why-card-border-gradient"></div>
+          <div class="why-card-glass-body">
+            <div class="why-icon animated-icon-wrap" style="background:#FFF0F0">🔐</div>
+            <h3 class="why-title">Your data stays in India</h3>
+            <p class="why-desc">AWS Mumbai hosted, DPDP Act compliant, daily encrypted backups.</p>
+          </div>
+        </div>
+        <div class="why-card fallback-static-card" style="--stagger-delay: 5">
+          <div class="why-card-border-gradient"></div>
+          <div class="why-card-glass-body">
+            <div class="why-icon animated-icon-wrap" style="background:#F5F3FF">📞</div>
+            <h3 class="why-title">Real support in Hindi & English</h3>
+            <p class="why-desc">9 AM – 9 PM IST support in Indian time zones. Real humans, no chatbots.</p>
+          </div>
+        </div>
+        <div class="why-card fallback-static-card" style="--stagger-delay: 6">
+          <div class="why-card-border-gradient"></div>
+          <div class="why-card-glass-body">
+            <div class="why-icon animated-icon-wrap" style="background:#ECFDF5">📱</div>
+            <h3 class="why-title">Works on any device</h3>
+            <p class="why-desc">Full mobile experience for Android and iOS.</p>
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 </section>
 
 <!-- INTEGRATIONS SECTION -->
-<section class="integrations-section">
+<section class="integrations-section" id="dynamic-integrations-scope">
   <div class="wrap">
     <div class="integrations-inner">
 
-      <!-- LEFT: Text + pill list -->
       <div class="integrations-left">
         <div class="integrations-eyebrow">Integrations</div>
         <h2 class="integrations-title">
-          Plugs into the tools<br>
-          <span class="blue">Indian businesses</span><br>
-          already use
+          {% if integration_section %}
+            {{ integration_section.title|safe }}
+          {% else %}
+            Plugs into the tools<br>
+            <span class="blue">Indian businesses</span><br>
+            already use
+          {% endif %}
         </h2>
         <p class="integrations-subtitle">
-          Razorpay, UPI, GST portals, WhatsApp Business, Tally, email &amp; SMS gateways — iSaral connects to your existing stack so nothing breaks.
+          {% if integration_section %}
+            {{ integration_section.subtitle }}
+          {% else %}
+            Razorpay, UPI, GST portals, WhatsApp Business, Tally, email &amp; SMS gateways — iSaral connects to your existing stack so nothing breaks.
+          {% endif %}
         </p>
 
         <div class="integrations-list">
-          <a href="https://pages.razorpay.com/airegistrationfee" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#1A56DB;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1A56DB"/><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-            </div>
-            Razorpay
-          </a>
-          <a href="#" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#FF6B00;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF6B00"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">UPI</text></svg>
-            </div>
-            UPI
-          </a>
-          <a href="#" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#1A56DB;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1A56DB"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">GST</text></svg>
-            </div>
-            GST Portal
-          </a>
-          <a href="https://api.whatsapp.com/send/?phone=919109024198&text&type=phone_number&app_absent=0" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#25D366;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><rect width="24" height="24" rx="4" fill="#25D366"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.07-1.35A9.95 9.95 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.64 13.43c-.19.54-1.12 1.03-1.54 1.09-.38.05-.87.08-1.39-.09-.32-.1-.73-.24-1.26-.47-2.21-.96-3.65-3.19-3.76-3.34-.11-.15-.89-1.19-.89-2.27 0-1.08.56-1.6.76-1.82.19-.21.42-.27.56-.27.14 0 .28.001.4.007.13.006.3-.05.47.36.18.43.6 1.49.65 1.6.05.11.09.24.02.39-.07.15-.11.24-.22.37-.11.13-.23.29-.33.39-.11.11-.22.22-.1.44.13.21.56.93 1.2 1.5.82.74 1.51.97 1.72 1.08.21.11.33.09.45-.05.13-.15.54-.63.68-.85.14-.21.28-.18.47-.11.19.07 1.22.58 1.43.68.21.1.35.15.4.24.05.1.05.55-.14 1.08z" fill="#fff"/></svg>
-            </div>
-            WhatsApp
-          </a>
-          <a href="mailto:rajesh@isaral.in" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#EA4335;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#EA4335"/><path d="M4 8l8 5 8-5M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-            </div>
-            Email
-          </a>
-          <a href="mailto:support@isaral.in" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#7C3AED;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#7C3AED"/><path d="M8 10h8M8 14h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="5" width="18" height="14" rx="2" stroke="#fff" stroke-width="1.5" fill="none"/></svg>
-            </div>
-            SMS
-          </a>
-          <a href="https://tallysoftware.shop/" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#16A34A;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#16A34A"/><text x="12" y="16" text-anchor="middle" font-size="8" font-weight="900" fill="#fff">Tally</text></svg>
-            </div>
-            Tally
-          </a>
-          <a href="#" class="integ-pill animate-fade-up">
-            <div class="integ-logo" style="background:#FF9900;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF9900"/><text x="12" y="13" text-anchor="middle" font-size="7" font-weight="900" fill="#fff">AWS</text><text x="12" y="19" text-anchor="middle" font-size="6" font-weight="700" fill="#fff">India</text></svg>
-            </div>
-            AWS India
-          </a>
+          {% if integration_pills %}
+            {% for pill in integration_pills %}
+              <a href="{{ pill.target_url }}" {% if pill.target_url != '#' %}target="_blank" rel="noopener"{% endif %} class="integ-pill animate-fade-up">
+                <div class="integ-logo" style="background: {{ pill.icon_background }};">
+                  {% if pill.icon_type == 'BOOTSTRAP' %}
+                    <i class="bi {{ pill.icon_class }}" style="color: #fff; font-size: 16px;"></i>
+                  {% else %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      {% if pill.icon_svg_path %}
+                        {{ pill.icon_svg_path|safe }}
+                      {% else %}
+                        <rect width="24" height="24" rx="4" fill="rgba(255,255,255,0.2)"/>
+                      {% endif %}
+                    </svg>
+                  {% endif %}
+                </div>
+                {{ pill.name }}
+              </a>
+            {% endfor %}
+          {% else %}
+            <a href="https://pages.razorpay.com/airegistrationfee" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
+              <div class="integ-logo" style="background:#1A56DB;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1A56DB"/><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              Razorpay
+            </a>
+            <a href="#" class="integ-pill animate-fade-up">
+              <div class="integ-logo" style="background:#FF6B00;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF6B00"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">UPI</text></svg>
+              </div>
+              UPI
+            </a>
+            <a href="#" class="integ-pill animate-fade-up">
+              <div class="integ-logo" style="background:#1A56DB;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1A56DB"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">GST</text></svg>
+              </div>
+              GST Portal
+            </a>
+            <a href="https://api.whatsapp.com/send/?phone=919109024198&text&type=phone_number&app_absent=0" target="_blank" rel="noopener" class="integ-pill animate-fade-up">
+              <div class="integ-logo" style="background:#25D366;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><rect width="24" height="24" rx="4" fill="#25D366"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.07-1.35A9.95 9.95 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.64 13.43c-.19.54-1.12 1.03-1.54 1.09-.38.05-.87.08-1.39-.09-.32-.1-.73-.24-1.26-.47-2.21-.96-3.65-3.19-3.76-3.34-.11-.15-.89-1.19-.89-2.27 0-1.08.56-1.6.76-1.82.19-.21.42-.27.56-.27.14 0 .28.001.4.007.13.006.3-.05.47.36.18.43.6 1.49.65 1.6.05.11.09.24.02.39-.07.15-.11.24-.22.37-.11.13-.23.29-.33.39-.11.11-.22.22-.1.44.13.21.56.93 1.2 1.5.82.74 1.51.97 1.72 1.08.21.11.33.09.45-.05.13-.15.54-.63.68-.85.14-.21.28-.18.47-.11.19.07 1.22.58 1.43.68.21.1.35.15.4.24.05.1.05.55-.14 1.08z" fill="#fff"/></svg>
+              </div>
+              WhatsApp
+            </a>
+          {% endif %}
         </div>
       </div>
 
-      <!-- RIGHT: Premium Integration Animation -->
-<div class="integrations-right" aria-hidden="true">
+      <div class="integrations-right" aria-hidden="true">
+        {% if integration_live_cards %}
+          {% for card in integration_live_cards %}
+            <div class="float-card dynamic-status-card-node">
+              <div class="float-icon-bubble">{{ card.icon_emoji }}</div>
+              <div class="float-text">
+                <strong>{{ card.title }}</strong>
+                <span>{{ card.description }}</span>
+              </div>
+              <span class="float-badge badge-{{ card.badge_style }}">{{ card.badge_text }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="float-card">
+            <div class="float-icon" style="background:#DCFCE7;">💳</div>
+            <div class="float-text">
+              <strong>Payment Received</strong>
+              <span>Razorpay · ₹24,500 via UPI</span>
+            </div>
+            <span class="float-badge badge-green">Live</span>
+          </div>
+          <div class="float-card">
+            <div class="float-icon" style="background:#EBF2FF;">🧾</div>
+            <div class="float-text">
+              <strong>GST Invoice Sent</strong>
+              <span>INV-2024-0892 · WhatsApp</span>
+            </div>
+            <span class="float-badge badge-blue">Sent</span>
+          </div>
+          <div class="float-card">
+            <div class="float-icon" style="background:#F0FDF4;">📊</div>
+            <div class="float-text">
+              <strong>Tally Synced</strong>
+              <span>48 entries · just now</span>
+            </div>
+            <span class="float-badge badge-green">✓ Done</span>
+          </div>
+          <div class="float-card">
+            <div class="float-icon" style="background:#FFF7ED;">💬</div>
+            <div class="float-text">
+              <strong>Reminder Sent</strong>
+              <span>3 overdue · WhatsApp</span>
+            </div>
+            <span class="float-badge badge-orange">Auto</span>
+          </div>
+        {% endif %}
+      </div>
 
-    <!-- Center Logo -->
-    <div class="center-orbit">
-
-        <div class="orbit-ring ring1"></div>
-        <div class="orbit-ring ring2"></div>
-        <div class="orbit-ring ring3"></div>
-
-        <img src="{% static 'images/logo.png' %}"
-             alt="iSaral"
-             class="orbit-logo">
-
-    </div>
-
-    <!-- Payment -->
-    <div class="float-card payment">
-
-        <div class="float-icon" style="background:#DCFCE7;">
-            💳
-        </div>
-
-        <div class="float-text">
-            <strong>Payment Received</strong>
-            <span>Razorpay • ₹24,500 via UPI</span>
-        </div>
-
-        <span class="float-badge badge-green">
-            Live
-        </span>
-
-    </div>
-
-    <!-- GST -->
-    <div class="float-card gst">
-
-        <div class="float-icon" style="background:#EBF2FF;">
-            🧾
-        </div>
-
-        <div class="float-text">
-            <strong>GST Invoice Sent</strong>
-            <span>INV-2024-0892 • WhatsApp</span>
-        </div>
-
-        <span class="float-badge badge-blue">
-            Sent
-        </span>
-
-    </div>
-
-    <!-- Tally -->
-    <div class="float-card tally">
-
-        <div class="float-icon" style="background:#F0FDF4;">
-            📊
-        </div>
-
-        <div class="float-text">
-            <strong>Tally Synced</strong>
-            <span>48 entries • Just now</span>
-        </div>
-
-        <span class="float-badge badge-green">
-            ✓ Done
-        </span>
-
-    </div>
-
-    <!-- Reminder -->
-    <div class="float-card reminder">
-
-        <div class="float-icon" style="background:#FFF7ED;">
-            💬
-        </div>
-
-        <div class="float-text">
-            <strong>Reminder Sent</strong>
-            <span>3 overdue • WhatsApp</span>
-        </div>
-
-        <span class="float-badge badge-orange">
-            Auto
-        </span>
-
-    </div>
-
-</div>
     </div>
   </div>
 </section>

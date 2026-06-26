@@ -93,4 +93,13 @@ urlpatterns = [
     # SETTINGS
     # ════════════════════════════════════════════════════════════════════
     path('settings/', views.settings_view, name='settings'),
+
+    # ============================================================
+# PRODUCT MANAGEMENT URLs
+# ============================================================
+path('products/', views.products_list, name='products_list'),
+path('products/create/', views.create_product, name='create_product'),
+path('products/<uuid:product_id>/edit/', views.edit_product, name='edit_product'),
+path('products/<uuid:product_id>/delete/', views.delete_product, name='delete_product'),
+path('products/<uuid:product_id>/json/', views.get_product_json, name='get_product_json'),
 ]

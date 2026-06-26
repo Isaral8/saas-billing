@@ -3,6 +3,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from accounts.models import CustomUser, Invoice, Customer, SupportTicket
+from django.forms import inlineformset_factory, BaseInlineFormSet
+from accounts.models import Product, InvoiceItem
+from decimal import Decimal
 
 # ============================================
 # INVOICE FORM
@@ -209,3 +212,166 @@ class ChangePasswordForm(forms.Form):
         if new_pw and confirm and new_pw != confirm:
             raise ValidationError('New passwords do not match.')
         return cleaned_data
+
+# ============================================================
+# MULTI-PRODUCT INVOICE FORMS
+# ============================================================
+
+class ProductForm(forms.ModelForm):
+    """Form for creating/editing products in the product master"""
+    
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'hsn_sac', 'price', 'gst_rate', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Product/Service name',
+                'required': True
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Description (optional)',
+                'rows': 3
+            }),
+            'hsn_sac': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'HSN/SAC code (optional)',
+                'maxlength': '20'
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01',
+                'min': '0',
+                'required': True
+            }),
+            'gst_rate': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '18.00',
+                'step': '0.01',
+                'min': '0',
+                'max': '100',
+                'required': True
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+
+
+class InvoiceItemForm(forms.ModelForm):
+    """Form for line items in invoice (with product auto-population)"""
+    
+    class Meta:
+        model = InvoiceItem
+        fields = [
+            'product',
+            'product_name',
+            'description',
+            'hsn_sac_code',
+            'quantity',
+            'unit_price',
+            'discount_percent',
+            'discount_amount',
+            'gst_rate',
+        ]
+        widgets = {
+            'product': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'product_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Product/Service name',
+                'required': True
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Item description',
+                'rows': 2
+            }),
+            'hsn_sac_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'HSN/SAC',
+                'maxlength': '20'
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '1',
+                'step': '0.01',
+                'min': '0.01',
+                'required': True,
+                'data-role': 'calc-trigger'
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01',
+                'min': '0',
+                'required': True,
+                'data-role': 'calc-trigger'
+            }),
+            'discount_percent': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0',
+                'step': '0.01',
+                'min': '0',
+                'max': '100',
+                'data-role': 'calc-trigger'
+            }),
+            'discount_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01',
+                'min': '0',
+                'data-role': 'calc-trigger',
+                'readonly': True
+            }),
+            'gst_rate': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '18.00',
+                'step': '0.01',
+                'min': '0',
+                'max': '100',
+                'required': True,
+                'data-role': 'calc-trigger'
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filter products by user
+        if user:
+            self.fields['product'].queryset = Product.objects.filter(
+                user=user,
+                is_active=True
+            ).order_by('name')
+
+
+class BaseInvoiceItemFormSet(BaseInlineFormSet):
+    """Custom formset to ensure at least one item"""
+    
+    def clean(self):
+        super().clean()
+        non_empty_forms = 0
+        for form in self.forms:
+            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                non_empty_forms += 1
+        
+        if non_empty_forms < 1:
+            raise forms.ValidationError('Invoice must have at least one item.')
+
+
+# Create the formset
+InvoiceItemFormSet = inlineformset_factory(
+    Invoice,
+    InvoiceItem,
+    form=InvoiceItemForm,
+    formset=BaseInvoiceItemFormSet,
+    extra=1,
+    can_delete=True,
+    min_num=1,
+    validate_min=True
+)

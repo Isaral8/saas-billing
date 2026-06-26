@@ -144,31 +144,6 @@ class Invoice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"Invoice {self.invoice_number}"
-
-    def calculate_from_items(self):
-        """
-        Recalculate invoice totals from all associated InvoiceItem records.
-        Call after all items have been saved.
-        """
-        from decimal import Decimal
-        items = self.items.all()
-        if not items.exists():
-            return
-        
-        self.subtotal = sum(item.subtotal for item in items) or Decimal('0.00')
-        self.gst_amount = sum(item.gst_amount for item in items) or Decimal('0.00')
-        self.cgst_amount = sum(item.cgst_amount for item in items) or Decimal('0.00')
-        self.sgst_amount = sum(item.sgst_amount for item in items) or Decimal('0.00')
-        self.igst_amount = sum(item.igst_amount for item in items) or Decimal('0.00')
-        self.total = self.subtotal + self.gst_amount
-        
-        # Calculate average GST rate
-        if self.subtotal > 0:
-            avg_rate = sum(item.gst_rate * item.subtotal for item in items) / self.subtotal
-            self.gst_rate = round(avg_rate, 2)
-
     class Meta:
         ordering = ['-created_at']
         indexes = [

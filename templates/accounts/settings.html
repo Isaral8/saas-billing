@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Settings — iSaral{% endblock %}
+{% block title %}Settings â€” iSaral{% endblock %}
 {% block page_title %}Settings{% endblock %}
 
 {% block content %}
@@ -83,7 +83,7 @@
 <div class="settings-wrap">
 
   <div class="settings-header">
-    <h1>⚙️ Account Preferences</h1>
+    <h1>âš™ï¸ Account Preferences</h1>
     <p>Manage your profile, security, notifications and billing preferences.</p>
   </div>
 
@@ -98,10 +98,10 @@
     {% endfor %}
   {% endif %}
 
-  <!-- SECTION 1 — PROFILE -->
+  <!-- SECTION 1 â€” PROFILE -->
   <div class="settings-card">
     <div class="settings-card-header">
-      <div class="settings-card-icon" style="background:#eff6ff;">👤</div>
+      <div class="settings-card-icon" style="background:#eff6ff;">ðŸ‘¤</div>
       <div>
         <h2>Profile Information</h2>
         <p>Update your photo, name, phone and company</p>
@@ -165,10 +165,10 @@
     </div>
   </div>
 
-  <!-- SECTION 2 — COMPANY & GST -->
+  <!-- SECTION 2 â€” COMPANY & GST -->
   <div class="settings-card">
     <div class="settings-card-header">
-      <div class="settings-card-icon" style="background:#f0fdf4;">🏢</div>
+      <div class="settings-card-icon" style="background:#f0fdf4;">ðŸ¢</div>
       <div>
         <h2>Company & GST Details</h2>
         <p>Used on your invoices and GST filings</p>
@@ -198,7 +198,7 @@
         <div class="settings-field">
           <label>Default GST Rate (%)</label>
           <select>
-            <option value="0">0% — Exempt</option>
+            <option value="0">0% â€” Exempt</option>
             <option value="5">5%</option>
             <option value="12">12%</option>
             <option value="18" selected>18%</option>
@@ -207,7 +207,7 @@
         </div>
         <div class="settings-field full">
           <label>Registered Business Address</label>
-          <input type="text" placeholder="No. 25, 1st A Main Road, Bangalore — 560072">
+          <input type="text" placeholder="No. 25, 1st A Main Road, Bangalore â€” 560072">
         </div>
         <div class="settings-field">
           <label>State</label>
@@ -227,7 +227,7 @@
         <div class="settings-field">
           <label>Invoice Prefix</label>
           <input type="text" placeholder="INV" maxlength="10">
-          <span class="hint">e.g. INV → INV-2026-001</span>
+          <span class="hint">e.g. INV â†’ INV-2026-001</span>
         </div>
       </div>
       <div class="settings-actions">
@@ -236,10 +236,10 @@
     </div>
   </div>
 
-  <!-- SECTION 3 — PLAN -->
+  <!-- SECTION 3 â€” PLAN -->
   <div class="settings-card">
     <div class="settings-card-header">
-      <div class="settings-card-icon" style="background:#fefce8;">⭐</div>
+      <div class="settings-card-icon" style="background:#fefce8;">â­</div>
       <div>
         <h2>Plan & Billing</h2>
         <p>Your current subscription plan</p>
@@ -249,12 +249,12 @@
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
           <p style="font-size:13px;color:#6b7280;margin:0 0 4px;">Current Plan</p>
-          <div class="plan-badge">⭐ {{ user.current_plan|default:"Free"|title }}</div>
+          <div class="plan-badge">â­ {{ user.current_plan|default:"Free"|title }}</div>
         </div>
         <a href="{% url 'accounts:plans' %}"
            style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 18px;
                   background:#1d4ed8;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
-          ⬆️ Upgrade Plan
+          â¬†ï¸ Upgrade Plan
         </a>
       </div>
       <div style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:8px;border:1px solid #e5e7eb;">
@@ -266,10 +266,10 @@
     </div>
   </div>
 
-  <!-- SECTION 4 — PASSWORD -->
+  <!-- SECTION 4 â€” PASSWORD -->
   <div class="settings-card">
     <div class="settings-card-header">
-      <div class="settings-card-icon" style="background:#fdf4ff;">🔒</div>
+      <div class="settings-card-icon" style="background:#fdf4ff;">ðŸ”’</div>
       <div>
         <h2>Change Password</h2>
         <p>Use a strong password of at least 8 characters</p>
@@ -307,10 +307,10 @@
     </div>
   </div>
 
-  <!-- SECTION 5 — NOTIFICATIONS -->
+  <!-- SECTION 5 â€” NOTIFICATIONS -->
   <div class="settings-card">
     <div class="settings-card-header">
-      <div class="settings-card-icon" style="background:#fff7ed;">🔔</div>
+      <div class="settings-card-icon" style="background:#fff7ed;">ðŸ””</div>
       <div>
         <h2>Notification Preferences</h2>
         <p>Choose which alerts you receive</p>
@@ -347,18 +347,18 @@
     </div>
   </div>
 
-  <!-- SECTION 6 — DANGER ZONE -->
+  <!-- SECTION 6 â€” DANGER ZONE -->
   <div class="settings-card danger-card">
     <div class="settings-card-header">
-      <div class="settings-card-icon" style="background:#fef2f2;">🗑️</div>
+      <div class="settings-card-icon" style="background:#fef2f2;">ðŸ—‘ï¸</div>
       <div>
         <h2>Danger Zone</h2>
-        <p>Irreversible actions — proceed with caution</p>
+        <p>Irreversible actions â€” proceed with caution</p>
       </div>
     </div>
     <div class="settings-card-body">
       <div class="danger-warning">
-        ⚠️ <strong>Deleting your account is permanent.</strong> All your invoices, customers, tickets and data will be erased immediately and cannot be recovered.
+        âš ï¸ <strong>Deleting your account is permanent.</strong> All your invoices, customers, tickets and data will be erased immediately and cannot be recovered.
       </div>
       <form method="POST" onsubmit="return confirm('This will permanently delete your account and ALL data. Are you absolutely sure?');">
         {% csrf_token %}
@@ -367,17 +367,10 @@
           <label>Type <strong>DELETE</strong> to confirm</label>
           <input type="text" name="confirm_delete" placeholder="DELETE" style="border-color:#fecaca;">
         </div>
-        <button type="submit" class="btn-danger">🗑️ Delete My Account</button>
+        <button type="submit" class="btn-danger">ðŸ—‘ï¸ Delete My Account</button>
       </form>
     </div>
   </div>
-
-  </form>
-    </div>
-  </div>
-
- 
-  
 
 </div>
 <script>

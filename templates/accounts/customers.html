@@ -474,12 +474,21 @@
         {% endif %}
     </button>
                             </form>
-                            <form method="POST" action="{% url 'accounts:delete_customer' customer.id %}" style="display: inline;" onsubmit="return confirm('Delete customer? This cannot be undone.');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-sm btn-delete">
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
-                            </form>
+                           {% if request.user.is_superuser %}
+<form method="POST"
+      action="{% url 'accounts:delete_customer' customer.id %}"
+      style="display:inline;"
+      onsubmit="return confirm('Delete customer permanently?');">
+
+    {% csrf_token %}
+
+    <button class="btn-sm btn-delete">
+        <i class="bi bi-trash"></i>
+        Delete
+    </button>
+
+</form>
+{% endif %}
                         </div>
                     </td>
                 </tr>

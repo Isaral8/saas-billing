@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if product %}Edit Product{% else %}Add Product{% endif %} — iSaral{% endblock %}
+{% block page_title %}{% if product %}Edit Product{% else %}Add Product{% endif %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .prod-form-page {
+    padding: 1.75rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .prod-form-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.75rem;
+  }
+
+  .prod-form-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .prod-form-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 0;
+  }
+
+  .prod-form-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .prod-form-section {
+    padding: 1.75rem;
+  }
+
+  .prod-form-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin-bottom: 1.25rem;
+  }
+
+  .prod-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .prod-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .prod-form-field.full {
+    grid-column: 1 / -1;
+  }
+
+  .prod-form-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .prod-form-field label .req {
+    color: #E24B4A;
+    margin-left: 2px;
+  }
+
+  .prod-form-field input,
+  .prod-form-field textarea,
+  .prod-form-field select {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 11px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+    font-family: inherit;
+    width: 100%;
+    box-shadow: none;
+  }
+
+  .prod-form-field textarea {
+    height: auto;
+    min-height: 90px;
+    padding: 10px 11px;
+    resize: vertical;
+  }
+
+  .prod-form-field input:focus,
+  .prod-form-field textarea:focus,
+  .prod-form-field select:focus {
+    border-color: #378ADD;
+    box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+    outline: none;
+  }
+
+  .prod-form-field .hint {
+    font-size: 11px;
+    color: #9ca3af;
+  }
+
+  .prod-form-field .help-text {
+    font-size: 11px;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  .prod-form-field .field-error {
+    font-size: 11px;
+    color: #E24B4A;
+    margin-top: 2px;
+  }
+
+  .prod-form-field.checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .prod-form-field.checkbox input {
+    height: 18px;
+    width: 18px;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .prod-form-field.checkbox label {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .prod-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 1.25rem 1.75rem;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 0 0 14px 14px;
+  }
+
+  .prod-form-btn {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #d1d5db;
+    background: transparent;
+    color: #374151;
+    text-decoration: none;
+    transition: all .12s;
+  }
+
+  .prod-form-btn:hover {
+    background: #f3f4f6;
+  }
+
+  .prod-form-btn-primary {
+    background: #185FA5;
+    color: #ffffff;
+    border-color: #185FA5;
+  }
+
+  .prod-form-btn-primary:hover {
+    background: #0C447C;
+    border-color: #0C447C;
+  }
+
+  .alerts-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 10px;
+    border: 1px solid;
+  }
+
+  .alert-success {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #D1FAE5;
+  }
+
+  .alert-danger {
+    background: #FEF2F2;
+    color: #A32D2D;
+    border-color: #FCA5A5;
+  }
+
+  .alert-close {
+    float: right;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    color: inherit;
+  }
+
+  .prod-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+
+  .gst-rate-helper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .gst-rate-btn {
+    padding: 6px 8px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+
+  .gst-rate-btn:hover {
+    background: #f3f4f6;
+    border-color: #378ADD;
+  }
+
+  .gst-rate-btn.active {
+    background: #378ADD;
+    color: #fff;
+    border-color: #378ADD;
+  }
+
+  @media (max-width: 768px) {
+    .prod-form-page {
+      padding: 1rem;
+    }
+    .prod-form-grid {
+      grid-template-columns: 1fr;
+    }
+    .prod-form-footer {
+      flex-direction: column-reverse;
+    }
+    .prod-form-btn,
+    .prod-form-btn-primary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="prod-form-page">
+
+  <!-- Header -->
+  <div class="prod-form-header">
+    <div>
+      <h1>{% if product %}Edit Product{% else %}Add New Product{% endif %}</h1>
+      <p>{% if product %}Update product details for invoicing{% else %}Create a new product/service for invoicing{% endif %}</p>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  {% if messages %}
+    <div class="alerts-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+          <button type="button" class="alert-close" onclick="this.parentElement.style.display='none';">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Form -->
+  <form method="POST" class="prod-form-card">
+    {% csrf_token %}
+
+    <!-- Product Details -->
+    <div class="prod-form-section">
+      <div class="prod-form-section-label">Product Details</div>
+
+      <div class="prod-form-grid">
+
+        <!-- Product Name -->
+        <div class="prod-form-field full">
+          <label for="id_name">Product/Service Name <span class="req">*</span></label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <span class="field-error">{{ form.name.errors.0 }}</span>
+          {% endif %}
+          <span class="hint">e.g., Website Development, Hosting Setup, Consulting</span>
+        </div>
+
+        <!-- Description -->
+        <div class="prod-form-field full">
+          <label for="id_description">Description</label>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <span class="field-error">{{ form.description.errors.0 }}</span>
+          {% endif %}
+          <span class="hint">Optional: Add more details about this product/service</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Pricing & Tax -->
+    <div class="prod-form-section">
+      <div class="prod-form-section-label">Pricing &amp; Tax Details</div>
+
+      <div class="prod-form-grid">
+
+        <!-- HSN/SAC Code -->
+        <div class="prod-form-field">
+          <label for="id_hsn_sac">HSN/SAC Code</label>
+          {{ form.hsn_sac }}
+          {% if form.hsn_sac.errors %}
+            <span class="field-error">{{ form.hsn_sac.errors.0 }}</span>
+          {% endif %}
+          <span class="help-text">
+            <strong>Services:</strong> 998361 (Service)<br>
+            <strong>Goods:</strong> 8471 (Computer), 8517 (Mobile), etc.
+          </span>
+        </div>
+
+        <!-- Price -->
+        <div class="prod-form-field">
+          <label for="id_price">Price (₹) <span class="req">*</span></label>
+          {{ form.price }}
+          {% if form.price.errors %}
+            <span class="field-error">{{ form.price.errors.0 }}</span>
+          {% endif %}
+          <span class="hint">Unit price in rupees</span>
+        </div>
+
+        <!-- GST Rate -->
+        <div class="prod-form-field full">
+          <label for="id_gst_rate">GST Rate (%) <span class="req">*</span></label>
+          {{ form.gst_rate }}
+          {% if form.gst_rate.errors %}
+            <span class="field-error">{{ form.gst_rate.errors.0 }}</span>
+          {% endif %}
+          <div class="gst-rate-helper">
+            <button type="button" class="gst-rate-btn" onclick="document.getElementById('id_gst_rate').value='0'; this.classList.add('active'); document.querySelectorAll('.gst-rate-btn').forEach(b => b !== this && b.classList.remove('active'));">0%</button>
+            <button type="button" class="gst-rate-btn" onclick="document.getElementById('id_gst_rate').value='5'; this.classList.add('active'); document.querySelectorAll('.gst-rate-btn').forEach(b => b !== this && b.classList.remove('active'));">5%</button>
+            <button type="button" class="gst-rate-btn" onclick="document.getElementById('id_gst_rate').value='12'; this.classList.add('active'); document.querySelectorAll('.gst-rate-btn').forEach(b => b !== this && b.classList.remove('active'));">12%</button>
+            <button type="button" class="gst-rate-btn" onclick="document.getElementById('id_gst_rate').value='18'; this.classList.add('active'); document.querySelectorAll('.gst-rate-btn').forEach(b => b !== this && b.classList.remove('active'));">18%</button>
+            <button type="button" class="gst-rate-btn" onclick="document.getElementById('id_gst_rate').value='28'; this.classList.add('active'); document.querySelectorAll('.gst-rate-btn').forEach(b => b !== this && b.classList.remove('active'));">28%</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="prod-form-section">
+      <div class="prod-form-section-label">Status</div>
+
+      <div class="prod-form-grid">
+        <div class="prod-form-field checkbox full">
+          {{ form.is_active }}
+          <label for="id_is_active">Active (Available for invoicing)</label>
+          {% if form.is_active.errors %}
+            <span class="field-error">{{ form.is_active.errors.0 }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="prod-form-footer">
+      <a href="{% url 'accounts:products_list' %}" class="prod-form-btn">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </a>
+      <button type="submit" class="prod-form-btn prod-form-btn-primary">
+        <i class="fa-solid fa-{% if product %}floppy-disk{% else %}plus{% endif %}"></i>
+        {% if product %}Update Product{% else %}Create Product{% endif %}
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+  // Set active GST button on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const gstInput = document.getElementById('id_gst_rate');
+    if (gstInput) {
+      const value = gstInput.value;
+      document.querySelectorAll('.gst-rate-btn').forEach(btn => {
+        if (btn.textContent.includes(value + '%')) {
+          btn.classList.add('active');
+        }
+      });
+    }
+  });
+</script>
+
+{% endblock %}
