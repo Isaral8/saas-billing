@@ -132,7 +132,10 @@
                   data-date="{{ invoice.issued_date|date:'Y-m-d' }}"
                   style="border-bottom: 1px solid #f0f0f0;">
                   <td style="padding: 12px 20px;">
-                    <span style="font-weight: 600; color: #0066cc; font-family: monospace; font-size: 12px;">{{ invoice.invoice_number }}</span>
+                    <!-- ✅ FIXED: Make invoice number clickable and link to detail page -->
+                    <a href="{% url 'accounts:invoice_detail' invoice.pk %}" style="font-weight: 600; color: #0066cc; font-family: monospace; font-size: 12px; text-decoration: none; cursor: pointer;">
+                      {{ invoice.invoice_number }}
+                    </a>
                   </td>
                   <td style="padding: 12px 20px; color: #1a1a1a;">
                     {% if invoice.customer %}{{ invoice.customer.name }}{% else %}<span style="color:#999;">—</span>{% endif %}
@@ -152,14 +155,17 @@
                   <td style="padding: 12px 20px; color: #666; font-size: 12px;">{{ invoice.issued_date|date:"d M, Y" }}</td>
                   <td style="padding: 12px 20px; text-align: center;">
                     <div style="display: flex; gap: 8px; justify-content: center;">
-                      <a href="{% url 'accounts:invoice_pdf' invoice.id %}" style="background:#f0f2f5;color:#0066cc;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;">
+                      <!-- View Details Button -->
+                      <a href="{% url 'accounts:invoice_detail' invoice.pk %}" style="background:#e3f2fd;color:#1565c0;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;">
+                        👁 View
+                      </a>
+                      <!-- Download Button -->
+                     <a href="{% url 'accounts:invoice_pdf' invoice.pk %}" style="background:#f0f2f5;color:#0066cc;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;">
                         📥 Download
                       </a>
-                      <a href="{% url 'accounts:email_invoice' invoice.id %}" style="background:#e8f4ff;color:#0066cc;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;" onclick="return confirm('Send invoice to {{ invoice.customer.email }}?')">
+                      <!-- Email Button -->
+                      <a href="{% url 'accounts:email_invoice' invoice.pk %}" style="background:#e8f4ff;color:#0066cc;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;" onclick="return confirm('Send invoice to {{ invoice.customer.email }}?')">
                         📧 Email
-                      </a>
-                      <a href="{% url 'accounts:update_invoice' invoice.id %}" style="background:#f0f2f5;color:#1a1a1a;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;">
-                        Edit
                       </a>
                     </div>
                   </td>

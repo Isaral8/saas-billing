@@ -1,11 +1,12 @@
-﻿import json
+﻿
+import json
 import os
 import uuid
-from io import BytesIO  # ← FIX: was missing, caused "BytesIO not defined" error
+from io import BytesIO
 from decimal import Decimal
 from datetime import datetime, timedelta, date
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
@@ -18,8 +19,8 @@ from django.db.models.functions import TruncMonth, Coalesce
 from django.views.decorators.http import require_http_methods
 from django.conf import settings as django_settings
 
-from accounts.models import Invoice, Customer, SupportTicket, CustomUser, Product
-from accounts.forms import InvoiceForm, SupportTicketForm
+from accounts.models import Invoice, Customer, SupportTicket, CustomUser, Product, ProductCategory
+from accounts.forms import InvoiceForm, SupportTicketForm, ProductCategoryForm, ProductForm
 from accounts.emails import (
     send_welcome_email, send_invoice_email, send_payment_confirmation_email,
     send_ticket_confirmation_email, send_ticket_update_email,
@@ -27,7 +28,6 @@ from accounts.emails import (
 
 from django.db import transaction
 from accounts.forms import InvoiceForm, InvoiceItemFormSet, ProductForm
-from datetime import timedelta
 from django.db import models
 
 
@@ -36,8 +36,6 @@ from django.db import models
 # ============================================================
 
 def get_company_logo_path(user):
-    """Return the filesystem path of the company logo, or None."""
-    # Try 1: CompanySettings model logo
     try:
         company = user.company_settings
         if company.logo and company.logo.name:
@@ -46,12 +44,9 @@ def get_company_logo_path(user):
                 return path
     except Exception:
         pass
-
-    # Try 2: Static images folder (works on any machine)
     static_logo = os.path.join(str(django_settings.BASE_DIR), 'static', 'images', 'logo.png')
     if os.path.isfile(static_logo):
         return static_logo
-
     return None
 
 
@@ -61,7 +56,6 @@ def get_next_invoice_number(user):
     last_invoice = Invoice.objects.filter(
         user=user, invoice_number__startswith=prefix
     ).order_by('-invoice_number').first()
-
     if last_invoice:
         try:
             last_num = int(last_invoice.invoice_number.replace(prefix, ''))
@@ -70,7 +64,6 @@ def get_next_invoice_number(user):
             next_num = 1
     else:
         next_num = 1
-
     return f"{prefix}{next_num:03d}"
 
 
@@ -89,19 +82,15 @@ def login_view(request):
     if request.method == 'POST':
         email    = request.POST.get('email', '').strip()
         password = request.POST.get('password', '').strip()
-
         if not email or not password:
             messages.error(request, 'Email and password are required.')
             return render(request, 'accounts/login.html')
-
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
             messages.success(request, 'Welcome back!')
             return redirect('accounts:dashboard')
-
         messages.error(request, 'Invalid email or password.')
-
     return render(request, 'accounts/login.html')
 
 
@@ -111,7 +100,6 @@ def signup_view(request):
         password         = request.POST.get('password', '').strip()
         password_confirm = request.POST.get('password_confirm', '').strip()
         company_name     = request.POST.get('company_name', '').strip()
-
         if not all([email, password, password_confirm, company_name]):
             messages.error(request, 'All fields are required.')
             return render(request, 'accounts/signup.html')
@@ -124,7 +112,6 @@ def signup_view(request):
         if CustomUser.objects.filter(email=email).exists():
             messages.error(request, 'This email is already registered.')
             return render(request, 'accounts/signup.html')
-
         try:
             user = CustomUser.objects.create_user(
                 email=email, password=password, company_name=company_name
@@ -141,7 +128,6 @@ def signup_view(request):
             return redirect('accounts:login')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
-
     return render(request, 'accounts/signup.html')
 
 
@@ -174,7 +160,7 @@ def dashboard_view(request):
     customers = Customer.objects.filter(user=user)
     tickets   = SupportTicket.objects.filter(user=user)
 
-    total_revenue  = invoices.aggregate(Sum('total'))['total__sum']       or Decimal('0.00')
+    total_revenue  = invoices.aggregate(Sum('total'))['total__sum'] or Decimal('0.00')
     total_paid     = invoices.filter(status='paid').aggregate(Sum('total'))['total__sum'] or Decimal('0.00')
     gst_collected  = invoices.aggregate(Sum('gst_amount'))['gst_amount__sum'] or Decimal('0.00')
 
@@ -307,90 +293,137 @@ def dashboard_view(request):
 
 @login_required(login_url='accounts:login')
 def create_invoice(request):
-    """Create invoice with multiple items"""
-    if not (request.user.is_staff or request.user.is_superuser):
-        messages.error(request, "You don't have permission to create invoices.")
-        return redirect('accounts:invoices')
-    
+    """Create invoice with multiple line items."""
     if request.method == 'POST':
-        form = InvoiceForm(request.POST, user=request.user)
-        formset = InvoiceItemFormSet(request.POST)
-        
+        post_data = request.POST.copy()
+        # Auto-generate invoice number if blank
+        if not post_data.get('invoice_number', '').strip():
+            post_data['invoice_number'] = get_next_invoice_number(request.user)
+
+        form    = InvoiceForm(post_data, user=request.user)
+        formset = InvoiceItemFormSet(post_data, prefix='accounts_invoiceitem_set')
+
         if form.is_valid() and formset.is_valid():
             try:
                 with transaction.atomic():
-                    # Create invoice
                     invoice = form.save(commit=False)
                     invoice.user = request.user
-                    invoice.invoice_number = get_next_invoice_number(request.user)
                     invoice.save()
-                    
-                    # Get business and customer state for GST split
+
                     business_state = (request.user.business_state or '').strip().lower()
                     customer_state = (invoice.customer.state or '').strip().lower() if invoice.customer else ''
-                    same_state = business_state and customer_state and business_state == customer_state
-                    
-                    # Save items and calculate totals
+                    same_state = bool(business_state and customer_state and business_state == customer_state)
+
                     formset.instance = invoice
                     for item_form in formset:
                         if item_form.cleaned_data and not item_form.cleaned_data.get('DELETE'):
                             item = item_form.save(commit=False)
                             item.invoice = invoice
-                            
-                            # If product selected, populate from product
                             if item.product:
-                                item.product_name = item.product.name
-                                item.description = item.product.description
-                                item.hsn_sac_code = item.product.hsn_sac
-                                item.unit_price = item.product.price
-                                item.gst_rate = item.product.gst_rate
-                            
-                            # Calculate line totals
+                                if not item.product_name:
+                                    item.product_name = item.product.name
+                                if not item.description:
+                                    item.description = item.product.description
+                                if not item.hsn_sac_code:
+                                    item.hsn_sac_code = item.product.hsn_sac
+                                if not item.unit_price:
+                                    item.unit_price = item.product.price
+                                if not item.gst_rate:
+                                    item.gst_rate = item.product.gst_rate
                             item.calculate(same_state=same_state)
                             item.save()
-                    
-                    # Recalculate invoice totals from items
+
                     invoice.calculate_from_items()
                     invoice.save()
-                    
-                    send_invoice_email(invoice)
+
+                    try:
+                        send_invoice_email(invoice)
+                    except Exception:
+                        pass
+
                     messages.success(request, f'Invoice #{invoice.invoice_number} created successfully!')
                     return redirect('accounts:invoices')
             except Exception as e:
-                messages.error(request, f'Error: {str(e)}')
+                messages.error(request, f'Error saving invoice: {str(e)}')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f'{field}: {error}')
-            for formset_error in formset.non_form_errors():
-                messages.error(request, formset_error)
+            for i, ferrors in enumerate(formset.errors):
+                if ferrors:
+                    for field_name, field_errors in ferrors.items():
+                        for err in field_errors:
+                            messages.error(request, f'Item {i+1} - {field_name}: {err}')
+            for err in formset.non_form_errors():
+                messages.error(request, err)
     else:
         form = InvoiceForm(user=request.user, initial={
             'issued_date': timezone.now().date(),
-            'due_date': timezone.now().date() + timedelta(days=30)
+            'due_date':    timezone.now().date() + timedelta(days=30),
         })
-        formset = InvoiceItemFormSet()
-    
-    # Filter formset to current user's products
-    for form_in_formset in formset.forms:
-        form_in_formset.fields['product'].queryset = Product.objects.filter(
-            user=request.user,
-            is_active=True
+        formset = InvoiceItemFormSet(prefix='accounts_invoiceitem_set')
+
+    for f in formset.forms:
+        f.fields['product'].queryset = Product.objects.filter(
+            user=request.user, is_active=True
         ).order_by('name')
-    
+
     context = {
-        'form': form,
-        'formset': formset,
+        'form':      form,
+        'formset':   formset,
         'customers': Customer.objects.filter(user=request.user),
-        'products': Product.objects.filter(user=request.user, is_active=True),
+        'products':  Product.objects.filter(user=request.user, is_active=True),
         'page_title': 'Create Invoice',
     }
     return render(request, 'accounts/create_invoice.html', context)
 
+
+@login_required
+def invoice_detail(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk, user=request.user)
+    items   = invoice.items.all()
+
+    total_paid    = Decimal('0.00')
+    paid_items    = []
+    partial_items = []
+    pending_items = []
+    paid_total    = Decimal('0.00')
+    partial_total = Decimal('0.00')
+    pending_total = Decimal('0.00')
+
+    for item in items:
+        total_paid += item.amount_paid
+        if item.payment_status == 'paid':
+            paid_items.append(item)
+            paid_total += item.line_total
+        elif item.payment_status == 'partial':
+            partial_items.append(item)
+            partial_total += item.amount_paid
+        else:
+            pending_items.append(item)
+            pending_total += item.line_total
+
+    outstanding_balance = max(Decimal('0.00'), invoice.total - total_paid)
+    payment_percentage  = (total_paid / invoice.total * 100) if invoice.total > 0 else 0
+
+    context = {
+        'invoice':             invoice,
+        'total_paid':          total_paid,
+        'outstanding_balance': outstanding_balance,
+        'paid_items':          paid_items,
+        'partial_items':       partial_items,
+        'pending_items':       pending_items,
+        'paid_total':          paid_total,
+        'partial_total':       partial_total,
+        'pending_total':       pending_total,
+        'payment_percentage':  payment_percentage,
+    }
+    return render(request, 'accounts/invoice_detail.html', context)
+
+
 @login_required(login_url='accounts:login')
 def invoices_list(request):
     all_invoices = Invoice.objects.filter(user=request.user)
-
     status   = request.GET.get('status')
     filtered = all_invoices
     if status in ['draft', 'issued', 'paid', 'overdue', 'pending']:
@@ -400,18 +433,14 @@ def invoices_list(request):
         result = qs.aggregate(s=Sum(field))['s']
         return Decimal(str(result)) if result else Decimal('0.00')
 
-    total_amount   = safe_sum(all_invoices, 'total')
-    paid_amount    = safe_sum(all_invoices.filter(status='paid'), 'total')
-    pending_amount = safe_sum(all_invoices.filter(status__in=['issued', 'pending', 'draft']), 'total')
-
     context = {
-        'invoices':              filtered,
-        'selected_status':       status or 'all',
-        'page_title':            'Invoices',
-        'total_invoices_count':  all_invoices.count(),
-        'total_amount':          f"{float(total_amount):.2f}",
-        'paid_amount':           f"{float(paid_amount):.2f}",
-        'pending_amount':        f"{float(pending_amount):.2f}",
+        'invoices':             filtered,
+        'selected_status':      status or 'all',
+        'page_title':           'Invoices',
+        'total_invoices_count': all_invoices.count(),
+        'total_amount':         f"{float(safe_sum(all_invoices, 'total')):.2f}",
+        'paid_amount':          f"{float(safe_sum(all_invoices.filter(status='paid'), 'total')):.2f}",
+        'pending_amount':       f"{float(safe_sum(all_invoices.filter(status__in=['issued','pending','draft']), 'total')):.2f}",
     }
     return render(request, 'accounts/invoices.html', context)
 
@@ -440,10 +469,8 @@ def update_invoice(request, invoice_id):
             gst_rate   = Decimal(post_data.get('gst_rate') or '18')
             gst_amount = round(subtotal * gst_rate / 100, 2)
             total      = round(subtotal + gst_amount, 2)
-
             business_state = (request.user.business_state or '').strip().lower()
             customer_state = (invoice.customer.state or '').strip().lower() if invoice.customer else ''
-
             if business_state and customer_state and business_state == customer_state:
                 cgst = round(gst_amount / 2, 2)
                 sgst = round(gst_amount / 2, 2)
@@ -452,7 +479,6 @@ def update_invoice(request, invoice_id):
                 cgst = Decimal('0')
                 sgst = Decimal('0')
                 igst = gst_amount
-
             post_data['gst_amount']  = str(gst_amount)
             post_data['cgst_amount'] = str(cgst)
             post_data['sgst_amount'] = str(sgst)
@@ -512,28 +538,19 @@ def delete_invoice(request, invoice_id):
 
 
 # ============================================================
-# EMAIL INVOICE  ← MAIN FIX IS HERE
+# PDF / EMAIL
 # ============================================================
 
 def _build_invoice_pdf_buffer(invoice, user):
-    """
-    Build a PDF for *invoice* and return the raw bytes.
-    Uses BytesIO (now properly imported at top of file).
-    Logo path is resolved dynamically — no hardcoded Windows paths.
-    """
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import (
-        SimpleDocTemplate, Table, TableStyle,
-        Paragraph, Spacer, HRFlowable,
-    )
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
     from reportlab.platypus import Image as RLImage
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
 
     buffer = BytesIO()
-
     LEFT_MARGIN = RIGHT_MARGIN = 15 * mm
     TOP_MARGIN  = BOT_MARGIN   = 12 * mm
     PAGE_W  = A4[0]
@@ -567,20 +584,20 @@ def _build_invoice_pdf_buffer(invoice, user):
             fontName=font, alignment=align, leading=leading or size + 4,
         )
 
-    customer = invoice.customer
+    customer        = invoice.customer
     company_name    = getattr(user, 'company_name', None)    or 'iSaral Business Solutions'
     company_address = getattr(user, 'business_address', None) or 'Bangalore, Karnataka'
     company_gstin   = getattr(user, 'gstin', None)           or ''
     company_phone   = getattr(user, 'phone', None)           or ''
     company_email   = user.email or ''
 
-    cname  = (customer.name    if customer else 'N/A')
-    cco    = (customer.company if customer else '')
-    cemail = (customer.email   if customer else '')
-    cphone = (customer.phone   if customer else '')
-    caddr  = (customer.address if customer else '')
-    cstate = (customer.state   if customer else '')
-    cgstin = (customer.gstin   if customer else '')
+    cname  = customer.name    if customer else 'N/A'
+    cco    = customer.company if customer else ''
+    cemail = customer.email   if customer else ''
+    cphone = customer.phone   if customer else ''
+    caddr  = customer.address if customer else ''
+    cstate = customer.state   if customer else ''
+    cgstin = customer.gstin   if customer else ''
 
     issued_str = invoice.issued_date.strftime('%d %b %Y')
     due_str    = invoice.due_date.strftime('%d %b %Y') if invoice.due_date else 'N/A'
@@ -599,13 +616,11 @@ def _build_invoice_pdf_buffer(invoice, user):
     L = USABLE * 0.55
     R = USABLE * 0.45
 
-    # ── Header ──────────────────────────────────────────────────────────
-    logo_path  = get_company_logo_path(user)   # ← dynamic, not hardcoded
+    logo_path  = get_company_logo_path(user)
     left_lines = []
-
     if logo_path:
         try:
-            _logo = RLImage(logo_path, width=40 * mm, height=14 * mm)
+            _logo = RLImage(logo_path, width=40*mm, height=14*mm)
             _logo.hAlign = 'LEFT'
             left_lines = [_logo, Spacer(1, 6)]
         except Exception:
@@ -618,38 +633,36 @@ def _build_invoice_pdf_buffer(invoice, user):
     if company_gstin:
         left_lines.append(Paragraph(f'GSTIN: {company_gstin}', S('h4', 8, WHITE, leading=12)))
     if company_phone:
-        left_lines.append(Paragraph(f'Ph: {company_phone}',    S('h5', 8, WHITE, leading=12)))
-    left_lines.append(Paragraph(f'Email: {company_email}',     S('h6', 8, WHITE, leading=12)))
+        left_lines.append(Paragraph(f'Ph: {company_phone}', S('h5', 8, WHITE, leading=12)))
+    left_lines.append(Paragraph(f'Email: {company_email}', S('h6', 8, WHITE, leading=12)))
 
     right_lines = [
-        Paragraph('TAX INVOICE',               S('ti', 13, GOLD,  'Helvetica-Bold', TA_RIGHT)),
+        Paragraph('TAX INVOICE',              S('ti', 13, GOLD, 'Helvetica-Bold', TA_RIGHT)),
         Spacer(1, 4),
         Paragraph(f'# {invoice.invoice_number}', S('in', 11, WHITE, 'Helvetica-Bold', TA_RIGHT)),
         Spacer(1, 6),
-        Paragraph(f'Date: {issued_str}',       S('d1',  9, WHITE, align=TA_RIGHT)),
-        Paragraph(f'Due:  {due_str}',           S('d2',  9, WHITE, align=TA_RIGHT)),
+        Paragraph(f'Date: {issued_str}', S('d1', 9, WHITE, align=TA_RIGHT)),
+        Paragraph(f'Due:  {due_str}',    S('d2', 9, WHITE, align=TA_RIGHT)),
         Spacer(1, 6),
-        Paragraph(invoice.status.upper(),       S('st',  8, WHITE, 'Helvetica-Bold', TA_RIGHT)),
+        Paragraph(invoice.status.upper(), S('st', 8, WHITE, 'Helvetica-Bold', TA_RIGHT)),
     ]
 
     header = Table(
-        [[left_lines, right_lines]],
-        colWidths=[L, R],
+        [[left_lines, right_lines]], colWidths=[L, R],
         style=TableStyle([
-            ('BACKGROUND',   (0, 0), (-1, -1), BRAND),
-            ('VALIGN',       (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 10),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 10),
-            ('TOPPADDING',   (0, 0), (-1, -1), 12),
-            ('BOTTOMPADDING',(0, 0), (-1, -1), 14),
+            ('BACKGROUND',    (0,0),(-1,-1), BRAND),
+            ('VALIGN',        (0,0),(-1,-1), 'TOP'),
+            ('LEFTPADDING',   (0,0),(-1,-1), 10),
+            ('RIGHTPADDING',  (0,0),(-1,-1), 10),
+            ('TOPPADDING',    (0,0),(-1,-1), 12),
+            ('BOTTOMPADDING', (0,0),(-1,-1), 14),
         ]),
     )
     story.append(header)
-    story.append(Spacer(1, 6 * mm))
+    story.append(Spacer(1, 6*mm))
 
-    # ── Bill To / Details ───────────────────────────────────────────────
-    BL = BR = USABLE * 0.50 - 3 * mm
-    GAP = 6 * mm
+    BL = BR = USABLE * 0.50 - 3*mm
+    GAP = 6*mm
 
     bill_rows = [
         [Paragraph('BILL TO', S('bt', 8, BRAND, 'Helvetica-Bold'))],
@@ -662,69 +675,59 @@ def _build_invoice_pdf_buffer(invoice, user):
             bill_rows.append([Paragraph(txt, S(f'b{len(bill_rows)}', 9, BLACK))])
 
     bill_tbl = Table(
-        bill_rows, colWidths=[BL - 16],
+        bill_rows, colWidths=[BL-16],
         style=TableStyle([
-            ('BACKGROUND',   (0, 0), (-1, -1), LGRAY),
-            ('TOPPADDING',   (0, 0), (-1, -1), 4),
-            ('BOTTOMPADDING',(0, 0), (-1, -1), 3),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 8),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+            ('BACKGROUND',    (0,0),(-1,-1), LGRAY),
+            ('TOPPADDING',    (0,0),(-1,-1), 4),
+            ('BOTTOMPADDING', (0,0),(-1,-1), 3),
+            ('LEFTPADDING',   (0,0),(-1,-1), 8),
+            ('RIGHTPADDING',  (0,0),(-1,-1), 8),
         ]),
     )
 
     meta_rows = [
         [Paragraph('DETAILS', S('det', 8, BRAND, 'Helvetica-Bold')), ''],
-        [Paragraph('Invoice No', S('ml',  8, GRAY)), Paragraph(invoice.invoice_number,         S('mv',  9, BLACK, 'Helvetica-Bold'))],
-        [Paragraph('Issue Date', S('ml2', 8, GRAY)), Paragraph(issued_str,                     S('mv2', 9, BLACK))],
-        [Paragraph('Due Date',   S('ml3', 8, GRAY)), Paragraph(due_str,                        S('mv3', 9, BLACK))],
-        [Paragraph('HSN / SAC',  S('ml4', 8, GRAY)), Paragraph(hsn,                            S('mv4', 9, BLACK))],
-        [Paragraph('Status',     S('ml5', 8, GRAY)), Paragraph(invoice.status.capitalize(),     S('mv5', 9, status_color, 'Helvetica-Bold'))],
+        [Paragraph('Invoice No', S('ml',  8, GRAY)), Paragraph(invoice.invoice_number,       S('mv',  9, BLACK, 'Helvetica-Bold'))],
+        [Paragraph('Issue Date', S('ml2', 8, GRAY)), Paragraph(issued_str,                   S('mv2', 9, BLACK))],
+        [Paragraph('Due Date',   S('ml3', 8, GRAY)), Paragraph(due_str,                      S('mv3', 9, BLACK))],
+        [Paragraph('HSN / SAC',  S('ml4', 8, GRAY)), Paragraph(hsn,                          S('mv4', 9, BLACK))],
+        [Paragraph('Status',     S('ml5', 8, GRAY)), Paragraph(invoice.status.capitalize(),   S('mv5', 9, status_color, 'Helvetica-Bold'))],
     ]
-    MC1 = (BR - 16) * 0.42
-    MC2 = (BR - 16) * 0.58
+    MC1 = (BR-16)*0.42
+    MC2 = (BR-16)*0.58
     meta_tbl = Table(
         meta_rows, colWidths=[MC1, MC2],
         style=TableStyle([
-            ('BACKGROUND',   (0, 0), (-1, -1), LGRAY),
-            ('SPAN',         (0, 0), (1, 0)),
-            ('TOPPADDING',   (0, 0), (-1, -1), 4),
-            ('BOTTOMPADDING',(0, 0), (-1, -1), 3),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 8),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+            ('BACKGROUND',    (0,0),(-1,-1), LGRAY),
+            ('SPAN',          (0,0),(1,0)),
+            ('TOPPADDING',    (0,0),(-1,-1), 4),
+            ('BOTTOMPADDING', (0,0),(-1,-1), 3),
+            ('LEFTPADDING',   (0,0),(-1,-1), 8),
+            ('RIGHTPADDING',  (0,0),(-1,-1), 8),
         ]),
     )
 
     info = Table(
-        [[bill_tbl, Spacer(GAP, 1), meta_tbl]],
-        colWidths=[BL, GAP, BR],
-        style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]),
+        [[bill_tbl, Spacer(GAP, 1), meta_tbl]], colWidths=[BL, GAP, BR],
+        style=TableStyle([('VALIGN', (0,0),(-1,-1), 'TOP')]),
     )
     story.append(info)
-    story.append(Spacer(1, 6 * mm))
+    story.append(Spacer(1, 6*mm))
 
-    # ── Line Items ──────────────────────────────────────────────────────
     def TH(t): return Paragraph(t, S('th', 9, WHITE, 'Helvetica-Bold', TA_CENTER))
     def TC(t): return Paragraph(t, S('tc', 9, BLACK, align=TA_CENTER))
     def TL(t): return Paragraph(t, S('tl', 9, BLACK))
     def TR(t): return Paragraph(t, S('tr', 9, BLACK, align=TA_RIGHT))
 
     C = [8*mm, USABLE-8*mm-20*mm-28*mm-18*mm-28*mm, 20*mm, 28*mm, 18*mm, 28*mm]
+    item_rows = [[TH('#'), TH('Description'), TH('HSN/SAC'), TH('Rate (Rs.)'), TH('GST %'), TH('Amount (Rs.)')]]
 
-    # Build rows: header + each invoice item
-    item_rows = [
-        [TH('#'), TH('Description'), TH('HSN/SAC'), TH('Rate (Rs.)'), TH('GST %'), TH('Amount (Rs.')],
-    ]
-
-    # Get all invoice items (from multi-product system)
     invoice_items = invoice.items.all() if hasattr(invoice, 'items') else []
-    
     if invoice_items.exists():
-        # Multi-item invoice
         for idx, item in enumerate(invoice_items, 1):
             item_subtotal = item.subtotal or Decimal('0')
-            item_gst = item.gst_rate or Decimal('0')
-            item_total = item.line_total or (item_subtotal + (item_subtotal * item_gst / 100))
-            
+            item_gst      = item.gst_rate or Decimal('0')
+            item_total    = item.line_total or (item_subtotal + item_subtotal * item_gst / 100)
             item_rows.append([
                 TC(str(idx)),
                 TL(item.product_name or item.description or '-'),
@@ -734,39 +737,29 @@ def _build_invoice_pdf_buffer(invoice, user):
                 TR(f'{item_total:,.2f}'),
             ])
     else:
-        # Fallback: single-item invoice (old format)
-        desc = invoice.description or 'Service / Product'
-        item_rows.append([
-            TC('1'),
-            TL(desc),
-            TC(hsn),
-            TR(f'{subtotal:,.2f}'),
-            TC(f'{gst_rate:.1f}%'),
-            TR(f'{subtotal:,.2f}'),
-        ])
+        desc = getattr(invoice, 'description', None) or 'Service / Product'
+        item_rows.append([TC('1'), TL(desc), TC(hsn), TR(f'{subtotal:,.2f}'), TC(f'{gst_rate:.1f}%'), TR(f'{subtotal:,.2f}')])
 
-    items = Table(
-        item_rows,
-        colWidths=C,
+    items_tbl = Table(
+        item_rows, colWidths=C,
         style=TableStyle([
-            ('BACKGROUND',   (0, 0), (-1, 0),  BRAND),
-            ('BACKGROUND',   (0, 1), (-1, -1), LGRAY),
-            ('GRID',         (0, 0), (-1, -1), 0.4, colors.HexColor('#E5E7EB')),
-            ('LINEBELOW',    (0, 0), (-1, 0),  1, BRAND),
-            ('TOPPADDING',   (0, 0), (-1, -1), 6),
-            ('BOTTOMPADDING',(0, 0), (-1, -1), 6),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 5),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 5),
-            ('VALIGN',       (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND',    (0,0),(-1,0),  BRAND),
+            ('BACKGROUND',    (0,1),(-1,-1), LGRAY),
+            ('GRID',          (0,0),(-1,-1), 0.4, colors.HexColor('#E5E7EB')),
+            ('LINEBELOW',     (0,0),(-1,0),  1, BRAND),
+            ('TOPPADDING',    (0,0),(-1,-1), 6),
+            ('BOTTOMPADDING', (0,0),(-1,-1), 6),
+            ('LEFTPADDING',   (0,0),(-1,-1), 5),
+            ('RIGHTPADDING',  (0,0),(-1,-1), 5),
+            ('VALIGN',        (0,0),(-1,-1), 'MIDDLE'),
         ]),
     )
-    story.append(items)
-    story.append(Spacer(1, 5 * mm))
+    story.append(items_tbl)
+    story.append(Spacer(1, 5*mm))
 
-    # ── Summary ─────────────────────────────────────────────────────────
-    SW  = 90 * mm
-    SC1 = 36 * mm
-    SC2 = 22 * mm
+    SW  = 90*mm
+    SC1 = 36*mm
+    SC2 = 22*mm
     SC3 = SW - SC1 - SC2
 
     def SL(t):  return Paragraph(t, S('sl',  8, GRAY))
@@ -777,10 +770,8 @@ def _build_invoice_pdf_buffer(invoice, user):
     gst_rows = (
         [[SL('IGST'), SL(f'@ {gst_rate:.1f}%'), SR(f'Rs. {igst:,.2f}')]]
         if igst > 0 else
-        [
-            [SL('CGST'), SL(f'@ {half_gst:.1f}%'), SR(f'Rs. {cgst:,.2f}')],
-            [SL('SGST'), SL(f'@ {half_gst:.1f}%'), SR(f'Rs. {sgst:,.2f}')],
-        ]
+        [[SL('CGST'), SL(f'@ {half_gst:.1f}%'), SR(f'Rs. {cgst:,.2f}')],
+         [SL('SGST'), SL(f'@ {half_gst:.1f}%'), SR(f'Rs. {sgst:,.2f}')]]
     )
     summary_rows = (
         [[SL('Subtotal'), SL(''), SR(f'Rs. {subtotal:,.2f}')]]
@@ -793,53 +784,46 @@ def _build_invoice_pdf_buffer(invoice, user):
     sum_tbl = Table(
         summary_rows, colWidths=[SC1, SC2, SC3],
         style=TableStyle([
-            ('BACKGROUND',   (0, last), (-1, last),  BRAND),
-            ('BACKGROUND',   (0, 0),    (-1, last-1), LGRAY),
-            ('LINEABOVE',    (0, last), (-1, last),  1, BRAND),
-            ('TOPPADDING',   (0, 0),    (-1, -1),    5),
-            ('BOTTOMPADDING',(0, 0),    (-1, -1),    5),
-            ('LEFTPADDING',  (0, 0),    (-1, -1),    8),
-            ('RIGHTPADDING', (0, 0),    (-1, -1),    8),
-            ('VALIGN',       (0, 0),    (-1, -1),    'MIDDLE'),
+            ('BACKGROUND',    (0,last),(-1,last),  BRAND),
+            ('BACKGROUND',    (0,0),   (-1,last-1), LGRAY),
+            ('LINEABOVE',     (0,last),(-1,last),  1, BRAND),
+            ('TOPPADDING',    (0,0),   (-1,-1),    5),
+            ('BOTTOMPADDING', (0,0),   (-1,-1),    5),
+            ('LEFTPADDING',   (0,0),   (-1,-1),    8),
+            ('RIGHTPADDING',  (0,0),   (-1,-1),    8),
+            ('VALIGN',        (0,0),   (-1,-1),    'MIDDLE'),
         ]),
     )
     wrapper = Table(
-        [[Spacer(USABLE - SW, 1), sum_tbl]],
-        colWidths=[USABLE - SW, SW],
-        style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]),
+        [[Spacer(USABLE-SW, 1), sum_tbl]], colWidths=[USABLE-SW, SW],
+        style=TableStyle([('VALIGN', (0,0),(-1,-1), 'TOP')]),
     )
     story.append(wrapper)
-    story.append(Spacer(1, 8 * mm))
+    story.append(Spacer(1, 8*mm))
 
-    # ── Notes ───────────────────────────────────────────────────────────
     if invoice.notes:
         story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#E5E7EB')))
-        story.append(Spacer(1, 3 * mm))
+        story.append(Spacer(1, 3*mm))
         story.append(Paragraph('Notes:', S('nl', 8, BRAND, 'Helvetica-Bold')))
         story.append(Paragraph(invoice.notes, S('nv', 8, GRAY, leading=12)))
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 4*mm))
 
-    # ── Footer ──────────────────────────────────────────────────────────
     story.append(HRFlowable(width='100%', thickness=0.8, color=BRAND))
-    story.append(Spacer(1, 3 * mm))
+    story.append(Spacer(1, 3*mm))
     footer = Table(
         [[
             Paragraph('Thank you for your business!', S('fl', 9, BRAND, 'Helvetica-Bold')),
-            Paragraph(
-                f'Generated {timezone.now().strftime("%d %b %Y")}  |  Powered by iSaral',
-                S('fr', 8, GRAY, align=TA_RIGHT),
-            ),
+            Paragraph(f'Generated {timezone.now().strftime("%d %b %Y")}  |  Powered by iSaral', S('fr', 8, GRAY, align=TA_RIGHT)),
         ]],
-        colWidths=[USABLE * 0.5, USABLE * 0.5],
+        colWidths=[USABLE*0.5, USABLE*0.5],
         style=TableStyle([
-            ('VALIGN',       (0, 0), (-1, -1), 'MIDDLE'),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 0),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('VALIGN',       (0,0),(-1,-1), 'MIDDLE'),
+            ('LEFTPADDING',  (0,0),(-1,-1), 0),
+            ('RIGHTPADDING', (0,0),(-1,-1), 0),
         ]),
     )
     story.append(footer)
     doc.build(story)
-
     pdf_bytes = buffer.getvalue()
     buffer.close()
     return pdf_bytes
@@ -860,72 +844,48 @@ def email_invoice(request, invoice_id):
     try:
         user     = request.user
         customer = invoice.customer
-
-        # Build PDF
         pdf_data = _build_invoice_pdf_buffer(invoice, user)
 
-        # Build email
         company_name_str = getattr(user, 'company_name', None) or 'iSaral Business Solutions'
         issued_str = invoice.issued_date.strftime('%d %b %Y')
         due_str    = invoice.due_date.strftime('%d %b %Y') if invoice.due_date else 'N/A'
 
-       # Build email body with line items
         items_text = ""
         invoice_items = invoice.items.all() if hasattr(invoice, 'items') else []
-        
         if invoice_items.exists():
-            items_text = "\nLine Items:\n"
-            items_text += "-" * 60 + "\n"
+            items_text = "\nLine Items:\n" + "-"*60 + "\n"
             for idx, item in enumerate(invoice_items, 1):
                 items_text += f"{idx}. {item.product_name or 'Item'}\n"
-                items_text += f"   Qty: {item.quantity} × Rs. {item.unit_price:,.2f} = Rs. {item.subtotal:,.2f}\n"
+                items_text += f"   Qty: {item.quantity} x Rs. {item.unit_price:,.2f} = Rs. {item.subtotal:,.2f}\n"
                 items_text += f"   GST ({item.gst_rate:.0f}%): Rs. {item.gst_amount:,.2f}\n"
                 items_text += f"   Line Total: Rs. {item.line_total:,.2f}\n\n"
-            items_text += "-" * 60 + "\n"
+            items_text += "-"*60 + "\n"
 
         subject = f"Invoice #{invoice.invoice_number} from {company_name_str}"
         body = (
-            f"Dear {customer.name},\n\n"
-            f"Thank you for your business!\n\n"
+            f"Dear {customer.name},\n\nThank you for your business!\n\n"
             f"Please find attached Invoice #{invoice.invoice_number}.\n\n"
-            f"Invoice Summary:\n"
-            f"{'='*60}\n"
+            f"Invoice Summary:\n{'='*60}\n"
             f"Invoice Number : {invoice.invoice_number}\n"
-            f"Invoice Date   : {issued_str}\n"
-            f"Due Date       : {due_str}\n"
-            f"{'='*60}\n"
+            f"Invoice Date   : {issued_str}\nDue Date       : {due_str}\n{'='*60}\n"
             + items_text +
             f"Subtotal       : Rs. {invoice.subtotal:,.2f}\n"
-            f"GST Total ({invoice.gst_rate:.0f}%) : Rs. {invoice.gst_amount:,.2f}\n"
-            f"{'='*60}\n"
-            f"Total Amount   : Rs. {invoice.total:,.2f}\n"
-            f"{'='*60}\n\n"
-            f"If you have any questions, please contact us.\n\n"
-            f"Regards,\n"
-            f"{company_name_str}\n"
-            f"https://isaral.ai\n"
+            f"GST Total ({invoice.gst_rate:.0f}%) : Rs. {invoice.gst_amount:,.2f}\n{'='*60}\n"
+            f"Total Amount   : Rs. {invoice.total:,.2f}\n{'='*60}\n\n"
+            f"Regards,\n{company_name_str}\nhttps://isaral.ai\n"
         )
 
         from django.core.mail import EmailMessage as DjangoEmailMessage
-
-        # ← FIX: use DEFAULT_FROM_EMAIL (matches Gmail SMTP credentials)
-        #         NOT user.email which caused SMTP authentication issues
         email_msg = DjangoEmailMessage(
-            subject=subject,
-            body=body,
+            subject=subject, body=body,
             from_email=django_settings.DEFAULT_FROM_EMAIL,
             to=[customer.email],
         )
-        email_msg.attach(
-            f'INV-{invoice.invoice_number}.pdf',
-            pdf_data,
-            'application/pdf',
-        )
+        email_msg.attach(f'INV-{invoice.invoice_number}.pdf', pdf_data, 'application/pdf')
         email_msg.send(fail_silently=False)
         messages.success(request, f'Invoice emailed successfully to {customer.email}')
-
     except Exception as e:
-        messages.error(request, f'Email could not be sent. Please try again later. ({str(e)})')
+        messages.error(request, f'Email could not be sent. ({str(e)})')
 
     return redirect('accounts:invoices')
 
@@ -939,7 +899,6 @@ def generate_invoice_pdf(request, invoice_id):
         return redirect('accounts:invoices')
 
     pdf_data = _build_invoice_pdf_buffer(invoice, request.user)
-
     response = HttpResponse(pdf_data, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="INV-{invoice.invoice_number}.pdf"'
     return response
@@ -983,8 +942,7 @@ def add_customer(request):
         except Exception as e:
             messages.error(request, f'Error creating customer: {str(e)}')
 
-    context = {'page_title': 'Add New Customer'}
-    return render(request, 'accounts/customer_form.html', context)
+    return render(request, 'accounts/customer_form.html', {'page_title': 'Add New Customer'})
 
 
 @login_required(login_url='accounts:login')
@@ -1002,10 +960,9 @@ def customer_list(request):
             Q(gstin__icontains=search_query)
         )
 
-    customers    = customers.order_by('-created_at')
-    paginator    = Paginator(customers, 10)
-    page_number  = request.GET.get('page', 1)
-    page_obj     = paginator.get_page(page_number)
+    customers     = customers.order_by('-created_at')
+    paginator     = Paginator(customers, 10)
+    page_obj      = paginator.get_page(request.GET.get('page', 1))
     all_customers = Customer.objects.filter(user=user)
 
     context = {
@@ -1023,25 +980,20 @@ def customer_list(request):
 @login_required(login_url='accounts:login')
 def customer_search(request):
     query = request.GET.get('q', '').strip()
-    user  = request.user
-
     if len(query) < 2:
         return render(request, 'accounts/customer_search_results.html', {'customers': []})
-
-    customers = Customer.objects.filter(user=user).filter(
-        Q(name__icontains=query)    | Q(company__icontains=query) |
-        Q(email__icontains=query)   | Q(phone__icontains=query)   |
+    customers = Customer.objects.filter(user=request.user).filter(
+        Q(name__icontains=query)  | Q(company__icontains=query) |
+        Q(email__icontains=query) | Q(phone__icontains=query)   |
         Q(gstin__icontains=query)
     )[:10]
-
     return render(request, 'accounts/customer_search_results.html', {'customers': customers, 'query': query})
 
 
 @login_required(login_url='accounts:login')
 def get_customer_details(request, customer_id):
-    user = request.user
     try:
-        customer = Customer.objects.get(id=customer_id, user=user)
+        customer = Customer.objects.get(id=customer_id, user=request.user)
     except Customer.DoesNotExist:
         messages.error(request, 'Customer not found.')
         return redirect('accounts:create_customer')
@@ -1073,9 +1025,8 @@ def customer_edit(request, customer_id):
         messages.error(request, "You don't have permission to edit customers.")
         return redirect('accounts:get_customer_details', customer_id=customer_id)
 
-    user = request.user
     try:
-        customer = Customer.objects.get(id=customer_id, user=user)
+        customer = Customer.objects.get(id=customer_id, user=request.user)
     except Customer.DoesNotExist:
         messages.error(request, 'Customer not found.')
         return redirect('accounts:create_customer')
@@ -1093,7 +1044,7 @@ def customer_edit(request, customer_id):
             messages.error(request, 'Name and Email are required.')
             return render(request, 'accounts/customer_form.html', {'customer': customer})
 
-        if Customer.objects.filter(user=user, email=email).exclude(id=customer.id).exists():
+        if Customer.objects.filter(user=request.user, email=email).exclude(id=customer.id).exists():
             messages.error(request, f'Email {email} is already used by another customer.')
             return render(request, 'accounts/customer_form.html', {'customer': customer})
 
@@ -1136,21 +1087,17 @@ def delete_customer(request, customer_id):
     if not request.user.is_superuser:
         messages.error(request, "You don't have permission to delete customers.")
         return redirect('accounts:customer_list')
-
     try:
         customer = Customer.objects.get(id=customer_id, user=request.user)
     except Customer.DoesNotExist:
         messages.error(request, "Customer not found.")
         return redirect('accounts:customer_list')
-
-    invoice_count = Invoice.objects.filter(customer=customer).count()
-    if invoice_count > 0:
-        messages.error(request, f"Cannot delete customer because {invoice_count} invoice(s) exist.")
+    if Invoice.objects.filter(customer=customer).count() > 0:
+        messages.error(request, f"Cannot delete customer because invoices exist.")
         return redirect('accounts:get_customer_details', customer_id=customer.id)
-
-    customer_name = customer.name
+    name = customer.name
     customer.delete()
-    messages.success(request, f"{customer_name} deleted successfully.")
+    messages.success(request, f"{name} deleted successfully.")
     return redirect('accounts:customer_list')
 
 
@@ -1180,26 +1127,22 @@ def create_ticket(request):
         if form.is_valid():
             try:
                 ticket_number = f"TKT-{timezone.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8].upper()}"
-                subject       = form.cleaned_data['subject']
                 product       = form.cleaned_data['product']
                 description   = form.cleaned_data['description']
                 description   = f"Product: {dict(form.fields['product'].choices).get(product, product)}\n\n{description}"
-
                 tally_sno = form.cleaned_data.get('tally_sno')
                 if tally_sno:
                     description += f"\n\nTally Serial Number: {tally_sno}"
-
                 other_product_name = form.cleaned_data.get('other_product_name')
                 if other_product_name:
                     description += f"\n\nOther Product: {other_product_name}"
-
                 ticket = SupportTicket.objects.create(
                     user=request.user,
                     ticket_number=ticket_number,
                     customer_name=form.cleaned_data['customer_name'],
                     customer_mobile=form.cleaned_data['customer_mobile'],
                     customer_email=form.cleaned_data['customer_email'],
-                    subject=subject,
+                    subject=form.cleaned_data['subject'],
                     description=description,
                     priority=form.cleaned_data['priority'],
                     status='open',
@@ -1215,7 +1158,6 @@ def create_ticket(request):
                     messages.error(request, f"{field}: {error}")
     else:
         form = SupportTicketForm()
-
     return render(request, 'accounts/create_ticket.html', {'form': form, 'page_title': 'Create Ticket'})
 
 
@@ -1236,11 +1178,9 @@ def ticket_detail_view(request, ticket_id):
             message_text    = request.POST.get('message', '').strip()
             resolution_note = request.POST.get('resolution_note', '').strip()
             new_status      = request.POST.get('status', ticket.status).strip()
-
             if not message_text:
                 messages.error(request, 'Reply message cannot be empty.')
                 return redirect('accounts:ticket_detail', ticket_id=ticket_id)
-
             from accounts.models import TicketReply
             TicketReply.objects.create(
                 ticket=ticket, user=request.user, message=message_text,
@@ -1299,10 +1239,8 @@ def update_ticket_status_view(request, ticket_id):
     except SupportTicket.DoesNotExist:
         messages.error(request, 'Ticket not found.')
         return redirect('accounts:tickets')
-
     if request.method != 'POST':
         return redirect('accounts:ticket_detail', ticket_id=ticket_id)
-
     new_status = request.POST.get('status', '').strip()
     if new_status in ['open', 'in_progress', 'resolved', 'closed']:
         ticket.status = new_status
@@ -1310,7 +1248,6 @@ def update_ticket_status_view(request, ticket_id):
         messages.success(request, f'Status updated to {ticket.get_status_display()}.')
     else:
         messages.error(request, 'Invalid status.')
-
     return redirect('accounts:ticket_detail', ticket_id=ticket_id)
 
 
@@ -1321,7 +1258,6 @@ def update_ticket_status_view(request, ticket_id):
 def get_invoice_stats(user, invoices_qs=None):
     if invoices_qs is None:
         invoices_qs = Invoice.objects.filter(user=user)
-
     agg = invoices_qs.aggregate(
         total_revenue   = Coalesce(Sum('total'),       Decimal('0.00')),
         paid_revenue    = Coalesce(Sum('total', filter=Q(status='paid')),                          Decimal('0.00')),
@@ -1340,7 +1276,6 @@ def get_invoice_stats(user, invoices_qs=None):
         draft_count     = Count('id', filter=Q(status='draft')),
         cancelled_count = Count('id', filter=Q(status='cancelled')),
     )
-
     total = agg['total_count'] or 1
     agg['paid_pct']      = round((agg['paid_count']      / total) * 100, 1)
     agg['pending_pct']   = round((agg['pending_count']   / total) * 100, 1)
@@ -1357,7 +1292,6 @@ def billing_reports(request):
     user  = request.user
     today = timezone.now().date()
 
-    # Financial year (India: Apr–Mar)
     fy_start_year = today.year if today.month >= 4 else today.year - 1
     this_fy_start = date(fy_start_year,     4, 1)
     this_fy_end   = date(fy_start_year + 1, 3, 31)
@@ -1369,15 +1303,12 @@ def billing_reports(request):
         'yesterday':  (today - timedelta(days=1), today - timedelta(days=1)),
         'this_week':  (today - timedelta(days=today.weekday()), today),
         'this_month': (today.replace(day=1), today),
-        'last_month': (
-            (today.replace(day=1) - timedelta(days=1)).replace(day=1),
-            today.replace(day=1) - timedelta(days=1),
-        ),
-        'last_3m':  (today - timedelta(days=90),  today),
-        'last_6m':  (today - timedelta(days=180), today),
-        'this_fy':  (this_fy_start, this_fy_end),
-        'prev_fy':  (prev_fy_start, prev_fy_end),
-        'all':      (None, None),
+        'last_month': ((today.replace(day=1) - timedelta(days=1)).replace(day=1), today.replace(day=1) - timedelta(days=1)),
+        'last_3m':    (today - timedelta(days=90),  today),
+        'last_6m':    (today - timedelta(days=180), today),
+        'this_fy':    (this_fy_start, this_fy_end),
+        'prev_fy':    (prev_fy_start, prev_fy_end),
+        'all':        (None, None),
     }
 
     preset        = request.GET.get('preset', '')
@@ -1414,25 +1345,24 @@ def billing_reports(request):
         filtered = filtered.filter(igst_amount__gt=0)
 
     filtered = filtered.order_by('-issued_date')
-
-    stats = get_invoice_stats(user, filtered)
+    stats    = get_invoice_stats(user, filtered)
 
     twelve_months_ago = today - timedelta(days=365)
     monthly_data = (
-        all_invoices
-        .filter(issued_date__gte=twelve_months_ago)
+        all_invoices.filter(issued_date__gte=twelve_months_ago)
         .annotate(month=TruncMonth('issued_date'))
         .values('month')
         .annotate(
-            revenue       = Coalesce(Sum('total'),                                               Decimal('0')),
-            paid_revenue  = Coalesce(Sum('total', filter=Q(status='paid')),                      Decimal('0')),
+            revenue       = Coalesce(Sum('total'),                                                    Decimal('0')),
+            paid_revenue  = Coalesce(Sum('total', filter=Q(status='paid')),                           Decimal('0')),
             pending_rev   = Coalesce(Sum('total', filter=Q(status__in=['issued','pending','draft'])), Decimal('0')),
-            overdue_rev   = Coalesce(Sum('total', filter=Q(status='overdue')),                   Decimal('0')),
+            overdue_rev   = Coalesce(Sum('total', filter=Q(status='overdue')),                        Decimal('0')),
             invoice_count = Count('id'),
         )
         .order_by('month')
     )
 
+    monthly_labels = monthly_revenue = monthly_paid = monthly_pending = monthly_overdue = monthly_invoice_count = []
     monthly_labels        = []
     monthly_revenue       = []
     monthly_paid          = []
@@ -1443,19 +1373,19 @@ def billing_reports(request):
     for m in monthly_data:
         if m['month']:
             monthly_labels.append(m['month'].strftime('%b %Y'))
-            monthly_revenue.append(float(m['revenue']       or 0))
-            monthly_paid.append(float(m['paid_revenue']     or 0))
-            monthly_pending.append(float(m['pending_rev']   or 0))
-            monthly_overdue.append(float(m['overdue_rev']   or 0))
+            monthly_revenue.append(float(m['revenue']      or 0))
+            monthly_paid.append(float(m['paid_revenue']    or 0))
+            monthly_pending.append(float(m['pending_rev']  or 0))
+            monthly_overdue.append(float(m['overdue_rev']  or 0))
             monthly_invoice_count.append(m['invoice_count'])
 
     top_customers = (
         Customer.objects.filter(user=user)
         .annotate(
-            total_revenue = Coalesce(Sum('invoice__total'),                                                          Decimal('0')),
-            paid_revenue  = Coalesce(Sum('invoice__total', filter=Q(invoice__status='paid')),                        Decimal('0')),
+            total_revenue = Coalesce(Sum('invoice__total'),                                                             Decimal('0')),
+            paid_revenue  = Coalesce(Sum('invoice__total', filter=Q(invoice__status='paid')),                           Decimal('0')),
             pending_rev   = Coalesce(Sum('invoice__total', filter=Q(invoice__status__in=['issued','pending','draft'])), Decimal('0')),
-            overdue_rev   = Coalesce(Sum('invoice__total', filter=Q(invoice__status='overdue')),                     Decimal('0')),
+            overdue_rev   = Coalesce(Sum('invoice__total', filter=Q(invoice__status='overdue')),                        Decimal('0')),
             invoice_count = Count('invoice'),
         )
         .filter(invoice_count__gt=0)
@@ -1492,8 +1422,7 @@ def billing_reports(request):
     )
 
     gst_monthly = (
-        all_invoices
-        .filter(issued_date__gte=twelve_months_ago)
+        all_invoices.filter(issued_date__gte=twelve_months_ago)
         .annotate(month=TruncMonth('issued_date'))
         .values('month')
         .annotate(
@@ -1573,11 +1502,7 @@ def _export_csv(invoices):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="invoices_report.csv"'
     writer = csv.writer(response)
-    writer.writerow([
-        'Invoice #', 'Customer', 'Date', 'Due Date',
-        'Subtotal', 'GST Rate', 'CGST', 'SGST', 'IGST',
-        'GST Amount', 'Total', 'Status',
-    ])
+    writer.writerow(['Invoice #','Customer','Date','Due Date','Subtotal','GST Rate','CGST','SGST','IGST','GST Amount','Total','Status'])
     for inv in invoices:
         writer.writerow([
             inv.invoice_number,
@@ -1596,11 +1521,7 @@ def _export_gst_csv(invoices):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="gst_report.csv"'
     writer = csv.writer(response)
-    writer.writerow([
-        'Invoice #', 'Customer', 'GSTIN', 'Date',
-        'Taxable Amount', 'GST Rate', 'CGST', 'SGST', 'IGST',
-        'Total GST', 'Grand Total',
-    ])
+    writer.writerow(['Invoice #','Customer','GSTIN','Date','Taxable Amount','GST Rate','CGST','SGST','IGST','Total GST','Grand Total'])
     for inv in invoices:
         writer.writerow([
             inv.invoice_number,
@@ -1618,20 +1539,13 @@ def _export_pdf(invoices, user, from_date, to_date):
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import (
-        SimpleDocTemplate, Table, TableStyle,
-        Paragraph, Spacer, HRFlowable,
-    )
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
     from reportlab.platypus import Image as RLImage
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
 
     buffer = BytesIO()
-    doc = SimpleDocTemplate(
-        buffer, pagesize=A4,
-        leftMargin=15*mm, rightMargin=15*mm,
-        topMargin=12*mm,  bottomMargin=15*mm,
-    )
+    doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=15*mm, rightMargin=15*mm, topMargin=12*mm, bottomMargin=15*mm)
 
     BRAND = colors.HexColor('#0D1B4B')
     GRAY  = colors.HexColor('#6B7280')
@@ -1643,133 +1557,89 @@ def _export_pdf(invoices, user, from_date, to_date):
     AMBER = colors.HexColor('#D97706')
 
     styles = getSampleStyleSheet()
-    USABLE = A4[0] - 30 * mm
+    USABLE = A4[0] - 30*mm
 
     def P(text, size=9, color=BLACK, bold=False, align=TA_LEFT):
         font = 'Helvetica-Bold' if bold else 'Helvetica'
-        return Paragraph(str(text), ParagraphStyle(
-            'x', parent=styles['Normal'],
-            fontSize=size, textColor=color,
-            fontName=font, alignment=align, leading=size + 4,
-        ))
+        return Paragraph(str(text), ParagraphStyle('x', parent=styles['Normal'], fontSize=size, textColor=color, fontName=font, alignment=align, leading=size+4))
 
     story      = []
-    date_range = (
-        f"{from_date.strftime('%d %b %Y')} – {to_date.strftime('%d %b %Y')}"
-        if from_date and to_date else 'All Time'
-    )
+    date_range = (f"{from_date.strftime('%d %b %Y')} - {to_date.strftime('%d %b %Y')}" if from_date and to_date else 'All Time')
     company    = (user.company_name if user else None) or 'iSaral Business Solutions'
 
-    # Logo (dynamic path)
     logo_path    = get_company_logo_path(user) if user else None
     left_content = []
     if logo_path:
         try:
-            _logo = RLImage(logo_path, width=40 * mm, height=14 * mm)
+            _logo = RLImage(logo_path, width=40*mm, height=14*mm)
             _logo.hAlign = 'LEFT'
             left_content = [_logo, Spacer(1, 3)]
         except Exception:
             pass
+    left_content += [P(company, 9, WHITE), P(f'Generated: {timezone.now().strftime("%d %b %Y")}', 8, WHITE)]
 
-    left_content += [
-        P(company, 9, WHITE),
-        P(f'Generated: {timezone.now().strftime("%d %b %Y")}', 8, WHITE),
-    ]
-
-    hdr = Table(
-        [[
-            left_content,
-            [
-                P('BILLING REPORT', 13, colors.HexColor('#F4A61D'), True, TA_RIGHT),
-                Spacer(1, 4),
-                P(f'Period: {date_range}', 9, WHITE, align=TA_RIGHT),
-                P(f'Generated by: {user.email if user else ""}', 8, WHITE, align=TA_RIGHT),
-            ],
-        ]],
-        colWidths=[USABLE * 0.55, USABLE * 0.45],
-        style=TableStyle([
-            ('BACKGROUND',   (0, 0), (-1, -1), BRAND),
-            ('VALIGN',       (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 12),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 12),
-            ('TOPPADDING',   (0, 0), (-1, -1), 14),
-            ('BOTTOMPADDING',(0, 0), (-1, -1), 14),
-        ]),
-    )
+    hdr = Table([[left_content, [
+        P('BILLING REPORT', 13, colors.HexColor('#F4A61D'), True, TA_RIGHT),
+        Spacer(1, 4),
+        P(f'Period: {date_range}', 9, WHITE, align=TA_RIGHT),
+        P(f'Generated by: {user.email if user else ""}', 8, WHITE, align=TA_RIGHT),
+    ]]],
+    colWidths=[USABLE*0.55, USABLE*0.45],
+    style=TableStyle([
+        ('BACKGROUND',(0,0),(-1,-1),BRAND),('VALIGN',(0,0),(-1,-1),'TOP'),
+        ('LEFTPADDING',(0,0),(-1,-1),12),('RIGHTPADDING',(0,0),(-1,-1),12),
+        ('TOPPADDING',(0,0),(-1,-1),14),('BOTTOMPADDING',(0,0),(-1,-1),14),
+    ]))
     story.append(hdr)
-    story.append(Spacer(1, 6 * mm))
+    story.append(Spacer(1, 6*mm))
 
     col_w = [USABLE*0.16, USABLE*0.22, USABLE*0.12, USABLE*0.14, USABLE*0.12, USABLE*0.12, USABLE*0.12]
-    rows  = [[
-        P('Invoice #', 8, WHITE, True, TA_CENTER),
-        P('Customer',  8, WHITE, True, TA_CENTER),
-        P('Date',      8, WHITE, True, TA_CENTER),
-        P('Subtotal',  8, WHITE, True, TA_RIGHT),
-        P('GST',       8, WHITE, True, TA_RIGHT),
-        P('Total',     8, WHITE, True, TA_RIGHT),
-        P('Status',    8, WHITE, True, TA_CENTER),
-    ]]
+    rows  = [[P('Invoice #',8,WHITE,True,TA_CENTER),P('Customer',8,WHITE,True,TA_CENTER),P('Date',8,WHITE,True,TA_CENTER),P('Subtotal',8,WHITE,True,TA_RIGHT),P('GST',8,WHITE,True,TA_RIGHT),P('Total',8,WHITE,True,TA_RIGHT),P('Status',8,WHITE,True,TA_CENTER)]]
 
-    status_colors = {
-        'paid': GREEN, 'pending': AMBER, 'issued': AMBER,
-        'overdue': RED, 'draft': GRAY, 'cancelled': GRAY,
-    }
-
+    status_colors = {'paid':GREEN,'pending':AMBER,'issued':AMBER,'overdue':RED,'draft':GRAY,'cancelled':GRAY}
     for inv in invoices:
         sc = status_colors.get(inv.status, GRAY)
         rows.append([
             P(inv.invoice_number, 8, colors.HexColor('#1d4ed8')),
             P(inv.customer.name if inv.customer else 'N/A', 8, BLACK),
             P(inv.issued_date.strftime('%d %b %Y'), 8, GRAY),
-            P(f'Rs.{inv.subtotal:,.2f}',    8, BLACK,  align=TA_RIGHT),
-            P(f'Rs.{inv.gst_amount:,.2f}',  8, BLACK,  align=TA_RIGHT),
-            P(f'Rs.{inv.total:,.2f}',        8, BLACK, True, TA_RIGHT),
-            P(inv.get_status_display(),       8, sc,   True, TA_CENTER),
+            P(f'Rs.{inv.subtotal:,.2f}',   8, BLACK, align=TA_RIGHT),
+            P(f'Rs.{inv.gst_amount:,.2f}', 8, BLACK, align=TA_RIGHT),
+            P(f'Rs.{inv.total:,.2f}',       8, BLACK, True, TA_RIGHT),
+            P(inv.get_status_display(),      8, sc,   True, TA_CENTER),
         ])
 
-    story.append(Table(
-        rows, colWidths=col_w, repeatRows=1,
-        style=TableStyle([
-            ('BACKGROUND',    (0, 0), (-1, 0),  BRAND),
-            ('BACKGROUND',    (0, 1), (-1, -1), LGRAY),
-            ('ROWBACKGROUNDS',(0, 1), (-1, -1), [WHITE, LGRAY]),
-            ('GRID',          (0, 0), (-1, -1), 0.3, colors.HexColor('#E5E7EB')),
-            ('TOPPADDING',    (0, 0), (-1, -1), 5),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-            ('LEFTPADDING',   (0, 0), (-1, -1), 6),
-            ('RIGHTPADDING',  (0, 0), (-1, -1), 6),
-            ('VALIGN',        (0, 0), (-1, -1), 'MIDDLE'),
-        ]),
-    ))
-    story.append(Spacer(1, 5 * mm))
+    story.append(Table(rows, colWidths=col_w, repeatRows=1, style=TableStyle([
+        ('BACKGROUND',(0,0),(-1,0),BRAND),('BACKGROUND',(0,1),(-1,-1),LGRAY),
+        ('ROWBACKGROUNDS',(0,1),(-1,-1),[WHITE,LGRAY]),
+        ('GRID',(0,0),(-1,-1),0.3,colors.HexColor('#E5E7EB')),
+        ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
+        ('LEFTPADDING',(0,0),(-1,-1),6),('RIGHTPADDING',(0,0),(-1,-1),6),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+    ])))
+    story.append(Spacer(1, 5*mm))
 
     inv_list       = list(invoices)
     grand_total    = sum(i.total      for i in inv_list)
     grand_subtotal = sum(i.subtotal   for i in inv_list)
     grand_gst      = sum(i.gst_amount for i in inv_list)
 
-    summary = Table(
-        [[
-            P(f'Total Invoices: {len(inv_list)}',         9,  BRAND, True),
-            P(f'Subtotal: Rs.{grand_subtotal:,.2f}',      9,  BRAND, True, TA_RIGHT),
-            P(f'Total GST: Rs.{grand_gst:,.2f}',          9,  BRAND, True, TA_RIGHT),
-            P(f'Grand Total: Rs.{grand_total:,.2f}',      11, WHITE, True, TA_RIGHT),
-        ]],
-        colWidths=[USABLE * 0.25] * 4,
-        style=TableStyle([
-            ('BACKGROUND',   (3, 0), (3, 0), BRAND),
-            ('BACKGROUND',   (0, 0), (2, 0), LGRAY),
-            ('TOPPADDING',   (0, 0), (-1, -1), 8),
-            ('BOTTOMPADDING',(0, 0), (-1, -1), 8),
-            ('LEFTPADDING',  (0, 0), (-1, -1), 8),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
-            ('VALIGN',       (0, 0), (-1, -1), 'MIDDLE'),
-        ]),
-    )
+    summary = Table([[
+        P(f'Total Invoices: {len(inv_list)}',    9,  BRAND, True),
+        P(f'Subtotal: Rs.{grand_subtotal:,.2f}', 9,  BRAND, True, TA_RIGHT),
+        P(f'Total GST: Rs.{grand_gst:,.2f}',     9,  BRAND, True, TA_RIGHT),
+        P(f'Grand Total: Rs.{grand_total:,.2f}', 11, WHITE, True, TA_RIGHT),
+    ]],
+    colWidths=[USABLE*0.25]*4,
+    style=TableStyle([
+        ('BACKGROUND',(3,0),(3,0),BRAND),('BACKGROUND',(0,0),(2,0),LGRAY),
+        ('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8),
+        ('LEFTPADDING',(0,0),(-1,-1),8),('RIGHTPADDING',(0,0),(-1,-1),8),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+    ]))
     story.append(summary)
-    story.append(Spacer(1, 4 * mm))
+    story.append(Spacer(1, 4*mm))
     story.append(HRFlowable(width='100%', thickness=0.8, color=BRAND))
-
     doc.build(story)
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
@@ -1795,15 +1665,12 @@ def plan_signup(request):
         full_name    = request.POST.get('full_name', '').strip()
         email        = request.POST.get('email', '').strip()
         phone        = request.POST.get('phone', '').strip()
-
         if not all([plan, company_name, full_name, email, phone]):
             return JsonResponse({'success': False, 'message': 'All fields are required'})
-
         user = request.user
         user.company_name = company_name
         user.phone        = phone
         user.save()
-
         return JsonResponse({
             'success': True,
             'message': f'Welcome to {plan} plan!',
@@ -1855,30 +1722,29 @@ def settings_view(request):
         elif action == 'update_company':
             from accounts.models import CompanySettings
             company_name = request.POST.get('company_name', '').strip()
-            gstin        = request.POST.get('gstin', '').strip()    or None
-            pan          = request.POST.get('pan', '').strip()      or None
+            gstin        = request.POST.get('gstin', '').strip()   or None
+            pan          = request.POST.get('pan', '').strip()     or None
             address      = request.POST.get('address', '').strip()
             city         = request.POST.get('city', '').strip()
             state        = request.POST.get('state', '').strip()
             pincode      = request.POST.get('pincode', '').strip()
             phone        = request.POST.get('phone', '').strip()
             email        = request.POST.get('email', '').strip()
-            website      = request.POST.get('website', '').strip()  or None
-
+            website      = request.POST.get('website', '').strip() or None
             try:
                 company, _ = CompanySettings.objects.get_or_create(user=user)
                 company.company_name = company_name
-                company.gstin   = gstin;  company.pan     = pan
-                company.address = address; company.city   = city
-                company.state   = state;  company.pincode = pincode
-                company.phone   = phone;  company.email   = email
+                company.gstin   = gstin;   company.pan     = pan
+                company.address = address; company.city    = city
+                company.state   = state;   company.pincode = pincode
+                company.phone   = phone;   company.email   = email
                 company.website = website
                 if 'logo' in request.FILES:
                     company.logo = request.FILES['logo']
                 company.save()
-                messages.success(request, '✅ Company settings saved successfully!')
+                messages.success(request, 'Company settings saved successfully!')
             except Exception as e:
-                messages.error(request, f'❌ Error saving company settings: {str(e)}')
+                messages.error(request, f'Error saving company settings: {str(e)}')
             return redirect('accounts:settings')
 
         elif action == 'delete_account':
@@ -1894,138 +1760,189 @@ def settings_view(request):
     except Exception:
         company = None
 
-    context = {
+    return render(request, 'accounts/settings.html', {
         'page_title': 'Settings',
         'user':       user,
         'company':    company,
-    }
-    return render(request, 'accounts/settings.html', context)
+    })
 
 
 # ============================================================
-# PRODUCT MANAGEMENT VIEWS
+# PRODUCT CATEGORY VIEWS
 # ============================================================
 
-@login_required(login_url='accounts:login')
-def products_list(request):
-    """List all products for current user"""
-    products = Product.objects.filter(user=request.user).order_by('-created_at')
-    
+@login_required
+def category_list(request):
+    categories = ProductCategory.objects.filter(user=request.user).annotate(
+        product_count=Count('products')
+    ).order_by('name')
+    return render(request, 'accounts/category_list.html', {'categories': categories})
+
+
+@login_required
+def category_add(request):
+    if request.method == 'POST':
+        form = ProductCategoryForm(request.POST, user=request.user)
+        if form.is_valid():
+            cat = form.save(commit=False)
+            cat.user = request.user
+            cat.save()
+            messages.success(request, f'Category "{cat.name}" created successfully.')
+            return redirect('accounts:category_list')
+    else:
+        form = ProductCategoryForm(user=request.user)
+    return render(request, 'accounts/category_form.html', {'form': form, 'action': 'Add'})
+
+
+@login_required
+def category_edit(request, pk):
+    cat = get_object_or_404(ProductCategory, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = ProductCategoryForm(request.POST, instance=cat, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Category "{cat.name}" updated.')
+            return redirect('accounts:category_list')
+    else:
+        form = ProductCategoryForm(instance=cat, user=request.user)
+    return render(request, 'accounts/category_form.html', {'form': form, 'action': 'Edit', 'category': cat})
+
+
+@login_required
+def category_delete(request, pk):
+    cat = get_object_or_404(ProductCategory, pk=pk, user=request.user)
+    if request.method == 'POST':
+        name = cat.name
+        cat.delete()
+        messages.success(request, f'Category "{name}" deleted.')
+        return redirect('accounts:category_list')
+    return render(request, 'accounts/category_confirm_delete.html', {'category': cat})
+
+
+# ============================================================
+# PRODUCT VIEWS
+# ============================================================
+
+@login_required
+def product_list(request):
+    qs = Product.objects.filter(user=request.user).select_related('category')
     search_query = request.GET.get('search', '').strip()
     if search_query:
-        products = products.filter(
-            models.Q(name__icontains=search_query) |
-            models.Q(description__icontains=search_query) |
-            models.Q(hsn_sac__icontains=search_query)
+        qs = qs.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(hsn_sac__icontains=search_query) |
+            Q(sku__icontains=search_query)
         )
-    
-    paginator = Paginator(products, 15)
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'page_title': 'Products',
-        'page_obj': page_obj,
-        'products': page_obj.object_list,
-        'search_query': search_query,
-        'total_products': Product.objects.filter(user=request.user).count(),
-        'active_products': Product.objects.filter(user=request.user, is_active=True).count(),
+    qs = qs.order_by('name')
+    paginator = Paginator(qs, 20)
+    page_obj  = paginator.get_page(request.GET.get('page'))
+
+    all_products    = Product.objects.filter(user=request.user)
+    total_products  = all_products.count()
+    active_products = all_products.filter(is_active=True).count()
+    stats = {
+        'total':        total_products,
+        'active':       active_products,
+        'low_stock':    all_products.filter(current_stock__lte=models.F('min_stock'), is_active=True).count(),
+        'out_of_stock': all_products.filter(current_stock__lte=0).count(),
     }
-    return render(request, 'accounts/products.html', context)
+
+    return render(request, 'accounts/product_list.html', {
+        'page_obj':        page_obj,
+        'products':        page_obj.object_list,
+        'total_products':  total_products,
+        'active_products': active_products,
+        'search_query':    search_query,
+        'stats':           stats,
+    })
 
 
-@login_required(login_url='accounts:login')
-def create_product(request):
-    """Create a new product"""
+@login_required
+def product_add(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, user=request.user)
         if form.is_valid():
-            try:
-                product = form.save(commit=False)
-                product.user = request.user
-                product.save()
-                messages.success(request, f'Product "{product.name}" created successfully!')
-                return redirect('accounts:products_list')
-            except Exception as e:
-                messages.error(request, f'Error: {str(e)}')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
+            product = form.save(commit=False)
+            product.user = request.user
+            product.save()
+            messages.success(request, f'Product "{product.name}" created successfully.')
+            return redirect('accounts:product_list')
     else:
-        form = ProductForm()
-    
-    context = {
-        'form': form,
-        'page_title': 'Add Product',
-    }
-    return render(request, 'accounts/product_form.html', context)
+        form = ProductForm(user=request.user)
+    return render(request, 'accounts/product_form.html', {'form': form, 'action': 'Add'})
 
 
-@login_required(login_url='accounts:login')
-def edit_product(request, product_id):
-    """Edit an existing product"""
-    try:
-        product = Product.objects.get(id=product_id, user=request.user)
-    except Product.DoesNotExist:
-        messages.error(request, 'Product not found.')
-        return redirect('accounts:products_list')
-    
+@login_required
+def product_edit(request, pk):
+    product = get_object_or_404(Product, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, instance=product, user=request.user)
         if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, f'Product "{product.name}" updated successfully!')
-                return redirect('accounts:products_list')
-            except Exception as e:
-                messages.error(request, f'Error: {str(e)}')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
+            form.save()
+            messages.success(request, f'Product "{product.name}" updated.')
+            return redirect('accounts:product_list')
     else:
-        form = ProductForm(instance=product)
-    
-    context = {
-        'form': form,
-        'product': product,
-        'page_title': f'Edit Product - {product.name}',
-    }
-    return render(request, 'accounts/product_form.html', context)
+        form = ProductForm(instance=product, user=request.user)
+    return render(request, 'accounts/product_form.html', {'form': form, 'action': 'Edit', 'product': product})
 
 
-@login_required(login_url='accounts:login')
-@require_http_methods(["POST"])
-def delete_product(request, product_id):
-    """Delete a product"""
-    if not request.user.is_superuser:
-        messages.error(request, "You don't have permission to delete products.")
-        return redirect('accounts:products_list')
-    
-    try:
-        product = Product.objects.get(id=product_id, user=request.user)
-        product_name = product.name
+@login_required
+def product_delete(request, pk):
+    product = get_object_or_404(Product, pk=pk, user=request.user)
+    if request.method == 'POST':
+        name = product.name
         product.delete()
-        messages.success(request, f'Product "{product_name}" deleted successfully!')
-    except Product.DoesNotExist:
-        messages.error(request, 'Product not found.')
-    
-    return redirect('accounts:products_list')
+        messages.success(request, f'Product "{name}" deleted.')
+        return redirect('accounts:product_list')
+    return render(request, 'accounts/product_confirm_delete.html', {'product': product})
 
 
-@login_required(login_url='accounts:login')
-def get_product_json(request, product_id):
-    """Return product details as JSON (for AJAX)"""
+@login_required
+def product_detail(request, pk):
+    product = get_object_or_404(Product.objects.select_related('category'), pk=pk, user=request.user)
+    recent_items = product.invoice_items.select_related('invoice', 'invoice__customer').order_by('-invoice__issued_date')[:10]
+    stats = product.invoice_items.aggregate(total_qty=Sum('quantity'), total_revenue=Sum('line_total'))
+    return render(request, 'accounts/product_detail.html', {
+        'product':      product,
+        'recent_items': recent_items,
+        'stats':        stats,
+    })
+
+
+@login_required
+def product_search_api(request):
+    q        = request.GET.get('q', '').strip()
+    products = Product.objects.filter(user=request.user, is_active=True).filter(
+        Q(name__icontains=q) | Q(sku__icontains=q) | Q(product_code__icontains=q)
+    ).select_related('category')[:10]
+    data = [{
+        'id':          str(p.id),
+        'name':        p.name,
+        'sku':         p.sku,
+        'hsn_sac':     p.hsn_sac,
+        'price':       str(p.price),
+        'gst_rate':    str(p.gst_rate),
+        'unit':        p.unit,
+        'description': p.description,
+    } for p in products]
+    return JsonResponse({'products': data})
+
+
+@login_required
+def product_detail_json(request, pk):
     try:
-        product = Product.objects.get(id=product_id, user=request.user)
-        return JsonResponse({
-            'success': True,
-            'name': product.name,
+        product = Product.objects.get(id=pk, user=request.user, is_active=True)
+        data = {
+            'success':     True,
+            'id':          str(product.id),
+            'name':        product.name,
             'description': product.description,
-            'hsn_sac': product.hsn_sac,
-            'price': float(product.price),
-            'gst_rate': float(product.gst_rate),
-        })
+            'hsn_sac':     product.hsn_sac,
+            'price':       str(product.price),
+            'gst_rate':    str(product.gst_rate),
+            'sku':         product.sku,
+        }
     except Product.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
+        data = {'success': False, 'error': 'Product not found'}
+    return JsonResponse(data)

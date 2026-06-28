@@ -5,1079 +5,587 @@
 {% block page_title %}Create Invoice{% endblock %}
 
 {% block content %}
-
 <style>
-  * {
-    box-sizing: border-box;
-  }
+* { box-sizing: border-box; }
+.invoice-page { padding: 2rem; background: #f5f7fa; min-height: 100vh; }
+.invoice-container { max-width: 1400px; margin: 0 auto; }
+
+.invoice-header {
+  background: #fff; border-radius: 12px; padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  border-left: 4px solid #185FA5;
+}
+.invoice-header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; }
+.invoice-header p { font-size: 13px; color: #6b7280; margin: 0; }
+
+.invoice-layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; }
+.invoice-main { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.invoice-card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.08); overflow: hidden;
+}
+.card-header {
+  background: linear-gradient(135deg, #185FA5 0%, #0C447C 100%);
+  color: #fff; padding: 1rem 1.5rem; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-body { padding: 1.25rem 1.5rem; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.form-grid.two-col { grid-template-columns: 1fr 1fr; }
+.form-grid.full { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 11px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: .5px; }
+.form-group label .req { color: #E24B4A; }
+.form-group input, .form-group select, .form-group textarea {
+  height: 38px; border: 1px solid #e5e7eb; border-radius: 7px;
+  padding: 0 11px; font-size: 13px; font-family: inherit; transition: all .18s;
+}
+.form-group textarea { height: auto; min-height: 72px; padding: 9px 11px; resize: vertical; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,.1);
+}
+.hint { font-size: 11px; color: #9ca3af; }
+
+/* Items table */
+.items-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.items-table thead { background: #f8fafc; border-bottom: 2px solid #e5e7eb; }
+.items-table th { padding: 10px 8px; text-align: left; font-weight: 600; color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+.items-table td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
+.items-table input, .items-table select {
+  width: 100%; height: 34px; padding: 0 7px; border: 1px solid #e5e7eb;
+  border-radius: 6px; font-size: 12px; background: #fff;
+}
+.items-table input:focus, .items-table select:focus {
+  border-color: #185FA5; outline: none; box-shadow: 0 0 0 2px rgba(24,95,165,.1);
+}
+.items-table input[readonly] { background: #f8fafc; color: #6b7280; }
+
+.badge-pending { display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#FEF3C7;color:#92400E; }
+.badge-partial { display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#DBEAFE;color:#0C4A6E; }
+.badge-paid    { display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#DCFCE7;color:#166534; }
+
+.btn-remove {
+  height: 30px; width: 30px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid #FECACA; background: #FEE2E2; color: #DC2626;
+  border-radius: 6px; cursor: pointer; transition: all .15s;
+}
+.btn-remove:hover { background: #FCA5A5; }
+
+.btn-add-item {
+  display: inline-flex; align-items: center; gap: 6px; height: 34px;
+  padding: 0 14px; background: #fff; border: 2px dashed #185FA5;
+  color: #185FA5; border-radius: 7px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; margin-top: .75rem;
+}
+.btn-add-item:hover { background: #EFF6FF; }
+
+.card-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; background: #f9fafb;
+}
+.btn { height: 38px; padding: 0 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; border: none; transition: all .18s; }
+.btn-secondary { background: #fff; border: 1px solid #e5e7eb; color: #374151; }
+.btn-secondary:hover { background: #f3f4f6; }
+.btn-primary { background: linear-gradient(135deg,#185FA5,#0C447C); color: #fff; }
+.btn-primary:hover { box-shadow: 0 4px 12px rgba(24,95,165,.3); transform: translateY(-1px); }
+
+/* Summary sidebar */
+.summary-sidebar { position: sticky; top: 1.5rem; height: fit-content; }
+.summary-card {
+  background: linear-gradient(135deg,#185FA5,#0C447C); color: #fff;
+  border-radius: 10px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(24,95,165,.2); margin-bottom: 1rem;
+}
+.summary-card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: .85; margin: 0 0 .75rem; font-weight: 600; }
+.summary-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.summary-row:last-child { border-bottom: none; }
+.summary-row.total { font-size: 17px; font-weight: 700; padding: 10px 0 0; margin-top: 6px; border-top: 2px solid rgba(255,255,255,.3); }
+.summary-value { font-weight: 600; }
+.payment-breakdown { background: rgba(255,255,255,.1); border-radius: 7px; padding: .75rem; margin-top: .75rem; font-size: 12px; }
+.payment-item { display: flex; justify-content: space-between; padding: 3px 0; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+.status-dot.paid { background: #34D399; }
+.status-dot.partial { background: #60A5FA; }
+.status-dot.pending { background: #FBBF24; }
 
-  .invoice-page {
-    padding: 2rem;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
-  }
+.error-alert { background: #FEE2E2; border: 1px solid #FECACA; border-radius: 7px; padding: 10px 14px; color: #DC2626; font-size: 13px; margin-bottom: 1rem; }
 
-  .invoice-container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .invoice-header {
-    background: #fff;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-left: 4px solid #185FA5;
-  }
-
-  .invoice-header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 8px;
-  }
-
-  .invoice-header p {
-    font-size: 14px;
-    color: #6b7280;
-    margin: 0;
-  }
-
-  .invoice-layout {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 2rem;
-  }
-
-  .invoice-main {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .invoice-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden;
-  }
-
-  .card-header {
-    background: linear-gradient(135deg, #185FA5 0%, #0C447C 100%);
-    color: #fff;
-    padding: 1.25rem 1.5rem;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .card-header i {
-    font-size: 16px;
-  }
-
-  .card-body {
-    padding: 1.5rem;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1.25rem;
-  }
-
-  .form-grid.full {
-    grid-template-columns: 1fr;
-  }
-
-  .form-grid.two-col {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .form-group label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .form-group label .req {
-    color: #E24B4A;
-    margin-left: 2px;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    height: 40px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 0 12px;
-    font-size: 13px;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-
-  .form-group textarea {
-    height: auto;
-    min-height: 80px;
-    padding: 10px 12px;
-    resize: vertical;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: #185FA5;
-    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1);
-  }
-
-  .form-group .hint {
-    font-size: 11px;
-    color: #9ca3af;
-  }
-
-  /* Items Table Section */
-  .items-section {
-    margin-top: 0;
-  }
-
-  .items-table-wrapper {
-    overflow-x: auto;
-  }
-
-  .items-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  .items-table thead {
-    background: #f8fafc;
-    border-bottom: 2px solid #e5e7eb;
-  }
-
-  .items-table th {
-    padding: 12px;
-    text-align: left;
-    font-weight: 600;
-    color: #475569;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .items-table td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-
-  .items-table tbody tr {
-    transition: background 0.2s;
-  }
-
-  .items-table tbody tr:hover {
-    background: #f8fafc;
-  }
-
-  .items-table input,
-  .items-table select {
-    width: 100%;
-    height: 36px;
-    padding: 0 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 12px;
-    transition: all 0.2s;
-  }
-
-  .items-table input:focus,
-  .items-table select:focus {
-    border-color: #185FA5;
-    box-shadow: 0 0 0 2px rgba(24, 95, 165, 0.1);
-    outline: none;
-  }
-
-  .items-table input[readonly] {
-    background: #f8fafc;
-    color: #6b7280;
-    cursor: not-allowed;
-  }
-
-  .payment-status-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .payment-status-badge.pending {
-    background: #FEF3C7;
-    color: #92400E;
-  }
-
-  .payment-status-badge.partial {
-    background: #DBEAFE;
-    color: #0C4A6E;
-  }
-
-  .payment-status-badge.paid {
-    background: #DCFCE7;
-    color: #166534;
-  }
-
-  .item-actions {
-    display: flex;
-    gap: 6px;
-  }
-
-  .btn-remove {
-    height: 32px;
-    width: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #FECACA;
-    background: #FEE2E2;
-    color: #DC2626;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-remove:hover {
-    background: #FCA5A5;
-    border-color: #DC2626;
-  }
-
-  .btn-add-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 36px;
-    padding: 0 14px;
-    background: #fff;
-    border: 2px dashed #185FA5;
-    color: #185FA5;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 1rem;
-  }
-
-  .btn-add-item:hover {
-    background: #EFF6FF;
-    border-color: #0C447C;
-  }
-
-  /* Sidebar Summary */
-  .summary-sidebar {
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
-  }
-
-  .summary-card {
-    background: linear-gradient(135deg, #185FA5 0%, #0C447C 100%);
-    color: #fff;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(24, 95, 165, 0.2);
-    margin-bottom: 1rem;
-  }
-
-  .summary-card h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.9;
-    margin: 0 0 1rem;
-    font-weight: 600;
-  }
-
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    font-size: 13px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .summary-row:last-child {
-    border-bottom: none;
-  }
-
-  .summary-row.total {
-    font-size: 18px;
-    font-weight: 700;
-    padding: 12px 0 0;
-    margin-top: 8px;
-    border-top: 2px solid rgba(255,255,255,0.3);
-  }
-
-  .summary-value {
-    font-weight: 600;
-  }
-
-  .payment-breakdown {
-    background: rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-top: 1rem;
-    font-size: 12px;
-  }
-
-  .payment-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-  }
-
-  .payment-item-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .status-dot.pending {
-    background: #FBBF24;
-  }
-
-  .status-dot.partial {
-    background: #60A5FA;
-  }
-
-  .status-dot.paid {
-    background: #34D399;
-  }
-
-  /* Footer */
-  .card-footer {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-  }
-
-  .btn {
-    height: 40px;
-    padding: 0 20px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: none;
-    transition: all 0.2s;
-  }
-
-  .btn-secondary {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    color: #374151;
-  }
-
-  .btn-secondary:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #185FA5 0%, #0C447C 100%);
-    color: #fff;
-  }
-
-  .btn-primary:hover {
-    box-shadow: 0 4px 12px rgba(24, 95, 165, 0.3);
-    transform: translateY(-1px);
-  }
-
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .invoice-layout {
-      grid-template-columns: 1fr;
-    }
-
-    .summary-sidebar {
-      position: static;
-    }
-
-    .form-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .form-grid.full {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .invoice-page {
-      padding: 1rem;
-    }
-
-    .invoice-header {
-      padding: 1.25rem;
-    }
-
-    .card-body {
-      padding: 1rem;
-    }
-
-    .form-grid,
-    .form-grid.two-col {
-      grid-template-columns: 1fr;
-    }
-
-    .items-table {
-      font-size: 11px;
-    }
-
-    .items-table th,
-    .items-table td {
-      padding: 8px;
-    }
-
-    .card-footer {
-      flex-direction: column-reverse;
-    }
-
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  .error-alert {
-    background: #FEE2E2;
-    border: 1px solid #FECACA;
-    border-radius: 8px;
-    padding: 12px;
-    color: #DC2626;
-    font-size: 13px;
-    margin-bottom: 1rem;
-  }
-
-  .success-alert {
-    background: #DCFCE7;
-    border: 1px solid #BBF7D0;
-    border-radius: 8px;
-    padding: 12px;
-    color: #166534;
-    font-size: 13px;
-    margin-bottom: 1rem;
-  }
+@media(max-width:1024px){ .invoice-layout { grid-template-columns: 1fr; } .summary-sidebar { position: static; } .form-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:768px){ .form-grid, .form-grid.two-col { grid-template-columns: 1fr; } .invoice-page { padding: 1rem; } }
 </style>
 
 <div class="invoice-page">
-  <div class="invoice-container">
+<div class="invoice-container">
 
-    <!-- Header -->
-    <div class="invoice-header">
-      <h1><i class="fa-solid fa-file-invoice"></i> Create Invoice</h1>
-      <p>Create professional invoices with real-time calculations and payment tracking</p>
-    </div>
+  <div class="invoice-header">
+    <h1>Create Invoice</h1>
+    <p>Create professional invoices with real-time calculations and payment tracking</p>
+  </div>
 
-    <!-- Alerts -->
-    {% if messages %}
-      {% for message in messages %}
-        <div class="{% if message.tags %}{{ message.tags }}-alert{% endif %}">
-          {{ message }}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="error-alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST" novalidate id="invoiceForm">
+    {% csrf_token %}
+    <div class="invoice-layout">
+
+      <!-- LEFT: Form -->
+      <div class="invoice-main">
+
+        <!-- Customer -->
+        <div class="invoice-card">
+          <div class="card-header"><i class="fa-solid fa-user"></i> Customer Details</div>
+          <div class="card-body">
+            <div class="form-grid full">
+              <div class="form-group">
+                <label>Select Customer <span class="req">*</span></label>
+                {{ form.customer }}
+                {% if form.customer.errors %}<span class="hint" style="color:#E24B4A;">{{ form.customer.errors.0 }}</span>{% endif %}
+              </div>
+            </div>
+          </div>
         </div>
-      {% endfor %}
-    {% endif %}
 
-    <!-- Main Form -->
-    <form method="POST" novalidate id="invoiceForm">
-      {% csrf_token %}
+        <!-- Invoice Details -->
+        <div class="invoice-card">
+          <div class="card-header"><i class="fa-solid fa-receipt"></i> Invoice Details</div>
+          <div class="card-body">
 
-      <div class="invoice-layout">
-
-        <!-- LEFT SIDE: Form -->
-        <div class="invoice-main">
-
-          <!-- SECTION 1: Customer Details -->
-          <div class="invoice-card">
-            <div class="card-header">
-              <i class="fa-solid fa-user"></i> Customer Details
+            <!-- ── FIX: invoice_number is now AUTO-GENERATED, show read-only display ── -->
+            <div class="form-grid">
+  <div class="form-group">
+    <label>Invoice Number</label>
+    <input type="text"
+           name="invoice_number"
+           id="id_invoice_number"
+           value="{{ form.invoice_number.value|default:'' }}"
+           placeholder="Auto-generated if left blank"
+           style="background:#fff;color:#1a1a1a;" />
+    <span class="hint">Leave blank to auto-generate</span>
+  </div>
+              <div class="form-group">
+                <label>Invoice Date <span class="req">*</span></label>
+                {{ form.issued_date }}
+                {% if form.issued_date.errors %}<span class="hint" style="color:#E24B4A;">{{ form.issued_date.errors.0 }}</span>{% endif %}
+              </div>
+              <div class="form-group">
+                <label>Due Date</label>
+                {{ form.due_date }}
+              </div>
             </div>
-            <div class="card-body">
-              <div class="form-grid full">
-                <div class="form-group">
-                  <label>Select Customer <span class="req">*</span></label>
-                  {{ form.customer }}
-                  {% if form.customer.errors %}<span class="hint" style="color: #E24B4A;">{{ form.customer.errors.0 }}</span>{% endif %}
-                </div>
+
+            <div class="form-grid two-col" style="margin-top:1rem;">
+              <div class="form-group">
+                <label>Status <span class="req">*</span></label>
+                {{ form.status }}
+              </div>
+              <div class="form-group">
+                <label>Notes</label>
+                {{ form.notes }}
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- SECTION 2: Invoice Details -->
-          <div class="invoice-card">
-            <div class="card-header">
-              <i class="fa-solid fa-receipt"></i> Invoice Details
-            </div>
-            <div class="card-body">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Invoice Number <span class="req">*</span></label>
-                  {{ form.invoice_number }}
-                  {% if form.invoice_number.errors %}<span class="hint" style="color: #E24B4A;">{{ form.invoice_number.errors.0 }}</span>{% endif %}
-                  <span class="hint">e.g. INV-2026-001</span>
-                </div>
-                <div class="form-group">
-                  <label>Invoice Date <span class="req">*</span></label>
-                  {{ form.issued_date }}
-                  {% if form.issued_date.errors %}<span class="hint" style="color: #E24B4A;">{{ form.issued_date.errors.0 }}</span>{% endif %}
-                </div>
-                <div class="form-group">
-                  <label>Due Date</label>
-                  {{ form.due_date }}
-                </div>
+        <!-- Line Items -->
+        <div class="invoice-card">
+          <div class="card-header"><i class="fa-solid fa-list"></i> Line Items</div>
+          <div class="card-body">
+
+            {% if formset.non_form_errors %}
+              <div class="error-alert">
+                {% for error in formset.non_form_errors %}{{ error }}{% endfor %}
               </div>
+            {% endif %}
 
-              <div class="form-grid two-col" style="margin-top: 1rem;">
-                <div class="form-group">
-                  <label>Status <span class="req">*</span></label>
-                  {{ form.status }}
-                </div>
-                <div class="form-group">
-                  <label>Notes</label>
-                  {{ form.notes }}
-                  <span class="hint">Add payment terms, thank you message, etc.</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            {{ formset.management_form }}
 
-          <!-- SECTION 3: Line Items -->
-          <div class="invoice-card items-section">
-            <div class="card-header">
-              <i class="fa-solid fa-list"></i> Line Items
-            </div>
-            <div class="card-body">
-
-              {% if formset.non_form_errors %}
-                <div class="error-alert">
-                  {% for error in formset.non_form_errors %}
-                    <p style="margin: 0;">{{ error }}</p>
+            <div style="overflow-x:auto;">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th style="width:16%;">Product</th>
+                    <th style="width:15%;">Item Name</th>
+                    <th style="width:8%;">Qty</th>
+                    <th style="width:13%;">Unit Price (₹)</th>
+                    <th style="width:8%;">GST %</th>
+                    <th style="width:13%;">Line Total (₹)</th>
+                    <th style="width:12%;">Paid (₹)</th>
+                    <th style="width:9%;">Status</th>
+                    <th style="width:6%;text-align:center;">Del</th>
+                  </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                  {% for item_form in formset %}
+                  <tr class="item-row" data-idx="{{ forloop.counter0 }}">
+                    <td>
+                      <select name="accounts_invoiceitem_set-{{ forloop.counter0 }}-product"
+                              id="id_items-{{ forloop.counter0 }}-product"
+                              class="product-select"
+                              onchange="onProductChange(this, {{ forloop.counter0 }})">
+                        <option value="">— Select —</option>
+                        {% for p in products %}
+                          <option value="{{ p.id }}"
+                                  data-price="{{ p.price }}"
+                                  data-gst="{{ p.gst_rate }}"
+                                  data-name="{{ p.name }}"
+                                  data-hsn="{{ p.hsn_sac }}">{{ p.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    <td>
+                      <!-- ── FIX: NOT readonly so it submits ── -->
+                      <input type="text"
+                             name="accounts_invoiceitem_set-{{ forloop.counter0 }}-product_name"
+                             id="id_items-{{ forloop.counter0 }}-product_name"
+                             placeholder="Item name" />
+                    </td>
+                    <td>
+                      <input type="number"
+                             name="accounts_invoiceitem_set-{{ forloop.counter0 }}-quantity"
+                             id="id_items-{{ forloop.counter0 }}-quantity"
+                             value="1" step="0.01" min="0.01"
+                             oninput="calcRow({{ forloop.counter0 }})" />
+                    </td>
+                    <td>
+                      <!-- ── FIX: NOT readonly — user can also type price ── -->
+                      <input type="number"
+                             name="accounts_invoiceitem_set-{{ forloop.counter0 }}-unit_price"
+                             id="id_items-{{ forloop.counter0 }}-unit_price"
+                             value="0" step="0.01" min="0"
+                             oninput="calcRow({{ forloop.counter0 }})" />
+                    </td>
+                    <td>
+                      <input type="number"
+                             name="accounts_invoiceitem_set-{{ forloop.counter0 }}-gst_rate"
+                             id="id_items-{{ forloop.counter0 }}-gst_rate"
+                             value="18" step="0.01" min="0" max="100"
+                             oninput="calcRow({{ forloop.counter0 }})" />
+                    </td>
+                    <td>
+                      <input type="text" class="line-total-display" readonly value="0.00"
+                             style="background:#f8fafc;font-weight:600;color:#185FA5;" />
+                    </td>
+                    <td>
+                      <input type="number"
+                             name="accounts_invoiceitem_set-{{ forloop.counter0 }}-amount_paid"
+                             id="id_items-{{ forloop.counter0 }}-amount_paid"
+                             value="0" step="0.01" min="0"
+                             oninput="updateStatus({{ forloop.counter0 }})" />
+                    </td>
+                    <td>
+                      <span class="badge-pending" id="badge-{{ forloop.counter0 }}">Pending</span>
+                    </td>
+                    <td style="text-align:center;">
+                      <input type="checkbox"
+                             name="accounts_invoiceitem_set-{{ forloop.counter0 }}-DELETE"
+                             id="id_items-{{ forloop.counter0 }}-DELETE"
+                             style="display:none;" />
+                      {% if forloop.counter0 > 0 %}
+                        <button type="button" class="btn-remove" onclick="removeRow(this, {{ forloop.counter0 }})">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      {% endif %}
+                    </td>
+                  </tr>
                   {% endfor %}
-                </div>
-              {% endif %}
-
-              {{ formset.management_form }}
-
-              <div class="items-table-wrapper">
-                <table class="items-table">
-                  <thead>
-                    <tr>
-                      <th style="width: 15%;">Product</th>
-                      <th style="width: 14%;">Item Name</th>
-                      <th style="width: 10%;">Qty</th>
-                      <th style="width: 12%;">Unit Price (₹)</th>
-                      <th style="width: 8%;">GST %</th>
-                      <th style="width: 12%;">Line Total (₹)</th>
-                      <th style="width: 12%;">Paid (₹)</th>
-                      <th style="width: 10%;">Status</th>
-                      <th style="width: 7%; text-align: center;">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="itemsTableBody">
-                    {% for item_form in formset %}
-                      <tr class="item-form-row" data-form-idx="{{ forloop.counter0 }}">
-                        <!-- Product -->
-                        <td>
-                          <select id="id_accounts_invoiceitem_set-{{ forloop.counter0 }}-product"
-                                  name="accounts_invoiceitem_set-{{ forloop.counter0 }}-product"
-                                  class="product-select"
-                                  data-idx="{{ forloop.counter0 }}"
-                                  onchange="loadProductDetails({{ forloop.counter0 }})">
-                            <option value="">— Select —</option>
-                            {% for product in products %}
-                              <option value="{{ product.id }}">{{ product.name }}</option>
-                            {% endfor %}
-                          </select>
-                        </td>
-
-                        <!-- Item Name -->
-                        <td>
-                          <input type="text" id="id_accounts_invoiceitem_set-{{ forloop.counter0 }}-product_name"
-                                 name="accounts_invoiceitem_set-{{ forloop.counter0 }}-product_name"
-                                 placeholder="Auto-filled"
-                                 readonly />
-                        </td>
-
-                        <!-- Qty -->
-                        <td>
-                          <input type="number" id="id_accounts_invoiceitem_set-{{ forloop.counter0 }}-quantity"
-                                 name="accounts_invoiceitem_set-{{ forloop.counter0 }}-quantity"
-                                 value="1"
-                                 step="0.01"
-                                 min="0.01"
-                                 onchange="calculateRow({{ forloop.counter0 }})"
-                                 oninput="calculateRow({{ forloop.counter0 }})" />
-                        </td>
-
-                        <!-- Unit Price -->
-                        <td>
-                          <input type="number" id="id_accounts_invoiceitem_set-{{ forloop.counter0 }}-unit_price"
-                                 name="accounts_invoiceitem_set-{{ forloop.counter0 }}-unit_price"
-                                 value="0"
-                                 step="0.01"
-                                 min="0"
-                                 readonly />
-                        </td>
-
-                        <!-- GST % -->
-                        <td>
-                          <input type="number" id="id_accounts_invoiceitem_set-{{ forloop.counter0 }}-gst_rate"
-                                 name="accounts_invoiceitem_set-{{ forloop.counter0 }}-gst_rate"
-                                 value="18"
-                                 step="0.01"
-                                 min="0"
-                                 max="100"
-                                 onchange="calculateRow({{ forloop.counter0 }})"
-                                 oninput="calculateRow({{ forloop.counter0 }})" />
-                        </td>
-
-                        <!-- Line Total (calculated) -->
-                        <td>
-                          <input type="text" class="line-total" readonly value="0.00" />
-                        </td>
-
-                        <!-- Amount Paid -->
-                        <td>
-                          <input type="number" id="id_accounts_invoiceitem_set-{{ forloop.counter0 }}-amount_paid"
-                                 name="accounts_invoiceitem_set-{{ forloop.counter0 }}-amount_paid"
-                                 value="0"
-                                 step="0.01"
-                                 min="0"
-                                 onchange="updatePaymentStatus({{ forloop.counter0 }})"
-                                 oninput="updatePaymentStatus({{ forloop.counter0 }})" />
-                        </td>
-
-                        <!-- Status Badge -->
-                        <td>
-                          <span class="payment-status-badge pending" id="status-{{ forloop.counter0 }}">Pending</span>
-                        </td>
-
-                        <!-- Actions -->
-                        <td style="text-align: center;">
-                          {% if forloop.counter > 1 %}
-                            <button type="button" class="btn-remove" onclick="removeRow(this)">
-                              <i class="fa-solid fa-trash"></i>
-                            </button>
-                          {% endif %}
-                          {{ item_form.DELETE }}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-
-              <button type="button" class="btn-add-item" onclick="addItemRow()">
-                <i class="fa-solid fa-plus"></i> Add Item
-              </button>
-
-              <!-- Hidden fields -->
-              {{ form.subtotal }}
-              {{ form.gst_rate }}
-              {{ form.gst_amount }}
-              {{ form.cgst_amount }}
-              {{ form.sgst_amount }}
-              {{ form.igst_amount }}
-              {{ form.total }}
+                </tbody>
+              </table>
             </div>
 
-            <!-- Footer -->
-            <div class="card-footer">
-              <a href="{% url 'accounts:invoices' %}" class="btn btn-secondary">
-                <i class="fa-solid fa-xmark"></i> Cancel
-              </a>
-              <button type="submit" class="btn btn-primary">
-                <i class="fa-solid fa-check"></i> Create Invoice
-              </button>
-            </div>
+            <button type="button" class="btn-add-item" onclick="addRow()">
+              <i class="fa-solid fa-plus"></i> Add Item
+            </button>
+
+            <!-- Hidden totals sent to server -->
+            {{ form.subtotal }}
+            {{ form.gst_rate }}
+            {{ form.gst_amount }}
+            {{ form.cgst_amount }}
+            {{ form.sgst_amount }}
+            {{ form.igst_amount }}
+            {{ form.total }}
           </div>
 
+          <div class="card-footer">
+            <a href="{% url 'accounts:invoices' %}" class="btn btn-secondary">
+              <i class="fa-solid fa-xmark"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-check"></i> Create Invoice
+            </button>
+          </div>
         </div>
 
-        <!-- RIGHT SIDE: Summary -->
-        <div class="summary-sidebar">
+      </div><!-- /invoice-main -->
 
-          <!-- Billing Summary -->
-          <div class="summary-card">
-            <h3>💰 Invoice Summary</h3>
-
-            <div class="summary-row">
-              <span>Subtotal</span>
-              <span class="summary-value">₹<span id="summary-subtotal">0.00</span></span>
-            </div>
-
-            <div class="summary-row">
-              <span>GST Total</span>
-              <span class="summary-value">₹<span id="summary-gst">0.00</span></span>
-            </div>
-
-            <div class="summary-row total">
-              <span>Total Due</span>
-              <span>₹<span id="summary-total">0.00</span></span>
-            </div>
-
-            <!-- Payment Breakdown -->
-            <div class="payment-breakdown">
-              <h4 style="margin: 0 0 0.75rem; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Payment Status</h4>
-
-              <div class="payment-item">
-                <span class="payment-item-status">
-                  <span class="status-dot paid"></span> Paid
-                </span>
-                <span>₹<span id="summary-paid">0.00</span></span>
-              </div>
-
-              <div class="payment-item">
-                <span class="payment-item-status">
-                  <span class="status-dot partial"></span> Partial
-                </span>
-                <span>₹<span id="summary-partial">0.00</span></span>
-              </div>
-
-              <div class="payment-item">
-                <span class="payment-item-status">
-                  <span class="status-dot pending"></span> Pending
-                </span>
-                <span>₹<span id="summary-pending">0.00</span></span>
-              </div>
-
-              <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.2);">
-                <div class="payment-item">
-                  <span>Outstanding</span>
-                  <span style="font-weight: 700;">₹<span id="summary-outstanding">0.00</span></span>
-                </div>
-              </div>
+      <!-- RIGHT: Summary -->
+      <div class="summary-sidebar">
+        <div class="summary-card">
+          <h3>💰 Invoice Summary</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span class="summary-value">₹<span id="s-subtotal">0.00</span></span>
+          </div>
+          <div class="summary-row">
+            <span>GST Total</span>
+            <span class="summary-value">₹<span id="s-gst">0.00</span></span>
+          </div>
+          <div class="summary-row total">
+            <span>Total Due</span>
+            <span>₹<span id="s-total">0.00</span></span>
+          </div>
+          <div class="payment-breakdown">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Payment Status</div>
+            <div class="payment-item"><span><span class="status-dot paid"></span>Paid</span><span>₹<span id="s-paid">0.00</span></span></div>
+            <div class="payment-item"><span><span class="status-dot partial"></span>Partial</span><span>₹<span id="s-partial">0.00</span></span></div>
+            <div class="payment-item"><span><span class="status-dot pending"></span>Pending</span><span>₹<span id="s-pending">0.00</span></span></div>
+            <div style="border-top:1px solid rgba(255,255,255,.2);margin-top:8px;padding-top:8px;">
+              <div class="payment-item"><span>Outstanding</span><span style="font-weight:700;">₹<span id="s-outstanding">0.00</span></span></div>
             </div>
           </div>
-
-          <!-- Info Card -->
-          <div class="invoice-card">
-            <div class="card-header" style="background: #0C447C;">
-              <i class="fa-solid fa-circle-info"></i> Tips
-            </div>
-            <div class="card-body" style="font-size: 12px; color: #6b7280; line-height: 1.6;">
-              <ul style="margin: 0; padding-left: 1rem;">
-                <li>Select a product to auto-populate details</li>
-                <li>Enter Paid amount to track payment status</li>
-                <li>Fully paid items show green status</li>
-                <li>Invoice calculates automatically</li>
-              </ul>
-            </div>
-          </div>
-
         </div>
 
+        <div class="invoice-card">
+          <div class="card-header" style="background:#0C447C;"><i class="fa-solid fa-circle-info"></i> Tips</div>
+          <div class="card-body" style="font-size:12px;color:#6b7280;line-height:1.7;">
+            <ul style="margin:0;padding-left:1.2rem;">
+              <li>Select a product to auto-fill price & GST</li>
+              <li>You can also type the price manually</li>
+              <li>Enter Paid amount to track payment status</li>
+              <li>Invoice total calculates automatically</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-    </form>
+    </div><!-- /invoice-layout -->
+  </form>
 
-  </div>
-</div>
+</div><!-- /container -->
+</div><!-- /page -->
 
 <script>
-const TOTAL_FORMS = document.getElementById('id_accounts_invoiceitem_set-TOTAL_FORMS');
+// ── Product catalog embedded from Django context (no extra AJAX endpoint needed) ──
+const PRODUCTS = {
+  {% for p in products %}
+  "{{ p.id }}": {
+    name: "{{ p.name|escapejs }}",
+    price: {{ p.price }},
+    gst_rate: {{ p.gst_rate }},
+    hsn_sac: "{{ p.hsn_sac|escapejs }}"
+  },
+  {% endfor %}
+};
 
-function getItemRowCount() {
-  return parseInt(TOTAL_FORMS.value) || 0;
+const TOTAL_FORMS = document.querySelector('input[name$="TOTAL_FORMS"]');
+
+function rowCount() { return parseInt(TOTAL_FORMS.value) || 0; }
+function setRowCount(n) { TOTAL_FORMS.value = n; }
+
+function field(idx, name) {
+  return document.getElementById(`id_items-${idx}-${name}`);
 }
 
-function setItemRowCount(count) {
-  TOTAL_FORMS.value = count;
+// When product dropdown changes, auto-fill price/gst/name from embedded catalog
+function onProductChange(select, idx) {
+  const pid = select.value;
+  if (!pid || !PRODUCTS[pid]) return;
+
+  const p = PRODUCTS[pid];
+  field(idx, 'unit_price').value = p.price.toFixed(2);
+  field(idx, 'gst_rate').value   = p.gst_rate.toFixed(2);
+  field(idx, 'product_name').value = p.name;
+
+  calcRow(idx);
 }
 
-function getSelector(idx, field) {
-  return document.querySelector(`#id_accounts_invoiceitem_set-${idx}-${field}`);
-}
+// Calculate a single row's line total
+function calcRow(idx) {
+  const qty      = parseFloat(field(idx, 'quantity')?.value)   || 0;
+  const price    = parseFloat(field(idx, 'unit_price')?.value) || 0;
+  const gstRate  = parseFloat(field(idx, 'gst_rate')?.value)   || 0;
 
-function calculateRow(idx) {
-  const qty = parseFloat(getSelector(idx, 'quantity')?.value || 0);
-  const unitPrice = parseFloat(getSelector(idx, 'unit_price')?.value || 0);
-  const gstRate = parseFloat(getSelector(idx, 'gst_rate')?.value || 0);
+  const subtotal   = qty * price;
+  const gstAmount  = subtotal * gstRate / 100;
+  const lineTotal  = subtotal + gstAmount;
 
-  const subtotal = qty * unitPrice;
-  const gstAmount = (subtotal * gstRate) / 100;
-  const lineTotal = subtotal + gstAmount;
-
-  const row = document.querySelector(`.item-form-row[data-form-idx="${idx}"]`);
+  // Update display cell (read-only)
+  const row = document.querySelector(`.item-row[data-idx="${idx}"]`);
   if (row) {
-    const lineTotalInput = row.querySelector('.line-total');
-    if (lineTotalInput) {
-      lineTotalInput.value = lineTotal.toFixed(2);
-    }
+    const display = row.querySelector('.line-total-display');
+    if (display) display.value = lineTotal.toFixed(2);
   }
 
-  updatePaymentStatus(idx);
-  updateSummary();
+  updateStatus(idx);
+  refreshSummary();
 }
 
-function updatePaymentStatus(idx) {
-  const amountPaidInput = getSelector(idx, 'amount_paid');
-  const row = document.querySelector(`.item-form-row[data-form-idx="${idx}"]`);
-  const lineTotalInput = row?.querySelector('.line-total');
-  const statusBadge = document.querySelector(`#status-${idx}`);
+// Update payment status badge
+function updateStatus(idx) {
+  const row = document.querySelector(`.item-row[data-idx="${idx}"]`);
+  if (!row) return;
 
-  if (!amountPaidInput || !lineTotalInput || !statusBadge) return;
+  const lineTotal  = parseFloat(row.querySelector('.line-total-display')?.value) || 0;
+  const amountPaid = parseFloat(field(idx, 'amount_paid')?.value) || 0;
+  const badge      = document.getElementById(`badge-${idx}`);
+  if (!badge) return;
 
-  const lineTotal = parseFloat(lineTotalInput.value || 0);
-  const amountPaid = parseFloat(amountPaidInput.value || 0);
-
-  let status = 'pending';
-  if (amountPaid >= lineTotal && lineTotal > 0) {
-    status = 'paid';
-  } else if (amountPaid > 0 && amountPaid < lineTotal) {
-    status = 'partial';
+  let cls = 'badge-pending', label = 'Pending';
+  if (lineTotal > 0 && amountPaid >= lineTotal) {
+    cls = 'badge-paid';    label = 'Paid';
+  } else if (amountPaid > 0) {
+    cls = 'badge-partial'; label = 'Partial';
   }
+  badge.className   = cls;
+  badge.textContent = label;
 
-  statusBadge.className = `payment-status-badge ${status}`;
-  statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-
-  updateSummary();
+  refreshSummary();
 }
 
-function updateSummary() {
-  let totalSubtotal = 0;
-  let totalGst = 0;
-  let totalPaid = 0;
-  let paidCount = 0;
-  let partialCount = 0;
-  let pendingCount = 0;
+// Recalculate and display the invoice summary
+function refreshSummary() {
+  let totalSubtotal = 0, totalGst = 0, totalPaid = 0;
+  let paidAmt = 0, partialAmt = 0, pendingAmt = 0;
 
-  const count = getItemRowCount();
-  
+  const count = rowCount();
   for (let i = 0; i < count; i++) {
-    const deleteCheckbox = getSelector(i, 'DELETE');
-    if (deleteCheckbox?.checked) continue;
-
-    const row = document.querySelector(`.item-form-row[data-form-idx="${i}"]`);
+    const row = document.querySelector(`.item-row[data-idx="${i}"]`);
     if (!row) continue;
+    const del = document.getElementById(`id_items-${i}-DELETE`);
+    if (del?.checked) continue;
 
-    const lineTotalInput = row.querySelector('.line-total');
-    const amountPaidInput = getSelector(i, 'amount_paid');
+    const qty     = parseFloat(field(i, 'quantity')?.value)   || 0;
+    const price   = parseFloat(field(i, 'unit_price')?.value) || 0;
+    const gstRate = parseFloat(field(i, 'gst_rate')?.value)   || 0;
+    const paid    = parseFloat(field(i, 'amount_paid')?.value) || 0;
 
-    if (!lineTotalInput) continue;
+    const sub  = qty * price;
+    const gst  = sub * gstRate / 100;
+    const line = sub + gst;
 
-    const lineTotal = parseFloat(lineTotalInput.value || 0);
-    const amountPaid = parseFloat(amountPaidInput?.value || 0);
+    totalSubtotal += sub;
+    totalGst      += gst;
+    totalPaid     += paid;
 
-    // Calculate subtotal and GST
-    const qty = parseFloat(getSelector(i, 'quantity')?.value || 0);
-    const unitPrice = parseFloat(getSelector(i, 'unit_price')?.value || 0);
-    const gstRate = parseFloat(getSelector(i, 'gst_rate')?.value || 0);
-
-    const subtotal = qty * unitPrice;
-    const gst = (subtotal * gstRate) / 100;
-
-    totalSubtotal += subtotal;
-    totalGst += gst;
-    totalPaid += amountPaid;
-
-    // Count statuses
-    if (amountPaid >= lineTotal && lineTotal > 0) {
-      paidCount += lineTotal;
-   } else if (amountPaid > 0) {
-  partialCount += (lineTotal - amountPaid);  // Now shows pending amount
-    } else {
-      pendingCount += lineTotal;
-    }
+    if (line > 0 && paid >= line)      paidAmt    += line;
+    else if (paid > 0 && paid < line)  partialAmt += paid;
+    else                               pendingAmt += line;
   }
 
-  const totalDue = totalSubtotal + totalGst;
-  const outstanding = totalDue - totalPaid;
+  const totalDue    = totalSubtotal + totalGst;
+  const outstanding = Math.max(0, totalDue - totalPaid);
 
-  // Update summary display
-  document.getElementById('summary-subtotal').textContent = totalSubtotal.toFixed(2);
-  document.getElementById('summary-gst').textContent = totalGst.toFixed(2);
-  document.getElementById('summary-total').textContent = totalDue.toFixed(2);
-  document.getElementById('summary-paid').textContent = totalPaid.toFixed(2);
-  document.getElementById('summary-outstanding').textContent = Math.max(0, outstanding).toFixed(2);
-  document.getElementById('summary-pending').textContent = Math.max(0, pendingCount).toFixed(2);
-  document.getElementById('summary-partial').textContent = Math.max(0, partialCount).toFixed(2);
+  setText('s-subtotal',    totalSubtotal.toFixed(2));
+  setText('s-gst',         totalGst.toFixed(2));
+  setText('s-total',       totalDue.toFixed(2));
+  setText('s-paid',        totalPaid.toFixed(2));
+  setText('s-partial',     partialAmt.toFixed(2));
+  setText('s-pending',     pendingAmt.toFixed(2));
+  setText('s-outstanding', outstanding.toFixed(2));
 
-  // Update hidden form fields for submission
-  document.getElementById('id_subtotal').value = totalSubtotal.toFixed(2);
-  document.getElementById('id_gst_amount').value = totalGst.toFixed(2);
-  document.getElementById('id_total').value = totalDue.toFixed(2);
+  // Update hidden form fields so the server receives correct totals
+  setVal('id_subtotal',    totalSubtotal.toFixed(2));
+  setVal('id_gst_amount',  totalGst.toFixed(2));
+  setVal('id_total',       totalDue.toFixed(2));
 }
 
-function loadProductDetails(idx) {
-  const productSelect = getSelector(idx, 'product');
-  if (!productSelect?.value) return;
-
-  fetch(`/accounts/products/${productSelect.value}/json/`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        getSelector(idx, 'product_name').value = data.name;
-        getSelector(idx, 'unit_price').value = data.price.toFixed(2);
-        getSelector(idx, 'gst_rate').value = data.gst_rate.toFixed(2);
-        
-        // Force recalculation
-        setTimeout(() => {
-          calculateRow(idx);
-        }, 100);
-      }
-    })
-    .catch(e => console.error('Error loading product:', e));
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
 }
 
-function addItemRow() {
-  const newIdx = getItemRowCount();
+// Add a new row
+function addRow() {
+  const idx   = rowCount();
   const tbody = document.getElementById('itemsTableBody');
-  const newRow = document.createElement('tr');
-  newRow.className = 'item-form-row';
-  newRow.setAttribute('data-form-idx', newIdx);
 
-  newRow.innerHTML = `
+  // Clone product options from first row
+  const firstSel = document.querySelector('.product-select');
+  let optionsHtml = '<option value="">— Select —</option>';
+  if (firstSel) {
+    [...firstSel.options].forEach(o => {
+      if (o.value) {
+        optionsHtml += `<option value="${o.value}"
+          data-price="${o.dataset.price}"
+          data-gst="${o.dataset.gst}"
+          data-name="${o.dataset.name}"
+          data-hsn="${o.dataset.hsn}">${o.text}</option>`;
+      }
+    });
+  }
+
+  const tr = document.createElement('tr');
+  tr.className   = 'item-row';
+  tr.dataset.idx = idx;
+  tr.innerHTML   = `
     <td>
-      <select id="id_accounts_invoiceitem_set-${newIdx}-product"
-              name="accounts_invoiceitem_set-${newIdx}-product"
+      <select name="accounts_invoiceitem_set-${idx}-product"
+              id="id_items-${idx}-product"
               class="product-select"
-              onchange="loadProductDetails(${newIdx})"></select>
+              onchange="onProductChange(this, ${idx})">${optionsHtml}</select>
     </td>
     <td>
-      <input type="text" id="id_accounts_invoiceitem_set-${newIdx}-product_name"
-             name="accounts_invoiceitem_set-${newIdx}-product_name"
-             placeholder="Auto-filled" readonly />
+      <input type="text" name="accounts_invoiceitem_set-${idx}-product_name"
+             id="id_items-${idx}-product_name" placeholder="Item name" />
     </td>
     <td>
-      <input type="number" id="id_accounts_invoiceitem_set-${newIdx}-quantity"
-             name="accounts_invoiceitem_set-${newIdx}-quantity"
-             value="1" step="0.01" min="0.01"
-             onchange="calculateRow(${newIdx})" oninput="calculateRow(${newIdx})" />
+      <input type="number" name="accounts_invoiceitem_set-${idx}-quantity"
+             id="id_items-${idx}-quantity" value="1" step="0.01" min="0.01"
+             oninput="calcRow(${idx})" />
     </td>
     <td>
-      <input type="number" id="id_accounts_invoiceitem_set-${newIdx}-unit_price"
-             name="accounts_invoiceitem_set-${newIdx}-unit_price"
-             value="0" step="0.01" min="0" readonly />
+      <input type="number" name="accounts_invoiceitem_set-${idx}-unit_price"
+             id="id_items-${idx}-unit_price" value="0" step="0.01" min="0"
+             oninput="calcRow(${idx})" />
     </td>
     <td>
-      <input type="number" id="id_accounts_invoiceitem_set-${newIdx}-gst_rate"
-             name="accounts_invoiceitem_set-${newIdx}-gst_rate"
-             value="18" step="0.01" min="0" max="100"
-             onchange="calculateRow(${newIdx})" oninput="calculateRow(${newIdx})" />
+      <input type="number" name="accounts_invoiceitem_set-${idx}-gst_rate"
+             id="id_items-${idx}-gst_rate" value="18" step="0.01" min="0" max="100"
+             oninput="calcRow(${idx})" />
     </td>
     <td>
-      <input type="text" class="line-total" readonly value="0.00" />
+      <input type="text" class="line-total-display" readonly value="0.00"
+             style="background:#f8fafc;font-weight:600;color:#185FA5;" />
     </td>
     <td>
-      <input type="number" id="id_accounts_invoiceitem_set-${newIdx}-amount_paid"
-             name="accounts_invoiceitem_set-${newIdx}-amount_paid"
-             value="0" step="0.01" min="0"
-             onchange="updatePaymentStatus(${newIdx})" oninput="updatePaymentStatus(${newIdx})" />
+      <input type="number" name="accounts_invoiceitem_set-${idx}-amount_paid"
+             id="id_items-${idx}-amount_paid" value="0" step="0.01" min="0"
+             oninput="updateStatus(${idx})" />
     </td>
-    <td>
-      <span class="payment-status-badge pending" id="status-${newIdx}">Pending</span>
-    </td>
-    <td style="text-align: center;">
-      <button type="button" class="btn-remove" onclick="removeRow(this)">
+    <td><span class="badge-pending" id="badge-${idx}">Pending</span></td>
+    <td style="text-align:center;">
+      <input type="checkbox" name="accounts_invoiceitem_set-${idx}-DELETE"
+             id="id_items-${idx}-DELETE" style="display:none;" />
+      <button type="button" class="btn-remove" onclick="removeRow(this, ${idx})">
         <i class="fa-solid fa-trash"></i>
       </button>
-      <input type="checkbox" id="id_accounts_invoiceitem_set-${newIdx}-DELETE"
-             name="accounts_invoiceitem_set-${newIdx}-DELETE" style="display:none;" />
-    </td>
-  `;
+    </td>`;
 
-  tbody.appendChild(newRow);
-  setItemRowCount(newIdx + 1);
-
-  const firstSelect = document.querySelector('.product-select:first-of-type');
-  const newSelect = document.querySelector(`.product-select[id*="${newIdx}"]`);
-  if (firstSelect && newSelect) {
-    newSelect.innerHTML = firstSelect.innerHTML;
-  }
+  tbody.appendChild(tr);
+  setRowCount(idx + 1);
 }
 
-function removeRow(btn) {
-  const row = btn.closest('.item-form-row');
-  const idx = parseInt(row.getAttribute('data-form-idx'));
-  const deleteCheckbox = getSelector(idx, 'DELETE');
-
-  if (deleteCheckbox) {
-    deleteCheckbox.checked = true;
-  }
+// Remove a row (mark for deletion)
+function removeRow(btn, idx) {
+  const row = btn.closest('.item-row');
+  const del = document.getElementById(`id_items-${idx}-DELETE`);
+  if (del) del.checked = true;
   row.style.display = 'none';
-  
-  updateSummary();
+  refreshSummary();
 }
 
-// Initialize on page load
+// Also update summary when invoice_number field is pre-filled by view
 document.addEventListener('DOMContentLoaded', function() {
-  // Attach event listeners to all existing rows
-  const count = getItemRowCount();
-  for (let i = 0; i < count; i++) {
-    const qtyInput = getSelector(i, 'quantity');
-    const priceInput = getSelector(i, 'unit_price');
-    const gstInput = getSelector(i, 'gst_rate');
-    const paidInput = getSelector(i, 'amount_paid');
-
-    if (qtyInput) {
-      qtyInput.addEventListener('change', () => calculateRow(i));
-      qtyInput.addEventListener('input', () => calculateRow(i));
-    }
-    if (gstInput) {
-      gstInput.addEventListener('change', () => calculateRow(i));
-      gstInput.addEventListener('input', () => calculateRow(i));
-    }
-    if (paidInput) {
-      paidInput.addEventListener('change', () => updatePaymentStatus(i));
-      paidInput.addEventListener('input', () => updatePaymentStatus(i));
-    }
-  }
-
-  // Copy product options to all rows
-  const firstSelect = document.querySelector('.product-select');
-  if (firstSelect && firstSelect.options.length > 1) {
-    for (let i = 0; i < count; i++) {
-      const select = document.querySelector(`.product-select[id*="${i}"]`);
-      if (select && select.options.length <= 1) {
-        select.innerHTML = firstSelect.innerHTML;
-      }
-    }
-  }
-
-  // Initial calculation
-  updateSummary();
+  refreshSummary();
 });
 </script>
 {% endblock %}

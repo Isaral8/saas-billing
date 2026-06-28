@@ -180,9 +180,58 @@ class Invoice(models.Model):
     def __str__(self):
         return f"Invoice {self.invoice_number}"
         
+class ProductCategory(models.Model):
+    """Product categories for organising the product catalog."""
+
+    id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user        = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='product_categories')
+    name        = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    is_active   = models.BooleanField(default=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    updated_at  = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name        = 'Product Category'
+        verbose_name_plural = 'Product Categories'
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     """Reusable product/service catalog for quick invoice line entry"""
 
+    UNIT_CHOICES = [
+        ('pcs',  'Pieces'),
+        ('nos',  'Numbers'),
+        ('kg',   'Kilograms'),
+        ('g',    'Grams'),
+        ('l',    'Litres'),
+        ('ml',   'Millilitres'),
+        ('m',    'Metres'),
+        ('sqft', 'Sq. Feet'),
+        ('hr',   'Hours'),
+        ('day',  'Days'),
+        ('month','Months'),
+        ('set',  'Set'),
+        ('box',  'Box'),
+        ('pack', 'Pack'),
+    ]
+
+    GST_RATE_CHOICES = [
+        (Decimal('0'),    '0%'),
+        (Decimal('5'),    '5%'),
+        (Decimal('12'),   '12%'),
+        (Decimal('18'),   '18%'),
+        (Decimal('28'),   '28%'),
+    ]
+
+    # ── Existing fields (unchanged) ──────────────────────────────────
     id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user        = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='products')
     name        = models.CharField(max_length=255)
@@ -194,18 +243,61 @@ class Product(models.Model):
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at  = models.DateTimeField(auto_now=True)
 
+    # ── New fields ───────────────────────────────────────────────────
+    category       = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
+    product_code   = models.CharField(max_length=50, blank=True, db_index=True)
+    sku            = models.CharField(max_length=100, blank=True, db_index=True)
+    brand          = models.CharField(max_length=100, blank=True)
+    unit           = models.CharField(max_length=10, choices=UNIT_CHOICES, default='pcs')
+    purchase_price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    min_stock      = models.PositiveIntegerField(default=0)
+    current_stock  = models.IntegerField(default=0)
+    opening_stock  = models.IntegerField(default=0)
+    barcode        = models.CharField(max_length=100, blank=True)
+
     class Meta:
         ordering = ['name']
         indexes = [
             models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['user', 'category']),
+            models.Index(fields=['sku']),
+            models.Index(fields=['product_code']),
         ]
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        # Auto-generate product_code on first save if not provided
+        if not self.product_code:
+            prefix = 'PRD'
+            import random, string
+            suffix = ''.join(random.choices(string.digits, k=6))
+            self.product_code = f"{prefix}-{suffix}"
+        super().save(*args, **kwargs)
+
+    @property
+    def is_low_stock(self):
+        return self.current_stock <= self.min_stock
+
+    @property
+    def is_out_of_stock(self):
+        return self.current_stock <= 0
+
+    @property
+    def profit_margin(self):
+        if self.purchase_price > 0:
+            return round(((self.price - self.purchase_price) / self.price) * 100, 2)
+        return Decimal('0')
 
 class InvoiceItem(models.Model):
     """A single product/service line on an invoice. An Invoice has many InvoiceItems."""
+
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('partial', 'Partial'),
+        ('paid', 'Paid'),
+    ]
 
     id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     invoice      = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
@@ -227,8 +319,12 @@ class InvoiceItem(models.Model):
     igst_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
     gst_amount  = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
 
-    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))  # qty * unit_price, before discount
-    line_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))  # subtotal - discount + gst
+    subtotal   = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))   # qty * unit_price, before discount
+    line_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))   # subtotal - discount + gst
+    
+    # ← NEW: Payment tracking fields
+    amount_paid     = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    payment_status  = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -237,6 +333,7 @@ class InvoiceItem(models.Model):
         ordering = ['created_at']
         indexes = [
             models.Index(fields=['invoice']),
+            models.Index(fields=['payment_status']),  # ← NEW: for faster queries
         ]
 
     def __str__(self):
@@ -278,7 +375,51 @@ class InvoiceItem(models.Model):
             self.igst_amount = total_gst
 
         self.line_total = (taxable_value + total_gst).quantize(Decimal('0.01'))
+        
+        # ← NEW: Update payment status
+        self._update_payment_status()
+        
         return self.line_total
+
+    # ← NEW METHODS
+    def _update_payment_status(self):
+        """Update payment_status based on amount_paid vs line_total."""
+        if self.line_total <= 0:
+            self.payment_status = 'paid'
+        elif self.amount_paid >= self.line_total:
+            self.payment_status = 'paid'
+        elif self.amount_paid > 0:
+            self.payment_status = 'partial'
+        else:
+            self.payment_status = 'pending'
+
+    def get_payment_status_display_badge(self):
+        """Return a formatted badge for the payment status."""
+        colors = {
+            'paid': '✓ Paid',
+            'partial': '⊘ Partial',
+            'pending': '⧗ Pending',
+        }
+        return colors.get(self.payment_status, 'Unknown')
+
+    def get_outstanding_amount(self):
+        """Calculate remaining amount to be paid."""
+        return max(Decimal('0.00'), self.line_total - self.amount_paid)
+
+    @property
+    def is_fully_paid(self):
+        """Check if item is fully paid."""
+        return self.payment_status == 'paid'
+
+    @property
+    def is_partially_paid(self):
+        """Check if item is partially paid."""
+        return self.payment_status == 'partial'
+
+    @property
+    def is_pending(self):
+        """Check if item is still pending."""
+        return self.payment_status == 'pending'
 
 class SupportTicket(models.Model):
     PRIORITY_CHOICES = [

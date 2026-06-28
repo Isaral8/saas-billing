@@ -64,16 +64,17 @@ urlpatterns = [
     path('customers/<uuid:customer_id>/edit/', views.customer_edit, name='customer_edit'),
     path('customers/<uuid:customer_id>/delete/', views.delete_customer, name='delete_customer'),
     path('customers/<uuid:customer_id>/toggle-status/', views.toggle_customer_status, name='toggle_customer_status'),
-    # ════════════════════════════════════════════════════════════════════
-    # INVOICES
-    # ════════════════════════════════════════════════════════════════════
-    path('invoices/', views.invoices_list, name='invoices'),
-    path('create-invoice/', views.create_invoice, name='create_invoice'),
-    path('invoices/<uuid:invoice_id>/edit/', views.update_invoice, name='update_invoice'),
-    path('invoices/<uuid:invoice_id>/delete/', views.delete_invoice, name='delete_invoice'),
-    path('invoices/<uuid:invoice_id>/pdf/', views.generate_invoice_pdf, name='invoice_pdf'),
-    path('invoices/<uuid:invoice_id>/email/', views.email_invoice, name='email_invoice'),
-
+  # ============================================================
+# INVOICE URLS
+# ============================================================
+path('invoices/',                              views.invoices_list,        name='invoices'),
+path('invoices/create/',                       views.create_invoice,       name='create_invoice'),
+path('invoices/<uuid:invoice_id>/',            views.invoice_detail,       name='invoice_detail'),
+path('invoices/<uuid:invoice_id>/pdf/',        views.generate_invoice_pdf, name='invoice_pdf'),       # ✅ ADD THIS
+path('invoices/<uuid:invoice_id>/download/',   views.generate_invoice_pdf, name='download_invoice'),
+path('invoices/<uuid:invoice_id>/email/',      views.email_invoice,        name='email_invoice'),
+path('invoices/<uuid:invoice_id>/update/',     views.update_invoice,       name='update_invoice'),
+path('invoices/<uuid:invoice_id>/delete/',     views.delete_invoice,       name='delete_invoice'),
     # ════════════════════════════════════════════════════════════════════
     # TICKETS
     # ════════════════════════════════════════════════════════════════════
@@ -94,12 +95,20 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════════════
     path('settings/', views.settings_view, name='settings'),
 
-    # ============================================================
+ # ============================================================
 # PRODUCT MANAGEMENT URLs
 # ============================================================
-path('products/', views.products_list, name='products_list'),
-path('products/create/', views.create_product, name='create_product'),
-path('products/<uuid:product_id>/edit/', views.edit_product, name='edit_product'),
-path('products/<uuid:product_id>/delete/', views.delete_product, name='delete_product'),
-path('products/<uuid:product_id>/json/', views.get_product_json, name='get_product_json'),
+path('products/',                              views.product_list,           name='product_list'),
+path('products/add/',                          views.product_add,            name='product_add'),
+path('products/search/',                       views.product_search_api,     name='product_search_api'),
+path('products/<uuid:pk>/json/',               views.product_detail_json,    name='product_detail_json'),  # ✅ NEW - REQUIRED!
+path('products/<uuid:pk>/',                    views.product_detail,         name='product_detail'),
+path('products/<uuid:pk>/edit/',               views.product_edit,           name='product_edit'),
+path('products/<uuid:pk>/delete/',             views.product_delete,         name='product_delete'),
+
+    # PRODUCT CATEGORY URLs
+    path('categories/',                            views.category_list,   name='category_list'),
+    path('categories/add/',                        views.category_add,    name='category_add'),
+    path('categories/<uuid:pk>/edit/',             views.category_edit,   name='category_edit'),
+    path('categories/<uuid:pk>/delete/',           views.category_delete, name='category_delete'),
 ]

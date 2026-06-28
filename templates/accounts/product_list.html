@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block page_title %}Products{% endblock %}
+{% block content %}
+<div style="background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); min-height: 100vh; padding: 30px 20px;">
+  <div style="max-width: 1400px; margin: 0 auto;">
+
+    <!-- Header Section -->
+    <div style="margin-bottom: 40px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0;">Products</h1>
+          <p style="color: #666; font-size: 15px; margin: 0;">Manage your product catalog efficiently</p>
+        </div>
+        <a href="{% url 'accounts:product_add' %}" 
+           style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0066cc 0%, #004499 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3); transition: all 0.3s; border: none; cursor: pointer;">
+          <i class="bi bi-plus-lg"></i> Add Product
+        </a>
+      </div>
+
+      <!-- Stats Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <!-- Total Products -->
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #0066cc;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Products</div>
+              <div style="font-size: 32px; font-weight: 700; color: #0066cc;">{{ stats.total }}</div>
+            </div>
+            <div style="font-size: 40px; color: #e8f1ff;">📦</div>
+          </div>
+        </div>
+
+        <!-- Active Products -->
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #28a745;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Active</div>
+              <div style="font-size: 32px; font-weight: 700; color: #28a745;">{{ stats.active }}</div>
+            </div>
+            <div style="font-size: 40px; color: #e8f8f0;">✓</div>
+          </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #ffc107;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Low Stock</div>
+              <div style="font-size: 32px; font-weight: 700; color: #ffc107;">{{ stats.low_stock }}</div>
+            </div>
+            <div style="font-size: 40px; color: #fffaf0;">⚠️</div>
+          </div>
+        </div>
+
+        <!-- Out of Stock -->
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #dc3545;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Out of Stock</div>
+              <div style="font-size: 32px; font-weight: 700; color: #dc3545;">{{ stats.out_of_stock }}</div>
+            </div>
+            <div style="font-size: 40px; color: #ffe8e8;">✕</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Section -->
+    <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; border: 1px solid #f0f0f0;">
+      <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0 0 20px 0;">Filter Products</h3>
+      <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div>
+          <input type="text" name="q" value="{{ q }}" 
+                 style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; transition: all 0.3s;" 
+                 placeholder="Search by name or SKU..." 
+                 onfocus="this.style.borderColor='#0066cc'; this.style.boxShadow='0 0 0 3px rgba(0,102,204,0.1)';"
+                 onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';" />
+        </div>
+        <div>
+          <select name="status" 
+                  style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; background: white; cursor: pointer; transition: all 0.3s;">
+            <option value="">All Status</option>
+            <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active Only</option>
+            <option value="inactive" {% if selected_status == "inactive" %}selected{% endif %}>Inactive Only</option>
+            <option value="low_stock" {% if selected_status == "low_stock" %}selected{% endif %}>Low Stock</option>
+            <option value="out_of_stock" {% if selected_status == "out_of_stock" %}selected{% endif %}>Out of Stock</option>
+          </select>
+        </div>
+        <div>
+          <select name="sort" 
+                  style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; background: white; cursor: pointer; transition: all 0.3s;">
+            <option value="name" {% if sort == "name" %}selected{% endif %}>Name (A-Z)</option>
+            <option value="-name" {% if sort == "-name" %}selected{% endif %}>Name (Z-A)</option>
+            <option value="-price" {% if sort == "-price" %}selected{% endif %}>Price (High-Low)</option>
+            <option value="price" {% if sort == "price" %}selected{% endif %}>Price (Low-High)</option>
+            <option value="-current_stock" {% if sort == "-current_stock" %}selected{% endif %}>Stock (High-Low)</option>
+            <option value="current_stock" {% if sort == "current_stock" %}selected{% endif %}>Stock (Low-High)</option>
+          </select>
+        </div>
+        <button type="submit" 
+                style="background: linear-gradient(135deg, #0066cc 0%, #004499 100%); color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,102,204,0.2);">
+          <i class="bi bi-funnel"></i> Filter
+        </button>
+      </form>
+    </div>
+
+    <!-- Products Table -->
+    {% if page_obj %}
+    <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%); border-bottom: 2px solid #e9ecef;">
+              <th style="padding: 16px 20px; text-align: left; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Product Name</th>
+              <th style="padding: 16px 20px; text-align: left; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">SKU</th>
+              <th style="padding: 16px 20px; text-align: right; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Price</th>
+              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">GST %</th>
+              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Stock</th>
+              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
+              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in page_obj %}
+            <tr style="border-bottom: 1px solid #f0f0f0; transition: all 0.3s; background: white;"
+                onmouseover="this.style.background='#f8f9fa'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.04)';"
+                onmouseout="this.style.background='white'; this.style.boxShadow='none';">
+              <td style="padding: 16px 20px;">
+                <div style="font-weight: 600; color: #1a1a1a; font-size: 14px;">{{ product.name }}</div>
+                {% if product.brand %}<div style="color: #999; font-size: 12px; margin-top: 4px;">{{ product.brand }}</div>{% endif %}
+              </td>
+              <td style="padding: 16px 20px;">
+                <code style="background: #f0f2f5; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #0066cc;">{{ product.sku|default:"-" }}</code>
+              </td>
+              <td style="padding: 16px 20px; text-align: right; font-weight: 600; color: #0066cc; font-size: 14px;">₹{{ product.price|floatformat:2 }}</td>
+              <td style="padding: 16px 20px; text-align: center;">
+                <span style="background: #f0f2f5; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #0066cc;">{{ product.gst_rate }}%</span>
+              </td>
+              <td style="padding: 16px 20px; text-align: center;">
+                {% if product.current_stock <= 0 %}
+                  <span style="background: #ffe8e8; color: #dc3545; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Out (0)</span>
+                {% elif product.current_stock <= product.min_stock %}
+                  <span style="background: #fff3cd; color: #856404; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">{{ product.current_stock }}</span>
+                {% else %}
+                  <span style="background: #e8f8f0; color: #28a745; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">{{ product.current_stock }}</span>
+                {% endif %}
+              </td>
+              <td style="padding: 16px 20px; text-align: center;">
+                {% if product.is_active %}
+                  <span style="background: #e8f8f0; color: #28a745; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Active</span>
+                {% else %}
+                  <span style="background: #f0f2f5; color: #666; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Inactive</span>
+                {% endif %}
+              </td>
+              <td style="padding: 16px 20px; text-align: center;">
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                  <a href="{% url 'accounts:product_edit' product.pk %}" 
+                     style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #ddd; border-radius: 6px; background: white; color: #0066cc; text-decoration: none; transition: all 0.3s; font-size: 14px; cursor: pointer;"
+                     onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
+                     onmouseout="this.style.background='white'; this.style.borderColor='#ddd';"
+                     title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <a href="{% url 'accounts:product_delete' product.pk %}" 
+                     style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #ddd; border-radius: 6px; background: white; color: #dc3545; text-decoration: none; transition: all 0.3s; font-size: 14px; cursor: pointer;"
+                     onmouseover="this.style.background='#ffe8e8'; this.style.borderColor='#dc3545';"
+                     onmouseout="this.style.background='white'; this.style.borderColor='#ddd';"
+                     onclick="return confirm('Are you sure you want to delete {{ product.name|escapejs }}?');"
+                     title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px;">
+      <nav style="display: flex; gap: 4px; align-items: center;">
+        {% if page_obj.has_previous %}
+        <a href="?page=1&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
+           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
+           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
+           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
+           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
+           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
+           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">←</a>
+        {% endif %}
+        
+        <span style="padding: 8px 16px; background: white; border: 1px solid #0066cc; border-radius: 6px; color: #0066cc; font-weight: 600; font-size: 12px;">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
+           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
+           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
+           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">→</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
+           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
+           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
+           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">Last</a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div style="background: white; border-radius: 12px; padding: 60px 40px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
+      <div style="font-size: 80px; margin-bottom: 20px; opacity: 0.6;">📦</div>
+      <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 10px 0;">No Products Yet</h2>
+      <p style="color: #999; font-size: 15px; margin: 0 0 30px 0; max-width: 400px; margin-left: auto; margin-right: auto;">Start by adding your first product to your catalog. Products help you create invoices faster and maintain consistent pricing.</p>
+      <a href="{% url 'accounts:product_add' %}" 
+         style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0066cc 0%, #004499 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3); transition: all 0.3s; border: none; cursor: pointer;">
+        <i class="bi bi-plus-lg"></i> Create First Product
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

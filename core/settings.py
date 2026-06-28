@@ -43,12 +43,14 @@ SHARED_APPS = (
     'automation',
     'django_celery_beat',
     'django_celery_results',
+    'backups',
+    'billing',                      # django_tenants requires at least one app
+
 )
 
 TENANT_APPS = (
-    'billing',                      # django_tenants requires at least one app
+    'billing',     # ← also keep here so django_tenants is satisfied
 )
-
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
 ]

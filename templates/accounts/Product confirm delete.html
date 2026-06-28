@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Delete Product{% endblock %}
+{% block content %}
+<div style="background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); min-height: 100vh; padding: 40px 20px; display: flex; align-items: center; justify-content: center;">
+  <div style="max-width: 500px; width: 100%;">
+
+    <!-- Delete Confirmation Card -->
+    <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); border: 1px solid #f0f0f0;">
+      
+      <!-- Warning Icon -->
+      <div style="text-align: center; margin-bottom: 30px;">
+        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+        <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0 0 12px 0;">Delete Product?</h1>
+        <p style="color: #666; font-size: 15px; margin: 0;">This action cannot be undone</p>
+      </div>
+
+      <!-- Product Details -->
+      <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 30px; border-left: 4px solid #dc3545;">
+        <div style="display: grid; gap: 12px;">
+          <div>
+            <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Product Name</div>
+            <div style="color: #1a1a1a; font-size: 16px; font-weight: 600;">{{ product.name }}</div>
+          </div>
+          {% if product.sku %}
+          <div>
+            <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">SKU</div>
+            <code style="background: white; padding: 4px 8px; border-radius: 4px; font-size: 14px; color: #0066cc;">{{ product.sku }}</code>
+          </div>
+          {% endif %}
+          <div>
+            <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Price</div>
+            <div style="color: #1a1a1a; font-size: 16px; font-weight: 600;">₹{{ product.price|floatformat:2 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning Message -->
+      <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px; margin-bottom: 30px;">
+        <div style="color: #856404; font-size: 14px; line-height: 1.6;">
+          <strong>⚠️ Warning:</strong> Deleting this product will:
+          <ul style="margin: 8px 0 0 20px; padding: 0;">
+            <li>Remove it from your product catalog</li>
+            <li>Remove it from all invoices</li>
+            <li>Delete all associated data</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 12px;">
+        <a href="{% url 'accounts:product_list' %}" 
+           style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: white; color: #0066cc; padding: 12px 24px; border: 2px solid #ddd; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+           onmouseover="this.style.borderColor='#0066cc'; this.style.background='#e8f1ff';"
+           onmouseout="this.style.borderColor='#ddd'; this.style.background='white';">
+          <i class="bi bi-x-lg"></i> Cancel
+        </a>
+        <form method="post" style="flex: 1;">
+          {% csrf_token %}
+          <button type="submit" 
+                  style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);"
+                  onmouseover="this.style.background='linear-gradient(135deg, #c82333 0%, #bd2130 100%)'; this.style.boxShadow='0 4px 12px rgba(220, 53, 69, 0.4)';"
+                  onmouseout="this.style.background='linear-gradient(135deg, #dc3545 0%, #c82333 100%)'; this.style.boxShadow='0 2px 8px rgba(220, 53, 69, 0.3)';">
+            <i class="bi bi-trash"></i> Delete Permanently
+          </button>
+        </form>
+      </div>
+
+      <!-- Info Text -->
+      <div style="text-align: center; margin-top: 20px;">
+        <p style="color: #999; font-size: 12px; margin: 0;">
+          <strong>Tip:</strong> You can also deactivate products instead of deleting them to keep records.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

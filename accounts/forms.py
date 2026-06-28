@@ -2,9 +2,9 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
-from accounts.models import CustomUser, Invoice, Customer, SupportTicket
+from accounts.models import CustomUser, Invoice, Customer, SupportTicket, Product, InvoiceItem, ProductCategory
 from django.forms import inlineformset_factory, BaseInlineFormSet
-from accounts.models import Product, InvoiceItem
+
 from decimal import Decimal
 
 # ============================================
@@ -217,48 +217,6 @@ class ChangePasswordForm(forms.Form):
 # MULTI-PRODUCT INVOICE FORMS
 # ============================================================
 
-class ProductForm(forms.ModelForm):
-    """Form for creating/editing products in the product master"""
-    
-    class Meta:
-        model = Product
-        fields = ['name', 'description', 'hsn_sac', 'price', 'gst_rate', 'is_active']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Product/Service name',
-                'required': True
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Description (optional)',
-                'rows': 3
-            }),
-            'hsn_sac': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'HSN/SAC code (optional)',
-                'maxlength': '20'
-            }),
-            'price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': '0.00',
-                'step': '0.01',
-                'min': '0',
-                'required': True
-            }),
-            'gst_rate': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': '18.00',
-                'step': '0.01',
-                'min': '0',
-                'max': '100',
-                'required': True
-            }),
-            'is_active': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
-            }),
-        }
-
 
 class InvoiceItemForm(forms.ModelForm):
     """Form for line items in invoice (with product auto-population)"""
@@ -348,21 +306,40 @@ class InvoiceItemForm(forms.ModelForm):
                 user=user,
                 is_active=True
             ).order_by('name')
+        
+        # Make ONLY truly optional fields not required
+        # But keep product and product_name required
+        self.fields['discount_percent'].required = False
+        self.fields['discount_amount'].required  = False
+        self.fields['description'].required      = False
+        self.fields['hsn_sac_code'].required     = False
+        
+        # Set default initial values
+        self.fields['discount_percent'].initial = Decimal('0')
+        self.fields['discount_amount'].initial  = Decimal('0')
+        
+        # Set default initial values
+        self.fields['discount_percent'].initial = Decimal('0')
+        self.fields['discount_amount'].initial  = Decimal('0')
 
 
 class BaseInvoiceItemFormSet(BaseInlineFormSet):
-    """Custom formset to ensure at least one item"""
+    """Custom formset to ensure at least one item with product selected"""
     
     def clean(self):
         super().clean()
-        non_empty_forms = 0
+        
+        # Count forms with a product selected
+        forms_with_product = 0
         for form in self.forms:
             if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                non_empty_forms += 1
+                # Check if product is selected
+                product = form.cleaned_data.get('product')
+                if product:
+                    forms_with_product += 1
         
-        if non_empty_forms < 1:
-            raise forms.ValidationError('Invoice must have at least one item.')
-
+        if forms_with_product < 1:
+            raise forms.ValidationError('Invoice must have at least one product selected.')
 
 # Create the formset
 InvoiceItemFormSet = inlineformset_factory(
@@ -375,3 +352,184 @@ InvoiceItemFormSet = inlineformset_factory(
     min_num=1,
     validate_min=True
 )
+
+# ============================================
+# PRODUCT CATEGORY FORM
+# ============================================
+
+class ProductCategoryForm(forms.ModelForm):
+    class Meta:
+        model  = ProductCategory
+        fields = ['name', 'description', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Electronics, Software, Services',
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional description',
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_name(self):
+        name = self.cleaned_data['name'].strip()
+        qs = ProductCategory.objects.filter(user=self.user, name__iexact=name)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("A category with this name already exists.")
+        return name
+
+
+# ============================================
+# PRODUCT FORM
+# ============================================
+
+class ProductForm(forms.ModelForm):
+
+    GST_CHOICES = [
+        ('0',  '0%'),
+        ('5',  '5%'),
+        ('12', '12%'),
+        ('18', '18%'),
+        ('28', '28%'),
+    ]
+
+    gst_rate = forms.ChoiceField(
+        choices=GST_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        initial='18',
+    )
+
+    class Meta:
+        model  = Product
+        fields = [
+            'name', 'product_code', 'sku', 'category', 'brand',
+            'description', 'hsn_sac', 'unit',
+            'price', 'purchase_price', 'gst_rate',
+            'min_stock', 'current_stock', 'opening_stock',
+            'barcode', 'is_active',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Product / Service name',
+            }),
+            'product_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Auto-generated if left blank',
+            }),
+            'sku': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Stock Keeping Unit',
+            }),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'brand': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Brand name (optional)',
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Product description',
+            }),
+            'hsn_sac': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'HSN / SAC Code',
+            }),
+            'unit': forms.Select(attrs={'class': 'form-select'}),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01',
+                'min': '0',
+            }),
+            'purchase_price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01',
+                'min': '0',
+            }),
+            'min_stock': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0',
+                'min': '0',
+            }),
+            'current_stock': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0',
+            }),
+            'opening_stock': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0',
+            }),
+            'barcode': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Barcode (optional)',
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        # Only show categories belonging to this user
+        self.fields['category'].queryset = ProductCategory.objects.filter(
+            user=user, is_active=True
+        ) if user else ProductCategory.objects.none()
+        self.fields['category'].empty_label = '— Select Category —'
+        # Pre-fill gst_rate from instance
+        if self.instance and self.instance.pk:
+            self.fields['gst_rate'].initial = str(int(self.instance.gst_rate))
+
+    def clean_sku(self):
+        sku = self.cleaned_data.get('sku', '').strip()
+        if sku:
+            qs = Product.objects.filter(user=self.user, sku__iexact=sku)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("A product with this SKU already exists.")
+        return sku
+
+    def clean_product_code(self):
+        code = self.cleaned_data.get('product_code', '').strip()
+        if code:
+            qs = Product.objects.filter(user=self.user, product_code__iexact=code)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("A product with this code already exists.")
+        return code
+
+    def clean_name(self):
+        name = self.cleaned_data['name'].strip()
+        qs = Product.objects.filter(user=self.user, name__iexact=name)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("A product with this name already exists.")
+        return name
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price is not None and price < 0:
+            raise forms.ValidationError("Selling price cannot be negative.")
+        return price
+
+    def clean_purchase_price(self):
+        price = self.cleaned_data.get('purchase_price')
+        if price is not None and price < 0:
+            raise forms.ValidationError("Purchase price cannot be negative.")
+        return price
+
+    def clean_gst_rate(self):
+        from decimal import Decimal
+        return Decimal(self.cleaned_data['gst_rate'])
