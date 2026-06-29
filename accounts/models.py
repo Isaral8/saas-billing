@@ -1,5 +1,3 @@
-# accounts/models.py - COMPLETE UPDATED VERSION
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
@@ -466,6 +464,29 @@ class Subscription(models.Model):
         ('enterprise', 'Enterprise'),
     ]
 
+    BILLING_CYCLE_CHOICES = [
+        ('monthly',    'Monthly'),
+        ('quarterly',  'Quarterly'),
+        ('half_yearly','Half-Yearly'),
+        ('yearly',     'Yearly'),
+    ]
+
+    RENEWAL_STATUS_CHOICES = [
+        ('upcoming',   'Upcoming'),
+        ('active',     'Active'),
+        ('expired',    'Expired'),
+        ('cancelled',  'Cancelled'),
+        ('grace',      'Grace Period'),
+    ]
+
+    PAYMENT_STATUS_CHOICES = [
+        ('paid',       'Paid'),
+        ('unpaid',     'Unpaid'),
+        ('pending',    'Pending'),
+        ('failed',     'Failed'),
+    ]
+
+    # ── Existing fields (unchanged) ──────────────────────────
     id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user       = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='subscription')
     plan       = models.CharField(max_length=50, choices=PLAN_CHOICES, default='free')
@@ -475,12 +496,70 @@ class Subscription(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # ── New fields ────────────────────────────────────────────
+    customer         = models.ForeignKey('Customer', on_delete=models.SET_NULL, null=True, blank=True, related_name='subscriptions')
+    billing_cycle    = models.CharField(max_length=20, choices=BILLING_CYCLE_CHOICES, default='monthly')
+    renewal_date     = models.DateTimeField(null=True, blank=True)
+    trial_end_date   = models.DateTimeField(null=True, blank=True)
+    next_invoice_date= models.DateField(null=True, blank=True)
+    renewal_status   = models.CharField(max_length=20, choices=RENEWAL_STATUS_CHOICES, default='active')
+    auto_renew       = models.BooleanField(default=True)
+    grace_period_days= models.PositiveIntegerField(default=7)
+    renewed_on       = models.DateTimeField(null=True, blank=True)
+    renewed_by       = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='renewals_done')
+    payment_status   = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
+    amount           = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    discount         = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    notes            = models.TextField(blank=True)
+    invoice          = models.ForeignKey('Invoice', on_delete=models.SET_NULL, null=True, blank=True, related_name='subscriptions')
+
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['renewal_status', 'expires_at']),
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['customer', 'renewal_status']),
+        ]
 
     def __str__(self):
         return f"{self.user.email} - {self.plan}"
 
+    # ── Helper properties ─────────────────────────────────────
+    @property
+    def is_expired(self):
+        if self.expires_at:
+            return timezone.now() > self.expires_at
+        return False
+
+    @property
+    def days_until_expiry(self):
+        if self.expires_at:
+            delta = self.expires_at - timezone.now()
+            return delta.days
+        return None
+
+    @property
+    def is_in_grace_period(self):
+        if self.expires_at and self.is_expired:
+            grace_end = self.expires_at + timezone.timedelta(days=self.grace_period_days)
+            return timezone.now() <= grace_end
+        return False
+
+    @property
+    def expiry_badge(self):
+        days = self.days_until_expiry
+        if days is None:
+            return 'secondary'
+        if days < 0:
+            return 'danger'
+        if days <= 7:
+            return 'warning'
+        if days <= 30:
+            return 'info'
+        return 'success'
+
+    def get_cycle_months(self):
+        return {'monthly': 1, 'quarterly': 3, 'half_yearly': 6, 'yearly': 12}.get(self.billing_cycle, 1)
 
 class ActivityLog(models.Model):
     ACTION_CHOICES = [
@@ -513,33 +592,202 @@ class ActivityLog(models.Model):
         return f"{self.user.email} - {self.action}"
 
 
+# ============================================
+# NOTIFICATION MODULE - PHASE 1
+# ============================================
+
 class Notification(models.Model):
+    """
+    Comprehensive notification system for iSaral.
+    Supports Invoice, Customer, Product, Backup, Renewal, and System events.
+    Extensible for future Email, SMS, WhatsApp, Push integrations.
+    """
+
+    # ─── NOTIFICATION TYPES ─────────────────────────────────────────
     TYPE_CHOICES = [
-        ('invoice_paid',    'Invoice Paid'),
-        ('invoice_overdue', 'Invoice Overdue'),
-        ('ticket_new',      'New Ticket'),
-        ('ticket_resolved', 'Ticket Resolved'),
-        ('plan_expiry',     'Plan Expiry'),
-        ('system',          'System'),
+        # Invoice Events
+        ('invoice_created',    'Invoice Created'),
+        ('invoice_updated',    'Invoice Updated'),
+        ('invoice_deleted',    'Invoice Deleted'),
+        ('invoice_paid',       'Invoice Paid'),
+        ('invoice_pending',    'Invoice Pending'),
+        
+        # Payment Events
+        ('payment_received',   'Payment Received'),
+        ('payment_failed',     'Payment Failed'),
+        
+        # Customer Events
+        ('customer_added',     'Customer Added'),
+        ('customer_updated',   'Customer Updated'),
+        ('customer_deleted',   'Customer Deleted'),
+        
+        # Product Events
+        ('product_added',      'Product Added'),
+        ('product_updated',    'Product Updated'),
+        ('product_deleted',    'Product Deleted'),
+        ('low_stock',          'Low Stock Alert'),
+        ('out_of_stock',       'Out of Stock Alert'),
+        
+        # Backup Events
+        ('backup_created',     'Backup Created'),
+        ('backup_failed',      'Backup Failed'),
+        
+        # Renewal Events
+        ('renewal_due',        'Renewal Due'),
+        ('renewal_expired',    'Renewal Expired'),
+        
+        # Subscription Events
+        ('subscription_renewed', 'Subscription Renewed'),
+        
+        # System Events
+        ('system_info',        'Information'),
+        ('system_success',     'Success'),
+        ('system_warning',     'Warning'),
+        ('system_error',       'Error'),
     ]
 
-    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user       = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
-    type       = models.CharField(max_length=30, choices=TYPE_CHOICES, default='system')
-    title      = models.CharField(max_length=200)
-    message    = models.TextField()
-    is_read    = models.BooleanField(default=False)
+    # ─── PRIORITY LEVELS ────────────────────────────────────────────
+    PRIORITY_CHOICES = [
+        ('low',      'Low'),
+        ('medium',   'Medium'),
+        ('high',     'High'),
+        ('critical', 'Critical'),
+    ]
+
+    # ─── FIELDS ─────────────────────────────────────────────────────
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # User & Type
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+    notification_type = models.CharField(
+        max_length=30,
+        choices=TYPE_CHOICES,
+        default='system_info'
+    )
+    
+    # Content
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    
+    # Metadata
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default='medium'
+    )
+    icon = models.CharField(
+        max_length=50,
+        default='info-circle',
+        help_text='Bootstrap icon name (e.g., "bell", "envelope", "check-circle")'
+    )
+    color = models.CharField(
+        max_length=20,
+        default='info',
+        help_text='Bootstrap color (success, danger, warning, info, primary)'
+    )
+    
+    # Read Status
+    is_read = models.BooleanField(default=False, db_index=True)
+    
+    # Related Object Tracking
+    related_model = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text='Model name (e.g., "Invoice", "Customer", "Product")'
+    )
+    related_object_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text='UUID or ID of the related object'
+    )
+    
+    # Action URL
+    action_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text='URL to navigate to when clicked'
+    )
+    
+    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = 'Notification'
+        verbose_name_plural = 'Notifications'
         indexes = [
             models.Index(fields=['user', '-created_at']),
-            models.Index(fields=['is_read']),
+            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['is_read', '-created_at']),
+            models.Index(fields=['priority']),
+            models.Index(fields=['notification_type']),
         ]
 
     def __str__(self):
         return f"{self.title} - {self.user.email}"
+    
+    def mark_as_read(self):
+        """Mark notification as read."""
+        if not self.is_read:
+            self.is_read = True
+            self.save(update_fields=['is_read', 'updated_at'])
+            return True
+        return False
+    
+    def mark_as_unread(self):
+        """Mark notification as unread."""
+        if self.is_read:
+            self.is_read = False
+            self.save(update_fields=['is_read', 'updated_at'])
+            return True
+        return False
+    
+    @property
+    def get_icon_class(self):
+        """Return Bootstrap icon class."""
+        icon_map = {
+            'invoice_created': 'file-earmark-plus',
+            'invoice_updated': 'file-earmark-check',
+            'invoice_deleted': 'file-earmark-x',
+            'invoice_paid': 'check-circle',
+            'invoice_pending': 'hourglass-split',
+            'payment_received': 'wallet2',
+            'payment_failed': 'x-circle',
+            'customer_added': 'person-plus',
+            'customer_updated': 'person-check',
+            'customer_deleted': 'person-x',
+            'product_added': 'box-seam',
+            'product_updated': 'box-seam',
+            'product_deleted': 'box-seam-x',
+            'low_stock': 'exclamation-triangle',
+            'out_of_stock': 'exclamation-circle',
+            'backup_created': 'cloud-check',
+            'backup_failed': 'cloud-x',
+            'renewal_due': 'calendar-event',
+            'renewal_expired': 'calendar-x',
+            'subscription_renewed': 'arrow-repeat',
+        }
+        return icon_map.get(self.notification_type, self.icon)
+    
+    @property
+    def get_color_class(self):
+        """Return Bootstrap color class."""
+        color_map = {
+            'success': 'success',
+            'danger': 'danger',
+            'warning': 'warning',
+            'info': 'info',
+            'primary': 'primary',
+            'secondary': 'secondary',
+        }
+        return color_map.get(self.color, 'info')
 
 
 # ============================================
@@ -963,3 +1211,41 @@ class SettingsAuditLog(models.Model):
     
     def __str__(self):
         return f"{self.user.email} - {self.action} - {self.model_name}"
+
+class RenewalHistory(models.Model):
+    """Tracks every renewal event for a subscription."""
+
+    RENEWAL_TYPE_CHOICES = [
+        ('manual',    'Manual'),
+        ('auto',      'Auto'),
+        ('trial',     'Trial'),
+    ]
+
+    id             = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    subscription   = models.ForeignKey(Subscription, on_delete=models.CASCADE, related_name='renewal_history')
+    user           = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='renewal_history')
+    customer       = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    plan           = models.CharField(max_length=50)
+    billing_cycle  = models.CharField(max_length=20)
+    amount         = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    discount       = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    gst_amount     = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    total_amount   = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0'))
+    renewal_type   = models.CharField(max_length=20, choices=RENEWAL_TYPE_CHOICES, default='manual')
+    renewed_on     = models.DateTimeField(default=timezone.now)
+    previous_expiry= models.DateTimeField(null=True, blank=True)
+    new_expiry     = models.DateTimeField(null=True, blank=True)
+    invoice        = models.ForeignKey('Invoice', on_delete=models.SET_NULL, null=True, blank=True)
+    payment_status = models.CharField(max_length=20, default='paid')
+    notes          = models.TextField(blank=True)
+    created_at     = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-renewed_on']
+        indexes = [
+            models.Index(fields=['subscription', '-renewed_on']),
+            models.Index(fields=['user', '-renewed_on']),
+        ]
+
+    def __str__(self):
+        return f"Renewal: {self.user.email} - {self.plan} on {self.renewed_on.strftime('%d %b %Y')}"

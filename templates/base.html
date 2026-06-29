@@ -242,39 +242,42 @@
     <!-- ── MAIN WRAPPER ── -->
     <div class="main-wrapper" id="mainWrapper">
 
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
-                    <i class="bi bi-list"></i>
-                </button>
-                <span class="header-title">{% block page_title %}Dashboard{% endblock %}</span>
+       <!-- HEADER -->
+<header class="header">
+    <div class="header-left">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="header-title">{% block page_title %}Dashboard{% endblock %}</span>
+    </div>
+    <div class="header-actions">
+        <!-- ✅ NOTIFICATION DROPDOWN -->
+        {% include 'accounts/components/notification_dropdown.html' %}
+        
+        <div class="user-menu">
+            <div class="user-avatar">
+                {{ request.user.first_name|first|upper|default:request.user.email|first|upper }}
             </div>
-            <div class="header-actions">
-                <div class="user-menu">
-                    <div class="user-avatar">
-                        {{ request.user.first_name|first|upper|default:request.user.email|first|upper }}
-                    </div>
-                    <div style="display:flex;flex-direction:column;line-height:1.2;">
-                        <span class="user-name">{{ request.user.first_name|default:request.user.email }}</span>
-                        <span class="user-email-sm">{{ request.user.email }}</span>
-                    </div>
-                    <div class="user-dropdown">
-                        <button class="dropdown-toggle-btn" id="userMenuBtn">
-                            <i class="bi bi-chevron-down" style="font-size:12px;"></i>
-                        </button>
-                        <div class="dropdown-menu" id="userDropdown">
-                            <a href="{% url 'accounts:settings' %}" class="dropdown-item">
-                                <i class="bi bi-gear"></i> Settings
-                            </a>
-                            <a href="{% url 'accounts:logout' %}" class="dropdown-item danger">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </div>
-                    </div>
+            <div style="display:flex;flex-direction:column;line-height:1.2;">
+                <span class="user-name">{{ request.user.first_name|default:request.user.email }}</span>
+                <span class="user-email-sm">{{ request.user.email }}</span>
+            </div>
+            <div class="user-dropdown">
+                <button class="dropdown-toggle-btn" id="userMenuBtn">
+                    <i class="bi bi-chevron-down" style="font-size:12px;"></i>
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="{% url 'accounts:settings' %}" class="dropdown-item">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                    <a href="{% url 'accounts:logout' %}" class="dropdown-item danger">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
                 </div>
             </div>
-        </header>
+        </div>
+    </div>
+</header>
 
         <!-- ALERTS -->
         <div style="padding:0 20px;">

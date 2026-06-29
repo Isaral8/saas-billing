@@ -1,10 +1,10 @@
-# accounts/admin.py
-
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
-from django.db.models import Sum
-from accounts.models import CustomUser, Customer, Invoice, SupportTicket, Subscription
+from django.db.models import Sum, Q
+from accounts.models import (
+    CustomUser, Customer, Invoice, SupportTicket, Subscription, Notification
+)
 from accounts.emails import (
     send_invoice_email,
     send_payment_confirmation_email,
@@ -83,20 +83,18 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display  = ('name', 'email', 'phone', 'company', 'get_gstin_badge',
                      'get_invoice_count', 'get_total_revenue', 'created_at')
     list_filter   = ('created_at', 'state')
-    # ↑ fixed: was 'company_name' — model field is 'company'
     search_fields = ('name', 'email', 'phone', 'gstin', 'company')
     readonly_fields = ('id', 'created_at', 'updated_at', 'get_stats')
 
     fieldsets = (
         ('Basic information', {
-            # ↑ fixed: removed city, postal_code (not in model); company_name → company
             'fields': ('user', 'name', 'email', 'phone', 'company', 'id'),
         }),
         ('Tax & compliance', {
             'fields': ('gstin', 'state'),
         }),
         ('Address', {
-            'fields': ('address',),          # ↑ fixed: removed city/postal_code
+            'fields': ('address',),
         }),
         ('Statistics', {
             'fields': ('get_stats',),
@@ -154,7 +152,6 @@ class CustomerAdmin(admin.ModelAdmin):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="customers.csv"'
         writer = csv.writer(response)
-        # ↑ fixed: removed city/postal_code columns; company_name → company
         writer.writerow(['Name', 'Email', 'Phone', 'Company', 'GSTIN', 'State', 'Invoices'])
         for c in queryset:
             writer.writerow([c.name, c.email, c.phone, c.company, c.gstin, c.state, c.invoice_set.count()])
@@ -183,7 +180,6 @@ class InvoiceAdmin(admin.ModelAdmin):
             'fields': ('subtotal', 'gst_rate', 'gst_amount', 'cgst_amount', 'sgst_amount', 'igst_amount', 'total'),
         }),
         ('Status & notes', {
-            # ↑ fixed: was 'description' — model field is 'notes'
             'fields': ('status', 'notes'),
         }),
         ('Summary', {'fields': ('get_summary',), 'classes': ('collapse',)}),
@@ -293,13 +289,11 @@ class SupportTicketAdmin(admin.ModelAdmin):
     list_display  = ('ticket_number', 'subject', 'customer_name', 'get_priority_badge',
                      'get_status_badge', 'get_age', 'created_at')
     list_filter   = ('priority', 'status', 'created_at')
-    # ↑ fixed: removed 'product' from search (not in model)
     search_fields = ('ticket_number', 'subject', 'customer_name', 'customer_email')
     readonly_fields = ('id', 'ticket_number', 'created_at', 'updated_at')
 
     fieldsets = (
         ('Ticket info', {
-            # ↑ fixed: removed 'product' field (not in SupportTicket model)
             'fields': ('user', 'ticket_number', 'subject', 'id'),
         }),
         ('Customer', {
@@ -379,6 +373,206 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter   = ('plan', 'is_active')
     search_fields = ('user__email', 'user__company_name')
     readonly_fields = ('id', 'created_at', 'updated_at')
+
+
+# ============================================
+# NOTIFICATION ADMIN - PHASE 2
+# ============================================
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    """
+    Notification admin with search, filters, bulk actions, and smart display.
+    """
+    
+    list_display = (
+        'get_title_link',
+        'get_user_link',
+        'get_type_badge',
+        'get_priority_badge',
+        'get_read_status',
+        'created_at'
+    )
+    
+    list_filter = (
+        'notification_type',
+        'priority',
+        'is_read',
+        'created_at',
+        ('created_at', admin.DateFieldListFilter),
+    )
+    
+    search_fields = (
+        'title',
+        'message',
+        'user__email',
+        'user__first_name',
+        'user__last_name',
+        'related_object_id',
+    )
+    
+    readonly_fields = (
+        'id',
+        'created_at',
+        'updated_at',
+        'get_related_object_link',
+    )
+    
+    fieldsets = (
+        ('Notification Details', {
+            'fields': ('user', 'notification_type', 'title', 'message', 'id'),
+        }),
+        ('Metadata', {
+            'fields': ('priority', 'is_read', 'icon', 'color'),
+        }),
+        ('Related Object', {
+            'fields': ('related_model', 'related_object_id', 'get_related_object_link', 'action_url'),
+            'classes': ('collapse',),
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    actions = [
+        'mark_as_read_action',
+        'mark_as_unread_action',
+        'delete_selected',
+    ]
+    
+    ordering = ('-created_at',)
+    list_per_page = 50
+    date_hierarchy = 'created_at'
+    
+    def get_title_link(self, obj):
+        """Display title with link to change view."""
+        url = reverse('admin:accounts_notification_change', args=[obj.id])
+        return format_html(
+            '<a href="{}">{}</a>',
+            url,
+            obj.title[:50] + '...' if len(obj.title) > 50 else obj.title
+        )
+    get_title_link.short_description = 'Title'
+    
+    def get_user_link(self, obj):
+        """Link to user admin."""
+        url = reverse('admin:accounts_customuser_change', args=[obj.user.id])
+        return format_html(
+            '<a href="{}">{}</a>',
+            url,
+            obj.user.email
+        )
+    get_user_link.short_description = 'User'
+    
+    def get_type_badge(self, obj):
+        """Color-coded notification type badge."""
+        color_map = {
+            'invoice_created': '#3b82f6',
+            'invoice_updated': '#3b82f6',
+            'invoice_deleted': '#dc2626',
+            'invoice_paid': '#16a34a',
+            'invoice_pending': '#f59e0b',
+            'payment_received': '#16a34a',
+            'payment_failed': '#dc2626',
+            'customer_added': '#8b5cf6',
+            'customer_updated': '#8b5cf6',
+            'customer_deleted': '#dc2626',
+            'product_added': '#14b8a6',
+            'product_updated': '#14b8a6',
+            'product_deleted': '#dc2626',
+            'low_stock': '#f59e0b',
+            'out_of_stock': '#dc2626',
+            'backup_created': '#16a34a',
+            'backup_failed': '#dc2626',
+            'renewal_due': '#f59e0b',
+            'renewal_expired': '#dc2626',
+            'subscription_renewed': '#16a34a',
+            'system_info': '#6b7280',
+            'system_success': '#16a34a',
+            'system_warning': '#f59e0b',
+            'system_error': '#dc2626',
+        }
+        
+        color = color_map.get(obj.notification_type, '#6b7280')
+        label = obj.get_notification_type_display()
+        
+        return format_html(
+            '<span style="background:{};color:#fff;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:600">{}</span>',
+            color,
+            label
+        )
+    get_type_badge.short_description = 'Type'
+    
+    def get_priority_badge(self, obj):
+        """Priority level badge."""
+        colors = {
+            'low': '#6b7280',
+            'medium': '#f59e0b',
+            'high': '#dc2626',
+            'critical': '#9c0c1a',
+        }
+        
+        color = colors.get(obj.priority, '#6b7280')
+        
+        return format_html(
+            '<span style="background:{};color:#fff;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:600">{}</span>',
+            color,
+            obj.get_priority_display()
+        )
+    get_priority_badge.short_description = 'Priority'
+    
+    def get_read_status(self, obj):
+        """Read/unread status indicator."""
+        if obj.is_read:
+            return format_html(
+                '<span style="background:#d1d5db;color:#1f2937;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:600">✓ Read</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background:#3b82f6;color:#fff;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:600">● Unread</span>'
+            )
+    get_read_status.short_description = 'Status'
+    
+    def get_related_object_link(self, obj):
+        """Link to related object if available."""
+        if not obj.related_model or not obj.related_object_id:
+            return '—'
+        
+        # Map model names to admin URL patterns
+        model_url_map = {
+            'Invoice': ('admin:accounts_invoice_change', 'invoice'),
+            'Customer': ('admin:accounts_customer_change', 'customer'),
+            'Product': ('admin:accounts_product_change', 'product'),
+        }
+        
+        if obj.related_model in model_url_map:
+            admin_name, _ = model_url_map[obj.related_model]
+            try:
+                url = reverse(admin_name, args=[obj.related_object_id])
+                return format_html(
+                    '<a href="{}">{} #{}</a>',
+                    url,
+                    obj.related_model,
+                    obj.related_object_id[:8]  # Show first 8 chars of UUID
+                )
+            except:
+                pass
+        
+        return format_html('{} #{}', obj.related_model, obj.related_object_id[:8])
+    get_related_object_link.short_description = 'Related Object'
+    
+    def mark_as_read_action(self, request, queryset):
+        """Bulk mark notifications as read."""
+        count = sum(1 for obj in queryset if obj.mark_as_read())
+        self.message_user(request, f'{count} notification(s) marked as read.')
+    mark_as_read_action.short_description = 'Mark selected as read'
+    
+    def mark_as_unread_action(self, request, queryset):
+        """Bulk mark notifications as unread."""
+        count = sum(1 for obj in queryset if obj.mark_as_unread())
+        self.message_user(request, f'{count} notification(s) marked as unread.')
+    mark_as_unread_action.short_description = 'Mark selected as unread'
 
 
 # ============================================

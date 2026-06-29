@@ -1,0 +1,173 @@
+﻿<!-- Notification Dropdown -->
+<div class="dropdown" id="notification-dropdown">
+    <button class="btn btn-link position-relative p-0" type="button" id="notificationBellBtn" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="unread-badge" style="display: none;">0</span>
+    </button>
+    
+    <div class="dropdown-menu dropdown-menu-end shadow" style="width: 380px; max-height: 500px; overflow-y: auto;" id="notificationDropdownMenu">
+        <div class="dropdown-header" id="dropdown-header" style="display: none;">
+            <h6 class="mb-0"><i class="bi bi-bell"></i> Notifications</h6>
+        </div>
+        <div id="notification-items-container"></div>
+        <div class="dropdown-item text-center text-muted py-3" id="empty-state" style="display: none;">
+            <i class="bi bi-inbox fs-5"></i>
+            <p class="mb-0">No notifications</p>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Dropdown -->
+<div class="dropdown" id="notification-dropdown">
+    <button class="btn btn-link position-relative p-0" type="button" id="notificationBellBtn" 
+            data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+              id="unread-badge" style="display: none;">0</span>
+    </button>
+    
+    <div class="dropdown-menu dropdown-menu-end shadow" style="width: 380px; max-height: 500px; overflow-y: auto;" 
+         id="notificationDropdownMenu">
+        <div class="dropdown-header" id="dropdown-header">
+            <h6 class="mb-0"><i class="bi bi-bell"></i> Notifications</h6>
+        </div>
+        <div id="notification-items-container"></div>
+        <div class="dropdown-item text-center text-muted py-3" id="empty-state" style="display: none;">
+            <i class="bi bi-inbox fs-5"></i>
+            <p class="mb-0">No notifications</p>
+        </div>
+    </div>
+</div>
+
+<script>
+console.log('📢 Notification dropdown script loading...');
+
+const NOTIFICATION_API = '/accounts/api/notifications/dropdown/';
+const POLL_INTERVAL = 30000;
+let pollTimer = null;
+
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+async function loadNotificationsDropdown() {
+    console.log('🔄 Loading notifications...');
+    try {
+        const response = await fetch(NOTIFICATION_API, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken || '',
+            },
+            credentials: 'same-origin',  // ← IMPORTANT: Include cookies
+        });
+        
+        console.log('📥 Response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('❌ API error:', response.status, response.statusText);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('✅ Notifications data:', data);
+        
+        if (data.status === 'success') {
+            renderNotificationsDropdown(data);
+        } else {
+            console.error('❌ API returned error:', data);
+        }
+    } catch (error) {
+        console.error('❌ Error loading notifications:', error);
+    }
+}
+
+function renderNotificationsDropdown(data) {
+    console.log('🎨 Rendering notifications...');
+    const badge = document.getElementById('unread-badge');
+    const container = document.getElementById('notification-items-container');
+    const emptyState = document.getElementById('empty-state');
+    const header = document.getElementById('dropdown-header');
+    
+    if (!badge || !container || !emptyState) {
+        console.error('❌ DOM elements not found');
+        return;
+    }
+    
+    // Update badge
+    if (data.unread_count > 0) {
+        badge.textContent = data.unread_count;
+        badge.style.display = 'inline-block';
+        console.log('🔴 Badge updated:', data.unread_count);
+    } else {
+        badge.style.display = 'none';
+    }
+    
+    // Clear container
+    container.innerHTML = '';
+    
+    // Show/hide states
+    if (data.notifications.length === 0) {
+        emptyState.style.display = 'block';
+        header.style.display = 'none';
+        console.log('📭 No notifications - showing empty state');
+    } else {
+        emptyState.style.display = 'block';
+        header.style.display = 'block';
+        console.log('📬 Showing', data.notifications.length, 'notifications');
+        
+        data.notifications.forEach((notif, index) => {
+            const item = document.createElement('a');
+            item.href = notif.action_url || '#';
+            item.className = 'dropdown-item';
+            item.style.cursor = 'pointer';
+            item.innerHTML = `
+                <div class="py-2">
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+                        <i class="bi bi-${notif.icon}" style="margin-top: 2px;"></i>
+                        <div>
+                            <strong>${notif.title}</strong><br>
+                            <small class="text-muted">${notif.message}</small><br>
+                            <small class="text-muted">${notif.created_at}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(item);
+            console.log(`  └─ Notification ${index + 1}: ${notif.title}`);
+        });
+    }
+}
+
+// Load on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM loaded - starting notification polling');
+    loadNotificationsDropdown();
+    pollTimer = setInterval(loadNotificationsDropdown, POLL_INTERVAL);
+    console.log('⏱️ Polling started every', POLL_INTERVAL/1000, 'seconds');
+});
+
+// Reload when dropdown is opened
+document.addEventListener('show.bs.dropdown', function(e) {
+    if (e.target.id === 'notification-dropdown') {
+        console.log('👁️ Dropdown opened - refreshing notifications');
+        loadNotificationsDropdown();
+    }
+});
+
+console.log('✅ Notification dropdown script loaded');
+</script>

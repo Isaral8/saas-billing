@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{% url 'renewals:list' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+                <span class="badge bg-light text-dark border">ID: {{ sub.id }}</span>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="card-title mb-0"><i class="fas fa-sync-alt me-2"></i>Process Subscription Renewal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="bg-light p-3 rounded mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block text-uppercase fw-bold">Customer</small>
+                                <span class="fs-5 fw-bold text-dark">{{ sub.customer.name }}</span>
+                                <small class="d-block text-muted">{{ sub.customer.email }}</small>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                <small class="text-muted d-block text-uppercase fw-bold">Current Plan</small>
+                                <span class="badge bg-primary text-capitalize fs-6">{{ sub.plan }}</span>
+                                <small class="d-block text-muted mt-1">Expires: {{ sub.expires_at|date:"d M Y" }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" action="" id="renewalForm">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Target Plan Level</label>
+                                <select name="plan" id="id_plan" class="form-select">
+                                    {% for choice in plan_choices %}
+                                        <option value="{{ choice }}" {% if choice == plan %}selected{% endif %}>{{ choice|title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Billing Frequency</label>
+                                <select name="billing_cycle" id="id_billing_cycle" class="form-select">
+                                    {% for value, label in cycle_choices %}
+                                        <option value="{{ value }}" {% if value == billing_cycle %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-secondary">Discounts / Adjustments (₹)</label>
+                            <input type="number" name="discount" id="id_discount" class="form-control" step="0.01" value="{{ discount }}">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-secondary">Internal Audit Notes</label>
+                            <textarea name="notes" class="form-control" rows="2" placeholder="e.g., Manual client upgrade via phone contract confirmation."></textarea>
+                        </div>
+
+                        <!-- Dynamic Invoice Preview Section -->
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3 border-bottom pb-2 text-secondary"><i class="fas fa-file-invoice me-2"></i>Invoice Breakdown Preview</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Plan Subtotal:</span>
+                                    <span class="fw-medium">₹<span id="preview_base">{{ base }}</span></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2 text-danger">
+                                    <span>Applied Discount:</span>
+                                    <span>-₹<span id="preview_discount">{{ discount }}</span></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2 text-muted small">
+                                    <span>GST (18%):</span>
+                                    <span>₹<span id="preview_gst">{{ gst }}</span></span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-dark">Total Payable Due:</span>
+                                    <span class="fs-5 fw-bold text-success">₹<span id="preview_total">{{ total }}</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2.5 fw-bold">
+                            <i class="fas fa-check-circle me-1"></i> Authorize & Renew Subscription
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const planSelect = document.getElementById('id_plan');
+        const cycleSelect = document.getElementById('id_billing_cycle');
+        const discountInput = document.getElementById('id_discount');
+
+        function updateInvoicePreview() {
+            const plan = planSelect.value;
+            const cycle = cycleSelect.value;
+            const discount = discountInput.value || '0';
+
+            fetch(`{% url "renewals:preview_api" %}?plan=${plan}&billing_cycle=${cycle}&discount=${discount}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('preview_base').textContent = parseFloat(data.base).toFixed(2);
+                    document.getElementById('preview_discount').textContent = parseFloat(discount).toFixed(2);
+                    document.getElementById('preview_gst').textContent = parseFloat(data.gst).toFixed(2);
+                    document.getElementById('preview_total').textContent = parseFloat(data.total).toFixed(2);
+                });
+        }
+
+        planSelect.addEventListener('change', updateInvoicePreview);
+        cycleSelect.addEventListener('change', updateInvoicePreview);
+        discountInput.addEventListener('input', updateInvoicePreview);
+    });
+</script>
+{% endblock %}

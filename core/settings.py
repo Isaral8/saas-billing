@@ -44,7 +44,8 @@ SHARED_APPS = (
     'django_celery_beat',
     'django_celery_results',
     'backups',
-    'billing',                      # django_tenants requires at least one app
+    'billing',
+    'renewals',                      # django_tenants requires at least one app
 
 )
 

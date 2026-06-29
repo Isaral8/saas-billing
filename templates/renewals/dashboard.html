@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Renewal Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">💳 Renewal Dashboard</h1>
+        <div>
+            <a href="{% url 'renewals:list' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-list"></i> View All
+            </a>
+            <a href="{% url 'renewals:reports' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-primary shadow h-100">
+                <div class="card-body">
+                    <div class="text-primary text-uppercase small font-weight-bold">Active Plans</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ stats.total_active }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-danger shadow h-100">
+                <div class="card-body">
+                    <div class="text-danger text-uppercase small font-weight-bold">Expiring Today</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ stats.expiring_today }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-warning shadow h-100">
+                <div class="card-body">
+                    <div class="text-warning text-uppercase small font-weight-bold">Expiring This Week</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ stats.expiring_week }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-info shadow h-100">
+                <div class="card-body">
+                    <div class="text-info text-uppercase small font-weight-bold">Renewed This Month</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ stats.renewed_this_month }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h6 class="m-0 font-weight-bold">💰 Revenue (This Month)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="h2 mb-0">₹{{ stats.revenue_this_month }}</div>
+                    <small class="text-muted">From {{ stats.renewed_this_month }} renewals</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">📈 All-Time Revenue</h6>
+                </div>
+                <div class="card-body">
+                    <div class="h2 mb-0">₹{{ stats.revenue_all_time }}</div>
+                    <small class="text-muted">Total renewals: {{ stats.total_renewals }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiry Buckets -->
+    <div class="row">
+        {% if buckets.expiring_today %}
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow border-left-danger">
+                <div class="card-header bg-light">
+                    <h6 class="m-0 font-weight-bold text-danger">
+                        🔴 Expiring Today ({{ buckets.expiring_today|length }})
+                    </h6>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    {% for sub in buckets.expiring_today %}
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ sub.customer.name|default:sub.user.email }}</h6>
+                                <small class="text-muted">
+                                    <strong>{{ sub.plan|title }}</strong> • {{ sub.billing_cycle|title }}
+                                </small>
+                                <br>
+                                <small class="text-danger"><strong>Expires: {{ sub.expires_at|date:"d M Y" }}</strong></small>
+                            </div>
+                            <a href="{% url 'renewals:renew' sub.id %}" class="btn btn-sm btn-danger">
+                                Renew Now
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if buckets.expiring_week %}
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow border-left-warning">
+                <div class="card-header bg-light">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        🟡 Expiring This Week ({{ buckets.expiring_week|length }})
+                    </h6>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    {% for sub in buckets.expiring_week %}
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ sub.customer.name|default:sub.user.email }}</h6>
+                                <small class="text-muted">
+                                    <strong>{{ sub.plan|title }}</strong> • {{ sub.billing_cycle|title }}
+                                </small>
+                                <br>
+                                <small class="text-warning"><strong>Expires: {{ sub.expires_at|date:"d M Y" }}</strong></small>
+                            </div>
+                            <a href="{% url 'renewals:renew' sub.id %}" class="btn btn-sm btn-warning">
+                                Renew
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if buckets.grace_period %}
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow border-left-info">
+                <div class="card-header bg-light">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        🔵 In Grace Period ({{ buckets.grace_period|length }})
+                    </h6>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    {% for sub in buckets.grace_period %}
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ sub.customer.name|default:sub.user.email }}</h6>
+                                <small class="text-muted">
+                                    <strong>{{ sub.plan|title }}</strong> • {{ sub.billing_cycle|title }}
+                                </small>
+                                <br>
+                                <small class="text-info"><strong>Grace Until: {{ sub.expires_at|date:"d M Y" }}</strong></small>
+                            </div>
+                            <a href="{% url 'renewals:renew' sub.id %}" class="btn btn-sm btn-info">
+                                Renew
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if buckets.expired %}
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow border-left-dark">
+                <div class="card-header bg-light">
+                    <h6 class="m-0 font-weight-bold text-dark">
+                        ⚫ Expired ({{ buckets.expired|length }})
+                    </h6>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    {% for sub in buckets.expired %}
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ sub.customer.name|default:sub.user.email }}</h6>
+                                <small class="text-muted">
+                                    <strong>{{ sub.plan|title }}</strong> • {{ sub.billing_cycle|title }}
+                                </small>
+                                <br>
+                                <small class="text-dark"><strong>Expired: {{ sub.expires_at|date:"d M Y" }}</strong></small>
+                            </div>
+                            <a href="{% url 'renewals:renew' sub.id %}" class="btn btn-sm btn-dark">
+                                Renew
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Renewals -->
+    {% if recent %}
+    <div class="card shadow mt-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">📋 Recent Renewals</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Customer</th>
+                        <th>Plan</th>
+                        <th>Billing Cycle</th>
+                        <th>Amount</th>
+                        <th>Renewed On</th>
+                        <th>Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for renewal in recent %}
+                    <tr>
+                        <td><strong>{{ renewal.customer.name|default:renewal.user.email }}</strong></td>
+                        <td><span class="badge bg-success">{{ renewal.plan|title }}</span></td>
+                        <td>{{ renewal.billing_cycle|title }}</td>
+                        <td><strong>₹{{ renewal.total_amount }}</strong></td>
+                        <td>{{ renewal.renewed_on|date:"d M Y, h:i A" }}</td>
+                        <td>
+                            {% if renewal.invoice %}
+                            <a href="{% url 'invoices:detail' renewal.invoice.id %}" class="btn btn-sm btn-outline-primary">
+                                #{{ renewal.invoice.invoice_number }}
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.border-left-primary { border-left: 4px solid #007bff !important; }
+.border-left-danger { border-left: 4px solid #dc3545 !important; }
+.border-left-warning { border-left: 4px solid #ffc107 !important; }
+.border-left-info { border-left: 4px solid #17a2b8 !important; }
+.border-left-success { border-left: 4px solid #28a745 !important; }
+.border-left-dark { border-left: 4px solid #343a40 !important; }
+</style>
+{% endblock %}
