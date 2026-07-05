@@ -46,6 +46,7 @@
   .invoice-actions {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .btn {
@@ -80,6 +81,15 @@
 
   .btn-secondary:hover {
     background: #f3f4f6;
+  }
+
+  .btn-success {
+    background: #059669;
+    color: #fff;
+  }
+
+  .btn-success:hover {
+    background: #047857;
   }
 
   .invoice-info-grid {
@@ -140,6 +150,21 @@
   .status-paid {
     background: #DCFCE7;
     color: #166534;
+  }
+
+  .status-overdue {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  .status-draft {
+    background: #F3F4F6;
+    color: #4B5563;
+  }
+
+  .status-cancelled {
+    background: #F3F4F6;
+    color: #6B7280;
   }
 
   /* Items Table */
@@ -380,10 +405,18 @@
         <p>Created on {{ invoice.issued_date|date:"d M Y" }} | Due {{ invoice.due_date|date:"d M Y" }}</p>
       </div>
       <div class="invoice-actions">
-        <a href="{% url 'accounts:download_invoice' invoice.id %}" class="btn btn-primary">
+        {% if invoice.status != 'paid' %}
+        <form method="POST" action="{% url 'accounts:mark_invoice_paid' pk=invoice.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success" onclick="return confirm('Mark this invoice as paid?')">
+            <i class="fa-solid fa-check"></i> Mark as Paid
+          </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'accounts:invoice_pdf' invoice.id %}" class="btn btn-primary">
           <i class="fa-solid fa-download"></i> Download PDF
         </a>
-        <a href="{% url 'accounts:email_invoice' invoice.id %}" class="btn btn-primary">
+        <a href="{% url 'accounts:email_invoice' invoice.id %}" class="btn btn-primary" onclick="return confirm('Send invoice to {{ invoice.customer.email }}?')">
           <i class="fa-solid fa-envelope"></i> Send Email
         </a>
         <a href="{% url 'accounts:invoices' %}" class="btn btn-secondary">
@@ -405,15 +438,19 @@
       </div>
       <div class="customer-info-item">
         <div class="customer-info-label">Company</div>
-        <div class="customer-info-value">{{ invoice.customer.company_name }}</div>
+        <div class="customer-info-value">{{ invoice.customer.company|default:"—" }}</div>
       </div>
       <div class="customer-info-item">
         <div class="customer-info-label">Status</div>
         <div class="customer-info-value">
-          {% if invoice.status == 'Draft' %}
-            <span class="status-badge status-pending">Draft</span>
-          {% elif invoice.status == 'Sent' %}
-            <span class="status-badge status-partial">Sent</span>
+          {% if invoice.status == 'draft' %}
+            <span class="status-badge status-draft">Draft</span>
+          {% elif invoice.status == 'issued' or invoice.status == 'pending' %}
+            <span class="status-badge status-pending">{{ invoice.get_status_display }}</span>
+          {% elif invoice.status == 'overdue' %}
+            <span class="status-badge status-overdue">Overdue</span>
+          {% elif invoice.status == 'cancelled' %}
+            <span class="status-badge status-cancelled">Cancelled</span>
           {% else %}
             <span class="status-badge status-paid">Paid</span>
           {% endif %}
@@ -488,7 +525,7 @@
                   <td>{{ item.gst_rate|floatformat:1 }}%</td>
                   <td class="amount-cell">₹{{ item.line_total|floatformat:2 }}</td>
                   <td class="amount-cell" style="color: #059669;">₹{{ item.amount_paid|floatformat:2 }}</td>
-                  <td class="amount-cell" style="color: #E24B4A;">₹{{ item.amount_pending|floatformat:2 }}</td>
+                  <td class="amount-cell" style="color: #E24B4A;">₹{{ item.get_outstanding_amount|floatformat:2 }}</td>
                   <td class="status-cell">
                     {% if item.payment_status == 'paid' %}
                       <span class="status-badge status-paid">✓ Paid</span>

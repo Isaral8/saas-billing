@@ -362,9 +362,9 @@
         return sortDir * av.localeCompare(bv);
       }
       // inv number
-      av = a.querySelector('td span').textContent;
-      bv = b.querySelector('td span').textContent;
-      return sortDir * av.localeCompare(bv);
+av = a.querySelector('td a').textContent.trim();
+bv = b.querySelector('td a').textContent.trim();
+return sortDir * av.localeCompare(bv);
     });
 
     rows.forEach(r => tbody.appendChild(r));

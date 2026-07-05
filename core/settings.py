@@ -1,5 +1,7 @@
 ﻿from pathlib import Path
+from celery.schedules import crontab
 from decouple import config, UndefinedValueError
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -62,7 +64,7 @@ SITE_ID = 1
 # MIDDLEWARE
 # ===================================
 MIDDLEWARE = [
-    'django_tenants.middleware.main.TenantMainMiddleware',  # must be first
+    # 'django_tenants.middleware.main.TenantMainMiddleware',  # Disabled for local dev
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -265,7 +267,7 @@ if not DEBUG:
 # ===================================
 # CELERY CONFIGURATION
 # ===================================
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -275,3 +277,22 @@ CELERY_TIMEZONE = 'Asia/Kolkata'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULE = {
+    'send-payment-reminders': {
+        'task': 'accounts.tasks.send_payment_reminders',
+        'schedule': crontab(hour=9, minute=0),  # every day at 9 AM
+    },
+    'mark-overdue-invoices': {
+        'task': 'accounts.tasks.mark_overdue_invoices_as_pending',
+        'schedule': crontab(hour=0, minute=0),  # every day at midnight
+    },
+    'process-renewal-invoices': {
+        'task': 'accounts.tasks.process_renewal_invoices',
+        'schedule': crontab(hour=1, minute=0),  # every day at 1 AM
+    },
+    'send-renewal-reminders': {
+        'task': 'accounts.tasks.send_renewal_reminders',
+        'schedule': crontab(hour=8, minute=0),  # every day at 8 AM
+    },
+}

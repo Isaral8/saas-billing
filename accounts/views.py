@@ -29,7 +29,7 @@ from accounts.emails import (
 from django.db import transaction
 from accounts.forms import InvoiceForm, InvoiceItemFormSet, ProductForm
 from django.db import models
-
+from dateutil.relativedelta import relativedelta
 
 # ============================================================
 # LOGO HELPER
@@ -246,8 +246,27 @@ def dashboard_view(request):
         total_revenue=Coalesce(
             Sum('invoice__total', filter=Q(invoice__user=user, invoice__status='paid')),
             Decimal('0.00')
-        )
+        ),
+        total_invoices=Count('invoice', filter=Q(invoice__user=user)),
     ).filter(total_revenue__gt=0).order_by('-total_revenue')[:10]
+    # ── Feature 4: Chart-ready datasets ─────────────────────────
+    revenue_by_month = []
+    month_cursor = start_of_this_month.date().replace(day=1)
+    months = [month_cursor - relativedelta(months=i) for i in range(11, -1, -1)]
+
+    for month_start in months:
+        month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
+        month_revenue = invoices.filter(
+            status='paid',
+            issued_date__gte=month_start,
+            issued_date__lte=month_end,
+        ).aggregate(Sum('total'))['total__sum'] or Decimal('0.00')
+        revenue_by_month.append({
+            'month': month_start.strftime('%b %Y'),
+            'revenue': float(month_revenue),
+        })
+
+    status_breakdown = list(invoices.values('status').annotate(count=Count('id')))
 
     context = {
         'page_title': 'Dashboard',
@@ -283,6 +302,8 @@ def dashboard_view(request):
         'recent_invoices':  recent_invoices,
         'recent_tickets':   recent_tickets,
         'top_customers':    top_customers_data,
+        'revenue_by_month_json':  json.dumps(revenue_by_month),
+        'status_breakdown_json':  json.dumps(status_breakdown),
     }
     return render(request, 'accounts/dashboard.html', context)
 
@@ -380,7 +401,7 @@ def create_invoice(request):
 
 @login_required
 def invoice_detail(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk, user=request.user)
+    invoice = get_object_or_404(Invoice, id=pk, user=request.user)
     items   = invoice.items.all()
 
     total_paid    = Decimal('0.00')
@@ -446,13 +467,13 @@ def invoices_list(request):
 
 
 @login_required(login_url='accounts:login')
-def update_invoice(request, invoice_id):
+def update_invoice(request, pk):
     if not (request.user.is_staff or request.user.is_superuser):
         messages.error(request, "You don't have permission to edit invoices.")
         return redirect('accounts:invoices')
 
     try:
-        invoice = Invoice.objects.get(id=invoice_id, user=request.user)
+        invoice = Invoice.objects.get(id=pk, user=request.user)
     except Invoice.DoesNotExist:
         messages.error(request, 'Invoice not found.')
         return redirect('accounts:invoices')
@@ -517,13 +538,13 @@ def update_invoice(request, invoice_id):
 
 
 @login_required(login_url='accounts:login')
-def delete_invoice(request, invoice_id):
+def delete_invoice(request, pk):
     if request.method == 'POST':
         if not (request.user.is_staff or request.user.is_superuser):
             messages.error(request, "You don't have permission to delete invoices.")
             return redirect('accounts:invoices')
         try:
-            invoice = Invoice.objects.get(id=invoice_id, user=request.user)
+            invoice = Invoice.objects.get(id=pk, user=request.user)
             if invoice.status != 'draft':
                 messages.error(request, f'Cannot delete {invoice.status} invoices. Only draft invoices can be deleted.')
                 return redirect('accounts:invoices')
@@ -535,6 +556,28 @@ def delete_invoice(request, invoice_id):
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
     return redirect('accounts:invoices')
+
+
+@login_required(login_url='accounts:login')
+@require_http_methods(["POST"])
+def mark_invoice_paid(request, pk):
+    """Mark invoice as paid"""
+    invoice = get_object_or_404(Invoice, id=pk, user=request.user)
+
+    if invoice.status != 'paid':
+        invoice.status = 'paid'
+        invoice.save()
+
+        try:
+            send_payment_confirmation_email(invoice)
+        except Exception:
+            pass
+
+        messages.success(request, f"Invoice {invoice.invoice_number} marked as paid!")
+    else:
+        messages.info(request, f"Invoice {invoice.invoice_number} is already marked as paid.")
+
+    return redirect('accounts:invoice_detail', pk=invoice.id)
 
 
 # ============================================================
@@ -830,9 +873,9 @@ def _build_invoice_pdf_buffer(invoice, user):
 
 
 @login_required(login_url='accounts:login')
-def email_invoice(request, invoice_id):
+def email_invoice(request, pk):
     try:
-        invoice = Invoice.objects.get(id=invoice_id, user=request.user)
+        invoice = Invoice.objects.get(id=pk, user=request.user)
     except Invoice.DoesNotExist:
         messages.error(request, 'Invoice not found.')
         return redirect('accounts:invoices')
@@ -891,9 +934,9 @@ def email_invoice(request, invoice_id):
 
 
 @login_required(login_url='accounts:login')
-def generate_invoice_pdf(request, invoice_id):
+def generate_invoice_pdf(request, pk):
     try:
-        invoice = Invoice.objects.get(id=invoice_id, user=request.user)
+        invoice = Invoice.objects.get(id=pk, user=request.user)
     except Invoice.DoesNotExist:
         messages.error(request, 'Invoice not found.')
         return redirect('accounts:invoices')
@@ -1163,6 +1206,8 @@ def create_ticket(request):
 
 @login_required(login_url='accounts:login')
 def ticket_detail_view(request, ticket_id):
+    from billing.models import TicketReply  # ✅ correct location — TicketReply lives in billing.models, not accounts.models
+
     try:
         ticket = SupportTicket.objects.get(id=ticket_id, user=request.user)
     except SupportTicket.DoesNotExist:
@@ -1175,17 +1220,19 @@ def ticket_detail_view(request, ticket_id):
         action = request.POST.get('action', '').strip()
 
         if action == 'add_reply':
-            message_text    = request.POST.get('message', '').strip()
-            resolution_note = request.POST.get('resolution_note', '').strip()
-            new_status      = request.POST.get('status', ticket.status).strip()
+            message_text = request.POST.get('message', '').strip()
+            new_status   = request.POST.get('status', ticket.status).strip()
             if not message_text:
                 messages.error(request, 'Reply message cannot be empty.')
                 return redirect('accounts:ticket_detail', ticket_id=ticket_id)
-            from accounts.models import TicketReply
+
             TicketReply.objects.create(
-                ticket=ticket, user=request.user, message=message_text,
-                resolution_note=resolution_note, is_staff_reply=request.user.is_staff,
-            )
+                ticket=ticket,
+                user=request.user,
+                message=message_text,
+                is_staff_reply=request.user.is_staff,
+            )  # ✅ removed resolution_note — TicketReply has no such field, and no form field ever sent one
+
             if new_status in ['open', 'in_progress', 'resolved', 'closed']:
                 ticket.status = new_status
             ticket.save()
@@ -1946,3 +1993,110 @@ def product_detail_json(request, pk):
     except Product.DoesNotExist:
         data = {'success': False, 'error': 'Product not found'}
     return JsonResponse(data)
+
+# ============================================================
+# CSV BULK IMPORT
+# ============================================================
+
+@login_required(login_url='accounts:login')
+def import_customers_csv(request):
+    """Import customers from CSV"""
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        import csv
+        csv_file = request.FILES['csv_file']
+
+        errors = []
+        created_count = 0
+
+        try:
+            decoded_file = csv_file.read().decode('utf-8-sig').splitlines()
+            reader = csv.DictReader(decoded_file)
+
+            required_fields = ['name', 'email']
+
+            for row_num, row in enumerate(reader, 2):
+                try:
+                    if not all((row.get(field) or '').strip() for field in required_fields):
+                        errors.append(f"Row {row_num}: Missing required fields (name, email)")
+                        continue
+
+                    customer, created = Customer.objects.get_or_create(
+                        user=request.user,
+                        email=row['email'].strip(),
+                        defaults={
+                            'name':    row.get('name', '').strip(),
+                            'phone':   row.get('phone', '').strip(),
+                            'company': row.get('company', '').strip(),
+                            'address': row.get('address', '').strip(),
+                            'state':   row.get('state', '').strip(),
+                            'gstin':   row.get('gstin', '').strip(),
+                        }
+                    )
+
+                    if created:
+                        created_count += 1
+
+                except Exception as e:
+                    errors.append(f"Row {row_num}: {str(e)}")
+
+            if created_count > 0:
+                messages.success(request, f"Imported {created_count} customers successfully!")
+            if errors:
+                messages.warning(request, f"{len(errors)} row(s) had errors: " + "; ".join(errors[:5]))
+
+        except Exception as e:
+            messages.error(request, f"Error reading CSV file: {str(e)}")
+
+        return redirect('accounts:customer_list')
+
+    return render(request, 'accounts/import_csv.html', {'import_type': 'customers'})
+
+
+@login_required(login_url='accounts:login')
+def import_products_csv(request):
+    """Import products from CSV"""
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        import csv
+        csv_file = request.FILES['csv_file']
+
+        errors = []
+        created_count = 0
+
+        try:
+            decoded_file = csv_file.read().decode('utf-8-sig').splitlines()
+            reader = csv.DictReader(decoded_file)
+
+            for row_num, row in enumerate(reader, 2):
+                try:
+                    if not row.get('name', '').strip() or not row.get('sku', '').strip():
+                        errors.append(f"Row {row_num}: Missing name or SKU")
+                        continue
+
+                    product, created = Product.objects.get_or_create(
+                        user=request.user,
+                        sku=row['sku'].strip(),
+                        defaults={
+                            'name':          row['name'].strip(),
+                            'price':         Decimal(row.get('price', '0') or '0'),
+                            'current_stock': int(row.get('current_stock', 0) or 0),
+                            'description':   row.get('description', '').strip(),
+                        }
+                    )
+
+                    if created:
+                        created_count += 1
+
+                except Exception as e:
+                    errors.append(f"Row {row_num}: {str(e)}")
+
+            if created_count > 0:
+                messages.success(request, f"Imported {created_count} products successfully!")
+            if errors:
+                messages.warning(request, f"{len(errors)} row(s) had errors: " + "; ".join(errors[:5]))
+
+        except Exception as e:
+            messages.error(request, f"Error reading CSV file: {str(e)}")
+
+        return redirect('accounts:product_list')
+
+    return render(request, 'accounts/import_csv.html', {'import_type': 'products'})

@@ -1,230 +1,523 @@
-{% extends "base.html" %}
-{% block title %}Products{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products — iSaral{% endblock %}
 {% block page_title %}Products{% endblock %}
+
 {% block content %}
-<div style="background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); min-height: 100vh; padding: 30px 20px;">
-  <div style="max-width: 1400px; margin: 0 auto;">
 
-    <!-- Header Section -->
-    <div style="margin-bottom: 40px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-        <div>
-          <h1 style="font-size: 32px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0;">Products</h1>
-          <p style="color: #666; font-size: 15px; margin: 0;">Manage your product catalog efficiently</p>
+<style>
+  .prod-page {
+    padding: 1.75rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .prod-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .prod-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .prod-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .prod-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 0;
+  }
+
+  .prod-btn-primary {
+    height: 38px;
+    padding: 0 18px;
+    background: #185FA5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .12s;
+  }
+
+  .prod-btn-primary:hover {
+    background: #0C447C;
+  }
+
+  .prod-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .prod-stat-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .prod-stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: #185FA5;
+    margin: 0;
+  }
+
+  .prod-stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 4px 0 0;
+  }
+
+  .prod-search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.75rem;
+  }
+
+  .prod-search-bar input {
+    flex: 1;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fff;
+  }
+
+  .prod-search-bar input:focus {
+    border-color: #378ADD;
+    box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+    outline: none;
+  }
+
+  .prod-search-btn {
+    height: 38px;
+    padding: 0 16px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+
+  .prod-search-btn:hover {
+    background: #e5e7eb;
+  }
+
+  .prod-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .prod-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .prod-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .prod-table thead {
+    background: #f8fafd;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .prod-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .prod-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #111827;
+  }
+
+  .prod-table tbody tr:hover {
+    background: #f9fafb;
+  }
+
+  .prod-name {
+    font-weight: 600;
+    color: #185FA5;
+  }
+
+  .prod-description {
+    font-size: 12px;
+    color: #6b7280;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .prod-price {
+    font-weight: 600;
+    color: #059669;
+  }
+
+  .prod-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .prod-badge-active {
+    background: #ECFDF5;
+    color: #047857;
+  }
+
+  .prod-badge-inactive {
+    background: #F3F4F6;
+    color: #6B7280;
+  }
+
+  .prod-badge-hsn {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  .prod-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .prod-action-btn {
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .12s;
+    color: #374151;
+  }
+
+  .prod-action-btn:hover {
+    background: #f3f4f6;
+  }
+
+  .prod-action-btn-delete {
+    border-color: #fca5a5;
+    background: #FEF2F2;
+    color: #A32D2D;
+  }
+
+  .prod-action-btn-delete:hover {
+    background: #FFEBEE;
+  }
+
+  .prod-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .prod-empty-icon {
+    font-size: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .prod-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+  }
+
+  .prod-empty-text {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 1rem;
+  }
+
+  .prod-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 1rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .prod-pagination a,
+  .prod-pagination span {
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .prod-pagination a {
+    background: #fff;
+    color: #374151;
+    transition: all .12s;
+  }
+
+  .prod-pagination a:hover {
+    background: #f3f4f6;
+  }
+
+  .prod-pagination .current {
+    background: #185FA5;
+    color: #fff;
+    border-color: #185FA5;
+  }
+
+  .alerts-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .alert-success {
+    background: #ECFDF5;
+    color: #047857;
+    border: 1px solid #D1FAE5;
+  }
+
+  .alert-danger {
+    background: #FEF2F2;
+    color: #A32D2D;
+    border: 1px solid #FCA5A5;
+  }
+
+  @media (max-width: 768px) {
+    .prod-page {
+      padding: 1rem;
+    }
+    .prod-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .prod-stats {
+      grid-template-columns: 1fr;
+    }
+    .prod-search-bar {
+      flex-direction: column;
+    }
+    .prod-table {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="prod-page">
+
+  <!-- Header -->
+  <div class="prod-header">
+    <div class="prod-header-left">
+      <div>
+        <h1>Products</h1>
+        <p>Manage your product/service master list</p>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <a href="{% url 'accounts:import_products_csv' %}" class="prod-btn-primary" style="background:#0EA5E9;">
+        <i class="fa-solid fa-upload"></i> Import CSV
+      </a>
+      <a href="{% url 'accounts:product_add' %}" class="prod-btn-primary">
+        <i class="fa-solid fa-plus"></i> Add Product
+      </a>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  {% if messages %}
+    <div class="alerts-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+          <button type="button" onclick="this.parentElement.style.display='none';" style="float:right; background:none; border:none; cursor:pointer; font-size:16px;">&times;</button>
         </div>
-        <a href="{% url 'accounts:product_add' %}" 
-           style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0066cc 0%, #004499 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3); transition: all 0.3s; border: none; cursor: pointer;">
-          <i class="bi bi-plus-lg"></i> Add Product
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Stats -->
+  <div class="prod-stats">
+    <div class="prod-stat-card">
+      <p class="prod-stat-value">{{ total_products }}</p>
+      <p class="prod-stat-label">Total Products</p>
+    </div>
+    <div class="prod-stat-card">
+      <p class="prod-stat-value" style="color: #059669;">{{ active_products }}</p>
+      <p class="prod-stat-label">Active</p>
+    </div>
+    <div class="prod-stat-card">
+      <p class="prod-stat-value" style="color: #6b7280;">{{ total_products|add:"-"|add:active_products }}</p>
+      <p class="prod-stat-label">Inactive</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="prod-search-bar">
+    <form method="GET" style="display: flex; gap: 8px; flex: 1;">
+      <input type="text" name="search" placeholder="Search by name, description, or HSN/SAC..."
+             value="{{ search_query }}" style="flex: 1;">
+      <button type="submit" class="prod-search-btn">
+        <i class="fa-solid fa-search"></i> Search
+      </button>
+      {% if search_query %}
+        <a href="{% url 'accounts:product_list' %}" class="prod-search-btn" style="text-decoration:none;">
+          <i class="fa-solid fa-xmark"></i> Clear
         </a>
-      </div>
+      {% endif %}
+    </form>
+  </div>
 
-      <!-- Stats Cards -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-        <!-- Total Products -->
-        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #0066cc;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Products</div>
-              <div style="font-size: 32px; font-weight: 700; color: #0066cc;">{{ stats.total }}</div>
-            </div>
-            <div style="font-size: 40px; color: #e8f1ff;">📦</div>
-          </div>
-        </div>
-
-        <!-- Active Products -->
-        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #28a745;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Active</div>
-              <div style="font-size: 32px; font-weight: 700; color: #28a745;">{{ stats.active }}</div>
-            </div>
-            <div style="font-size: 40px; color: #e8f8f0;">✓</div>
-          </div>
-        </div>
-
-        <!-- Low Stock -->
-        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #ffc107;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Low Stock</div>
-              <div style="font-size: 32px; font-weight: 700; color: #ffc107;">{{ stats.low_stock }}</div>
-            </div>
-            <div style="font-size: 40px; color: #fffaf0;">⚠️</div>
-          </div>
-        </div>
-
-        <!-- Out of Stock -->
-        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border: 1px solid #f0f0f0; border-left: 4px solid #dc3545;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="color: #999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Out of Stock</div>
-              <div style="font-size: 32px; font-weight: 700; color: #dc3545;">{{ stats.out_of_stock }}</div>
-            </div>
-            <div style="font-size: 40px; color: #ffe8e8;">✕</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Search & Filter Section -->
-    <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; border: 1px solid #f0f0f0;">
-      <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0 0 20px 0;">Filter Products</h3>
-      <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-        <div>
-          <input type="text" name="q" value="{{ q }}" 
-                 style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; transition: all 0.3s;" 
-                 placeholder="Search by name or SKU..." 
-                 onfocus="this.style.borderColor='#0066cc'; this.style.boxShadow='0 0 0 3px rgba(0,102,204,0.1)';"
-                 onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';" />
-        </div>
-        <div>
-          <select name="status" 
-                  style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; background: white; cursor: pointer; transition: all 0.3s;">
-            <option value="">All Status</option>
-            <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active Only</option>
-            <option value="inactive" {% if selected_status == "inactive" %}selected{% endif %}>Inactive Only</option>
-            <option value="low_stock" {% if selected_status == "low_stock" %}selected{% endif %}>Low Stock</option>
-            <option value="out_of_stock" {% if selected_status == "out_of_stock" %}selected{% endif %}>Out of Stock</option>
-          </select>
-        </div>
-        <div>
-          <select name="sort" 
-                  style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; background: white; cursor: pointer; transition: all 0.3s;">
-            <option value="name" {% if sort == "name" %}selected{% endif %}>Name (A-Z)</option>
-            <option value="-name" {% if sort == "-name" %}selected{% endif %}>Name (Z-A)</option>
-            <option value="-price" {% if sort == "-price" %}selected{% endif %}>Price (High-Low)</option>
-            <option value="price" {% if sort == "price" %}selected{% endif %}>Price (Low-High)</option>
-            <option value="-current_stock" {% if sort == "-current_stock" %}selected{% endif %}>Stock (High-Low)</option>
-            <option value="current_stock" {% if sort == "current_stock" %}selected{% endif %}>Stock (Low-High)</option>
-          </select>
-        </div>
-        <button type="submit" 
-                style="background: linear-gradient(135deg, #0066cc 0%, #004499 100%); color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,102,204,0.2);">
-          <i class="bi bi-funnel"></i> Filter
-        </button>
-      </form>
-    </div>
-
-    <!-- Products Table -->
-    {% if page_obj %}
-    <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+  <!-- Products Table -->
+  {% if products %}
+    <div class="prod-card">
+      <div class="prod-table-wrapper">
+        <table class="prod-table">
           <thead>
-            <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%); border-bottom: 2px solid #e9ecef;">
-              <th style="padding: 16px 20px; text-align: left; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Product Name</th>
-              <th style="padding: 16px 20px; text-align: left; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">SKU</th>
-              <th style="padding: 16px 20px; text-align: right; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Price</th>
-              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">GST %</th>
-              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Stock</th>
-              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
-              <th style="padding: 16px 20px; text-align: center; font-weight: 600; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Actions</th>
+            <tr>
+              <th>Product Name</th>
+              <th>Description</th>
+              <th>HSN/SAC</th>
+              <th>Price (₹)</th>
+              <th>GST Rate</th>
+              <th>Status</th>
+              <th style="text-align: center;">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {% for product in page_obj %}
-            <tr style="border-bottom: 1px solid #f0f0f0; transition: all 0.3s; background: white;"
-                onmouseover="this.style.background='#f8f9fa'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.04)';"
-                onmouseout="this.style.background='white'; this.style.boxShadow='none';">
-              <td style="padding: 16px 20px;">
-                <div style="font-weight: 600; color: #1a1a1a; font-size: 14px;">{{ product.name }}</div>
-                {% if product.brand %}<div style="color: #999; font-size: 12px; margin-top: 4px;">{{ product.brand }}</div>{% endif %}
-              </td>
-              <td style="padding: 16px 20px;">
-                <code style="background: #f0f2f5; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #0066cc;">{{ product.sku|default:"-" }}</code>
-              </td>
-              <td style="padding: 16px 20px; text-align: right; font-weight: 600; color: #0066cc; font-size: 14px;">₹{{ product.price|floatformat:2 }}</td>
-              <td style="padding: 16px 20px; text-align: center;">
-                <span style="background: #f0f2f5; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #0066cc;">{{ product.gst_rate }}%</span>
-              </td>
-              <td style="padding: 16px 20px; text-align: center;">
-                {% if product.current_stock <= 0 %}
-                  <span style="background: #ffe8e8; color: #dc3545; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Out (0)</span>
-                {% elif product.current_stock <= product.min_stock %}
-                  <span style="background: #fff3cd; color: #856404; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">{{ product.current_stock }}</span>
-                {% else %}
-                  <span style="background: #e8f8f0; color: #28a745; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">{{ product.current_stock }}</span>
-                {% endif %}
-              </td>
-              <td style="padding: 16px 20px; text-align: center;">
-                {% if product.is_active %}
-                  <span style="background: #e8f8f0; color: #28a745; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Active</span>
-                {% else %}
-                  <span style="background: #f0f2f5; color: #666; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Inactive</span>
-                {% endif %}
-              </td>
-              <td style="padding: 16px 20px; text-align: center;">
-                <div style="display: flex; gap: 8px; justify-content: center;">
-                  <a href="{% url 'accounts:product_edit' product.pk %}" 
-                     style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #ddd; border-radius: 6px; background: white; color: #0066cc; text-decoration: none; transition: all 0.3s; font-size: 14px; cursor: pointer;"
-                     onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
-                     onmouseout="this.style.background='white'; this.style.borderColor='#ddd';"
-                     title="Edit">
-                    <i class="bi bi-pencil"></i>
-                  </a>
-                  <a href="{% url 'accounts:product_delete' product.pk %}" 
-                     style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #ddd; border-radius: 6px; background: white; color: #dc3545; text-decoration: none; transition: all 0.3s; font-size: 14px; cursor: pointer;"
-                     onmouseover="this.style.background='#ffe8e8'; this.style.borderColor='#dc3545';"
-                     onmouseout="this.style.background='white'; this.style.borderColor='#ddd';"
-                     onclick="return confirm('Are you sure you want to delete {{ product.name|escapejs }}?');"
-                     title="Delete">
-                    <i class="bi bi-trash"></i>
-                  </a>
-                </div>
-              </td>
-            </tr>
+            {% for product in products %}
+              <tr>
+                <td>
+                  <div class="prod-name">{{ product.name }}</div>
+                </td>
+                <td>
+                  <div class="prod-description">{{ product.description|default:"—" }}</div>
+                </td>
+                <td>
+                  {% if product.hsn_sac %}
+                    <span class="prod-badge prod-badge-hsn">{{ product.hsn_sac }}</span>
+                  {% else %}
+                    <span style="color: #9ca3af;">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="prod-price">₹{{ product.price|floatformat:2 }}</span>
+                </td>
+                <td>
+                  <span>{{ product.gst_rate|floatformat:2 }}%</span>
+                </td>
+                <td>
+                  {% if product.is_active %}
+                    <span class="prod-badge prod-badge-active">✓ Active</span>
+                  {% else %}
+                    <span class="prod-badge prod-badge-inactive">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="prod-actions" style="justify-content: center;">
+                    <a href="{% url 'accounts:product_edit' product.id %}" class="prod-action-btn">
+                      <i class="fa-solid fa-pencil"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'accounts:product_delete' product.id %}"
+                          style="display:inline;" onsubmit="return confirm('Delete this product?');">
+                      {% csrf_token %}
+                      <button type="submit" class="prod-action-btn prod-action-btn-delete">
+                        <i class="fa-solid fa-trash"></i> Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-    </div>
 
-    <!-- Pagination -->
-    {% if page_obj.has_other_pages %}
-    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px;">
-      <nav style="display: flex; gap: 4px; align-items: center;">
-        {% if page_obj.has_previous %}
-        <a href="?page=1&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
-           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
-           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">First</a>
-        <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
-           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
-           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">←</a>
-        {% endif %}
-        
-        <span style="padding: 8px 16px; background: white; border: 1px solid #0066cc; border-radius: 6px; color: #0066cc; font-weight: 600; font-size: 12px;">
-          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-        </span>
-        
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
-           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
-           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">→</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}&q={{ q }}&status={{ selected_status }}&sort={{ sort }}" 
-           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #0066cc; font-weight: 600; font-size: 12px; transition: all 0.3s;"
-           onmouseover="this.style.background='#e8f1ff'; this.style.borderColor='#0066cc';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#ddd';">Last</a>
-        {% endif %}
-      </nav>
-    </div>
-    {% endif %}
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+        <div class="prod-pagination">
+          {% if page_obj.has_previous %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">« First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">‹ Prev</a>
+          {% endif %}
 
-    {% else %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <span class="current">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last »</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
     <!-- Empty State -->
-    <div style="background: white; border-radius: 12px; padding: 60px 40px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;">
-      <div style="font-size: 80px; margin-bottom: 20px; opacity: 0.6;">📦</div>
-      <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 10px 0;">No Products Yet</h2>
-      <p style="color: #999; font-size: 15px; margin: 0 0 30px 0; max-width: 400px; margin-left: auto; margin-right: auto;">Start by adding your first product to your catalog. Products help you create invoices faster and maintain consistent pricing.</p>
-      <a href="{% url 'accounts:product_add' %}" 
-         style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0066cc 0%, #004499 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3); transition: all 0.3s; border: none; cursor: pointer;">
-        <i class="bi bi-plus-lg"></i> Create First Product
-      </a>
+    <div class="prod-card">
+      <div class="prod-empty">
+        <div class="prod-empty-icon">📦</div>
+        <p class="prod-empty-title">No products found</p>
+        <p class="prod-empty-text">
+          {% if search_query %}
+            No products match your search. Try different keywords.
+          {% else %}
+            Start by creating your first product to use in invoices.
+          {% endif %}
+        </p>
+        <a href="{% url 'accounts:product_add' %}" class="prod-btn-primary">
+          <i class="fa-solid fa-plus"></i> Create First Product
+        </a>
+      </div>
     </div>
-    {% endif %}
+  {% endif %}
 
-  </div>
 </div>
+
 {% endblock %}

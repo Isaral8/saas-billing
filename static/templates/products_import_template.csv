@@ -1,0 +1,4 @@
+name,sku,category,unit_price,stock,description
+Monthly Subscription,SUB-001,Services,5000,100,Monthly subscription service
+Annual License,LIC-001,Software,50000,50,Annual software license
+Support Package,SUP-001,Services,2000,200,24/7 technical support

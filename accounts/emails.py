@@ -1,11 +1,14 @@
 ﻿# accounts/emails.py
 # Automated email sending functions
 
+import logging
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from decimal import Decimal
+
+logger = logging.getLogger(__name__)
 
 # ============================================
 # WELCOME EMAILS
@@ -63,25 +66,14 @@ def send_welcome_email(user):
 # ============================================
 
 def send_invoice_email(invoice):
-    """Send invoice to customer via email"""
+    """Send notification email when a new invoice is created"""
     try:
         if not invoice.customer or not invoice.customer.email:
             return False
 
-        subject = f"Invoice #{invoice.invoice_number} - iSaral"
-
-        context = {
-            'invoice_number': invoice.invoice_number,
-            'customer_name': invoice.customer.name,
-            'customer_email': invoice.customer.email,
-            'amount': invoice.total,
-            'subtotal': invoice.subtotal,
-            'gst_amount': invoice.gst_amount,
-            'issued_date': invoice.issued_date.strftime('%d %b %Y'),
-            'due_date': invoice.due_date.strftime('%d %b %Y') if invoice.due_date else 'N/A',
-            'company_name': 'iSaral Business Solutions',
-            'company_email': settings.DEFAULT_FROM_EMAIL,
-        }
+        issued_str = invoice.issued_date.strftime('%d %b %Y')
+        due_str = invoice.due_date.strftime('%d %b %Y') if invoice.due_date else 'N/A'
+        subject = f"New Invoice #{invoice.invoice_number} - iSaral"
 
         html_message = f"""
         <html>
@@ -89,44 +81,18 @@ def send_invoice_email(invoice):
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0066cc; padding-bottom: 20px;">
                         <h1 style="color: #0066cc; margin: 0;">iSaral</h1>
-                        <p style="color: #666; margin: 5px 0 0 0;">Invoice #{context['invoice_number']}</p>
+                        <p style="color: #666; margin: 5px 0 0 0;">Invoice Notification</p>
                     </div>
-                    <p>Dear <strong>{context['customer_name']}</strong>,</p>
-                    <p>Your invoice has been generated. Please find the details below:</p>
+                    <p>Dear <strong>{invoice.customer.name}</strong>,</p>
+                    <p>A new invoice has been created for you.</p>
                     <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr style="border-bottom: 1px solid #ddd;">
-                                <td style="padding: 10px; font-weight: 600;">Invoice #:</td>
-                                <td style="padding: 10px; text-align: right;">{context['invoice_number']}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ddd;">
-                                <td style="padding: 10px; font-weight: 600;">Issued Date:</td>
-                                <td style="padding: 10px; text-align: right;">{context['issued_date']}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ddd;">
-                                <td style="padding: 10px; font-weight: 600;">Due Date:</td>
-                                <td style="padding: 10px; text-align: right;">{context['due_date']}</td>
-                            </tr>
-                            <tr style="border-bottom: 2px solid #0066cc;">
-                                <td style="padding: 10px; font-weight: 600;">Subtotal:</td>
-                                <td style="padding: 10px; text-align: right;">Rs.{context['subtotal']:.2f}</td>
-                            </tr>
-                            <tr style="border-bottom: 2px solid #0066cc;">
-                                <td style="padding: 10px; font-weight: 600;">GST ({invoice.gst_rate:.0f}%):</td>
-                                <td style="padding: 10px; text-align: right;">Rs.{context['gst_amount']:.2f}</td>
-                            </tr>
-                            <tr style="background: #0066cc; color: white;">
-                                <td style="padding: 12px; font-weight: 700; font-size: 16px;">Total Amount:</td>
-                                <td style="padding: 12px; text-align: right; font-weight: 700; font-size: 16px;">Rs.{context['amount']:.2f}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div style="background: #e8f4ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
-                        <p style="margin: 0;">Please review the invoice and make payment at your earliest convenience.</p>
+                        <p style="margin: 5px 0;"><strong>Invoice #:</strong> {invoice.invoice_number}</p>
+                        <p style="margin: 5px 0;"><strong>Issue Date:</strong> {issued_str}</p>
+                        <p style="margin: 5px 0;"><strong>Due Date:</strong> {due_str}</p>
+                        <p style="margin: 5px 0;"><strong>Total Amount:</strong> Rs.{invoice.total:.2f}</p>
                     </div>
                     <div style="border-top: 1px solid #ddd; padding-top: 20px; margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
-                        <p style="margin: 5px 0;"><strong>{context['company_name']}</strong><br>Email: {context['company_email']}<br>Website: www.isaral.ai</p>
-                        <p style="margin-top: 10px; color: #999;">This is an automated email. Please do not reply to this message.</p>
+                        <p style="margin: 5px 0;"><strong>iSaral Business Solutions</strong><br>Thank you for your business!</p>
                     </div>
                 </div>
             </body>
@@ -144,6 +110,68 @@ def send_invoice_email(invoice):
         return True
     except Exception as e:
         print(f"Error sending invoice email: {str(e)}")
+        return False
+
+
+def send_invoice_reminder_email(invoice):
+    """
+    Send a payment reminder email for a pending/overdue invoice.
+    Returns True if sent successfully, False otherwise.
+    """
+    from django.utils import timezone
+
+    if invoice.status == 'paid':
+        return False
+
+    if not invoice.customer or not invoice.customer.email:
+        return False
+
+    today = timezone.now().date()
+    days_overdue = (today - invoice.due_date).days if invoice.due_date else 0
+    is_overdue = days_overdue > 0
+
+    subject = f"[Payment Reminder] Invoice {invoice.invoice_number} - Action Required"
+
+    overdue_line = (
+        f'<p style="color:#d9534f;"><strong>Status:</strong> OVERDUE by {days_overdue} days</p>'
+        if is_overdue else ''
+    )
+
+    html_message = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px;">
+                <h2 style="color: #d9534f;">Payment Reminder</h2>
+                <p>Dear {invoice.customer.name},</p>
+                <p>This is a friendly reminder that the following invoice is pending payment:</p>
+                <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #d9534f;">
+                    <p><strong>Invoice Number:</strong> {invoice.invoice_number}</p>
+                    <p><strong>Amount Due:</strong> Rs. {invoice.total:,.2f}</p>
+                    <p><strong>Due Date:</strong> {invoice.due_date.strftime('%d %b %Y') if invoice.due_date else 'N/A'}</p>
+                    {overdue_line}
+                </div>
+                <p>Please arrange payment at your earliest convenience.</p>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+                <p style="font-size: 12px; color: #666;">
+                    If you have already made this payment, please disregard this message.
+                </p>
+            </div>
+        </body>
+    </html>
+    """
+
+    try:
+        send_mail(
+            subject=subject,
+            message=f"Payment Reminder for Invoice {invoice.invoice_number}. Amount due: Rs. {invoice.total:,.2f}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[invoice.customer.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Error sending reminder email for invoice {invoice.invoice_number}: {e}")
         return False
 
 
@@ -238,6 +266,8 @@ def send_ticket_confirmation_email(ticket):
     except Exception as e:
         print(f"Error sending ticket email: {str(e)}")
         return False
+
+
 def send_ticket_update_email(ticket, update_message):
     """Send support ticket update email"""
     try:

@@ -1,4 +1,3 @@
-
 from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
@@ -23,35 +22,35 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════════════
     # PASSWORD RESET
     # ════════════════════════════════════════════════════════════════════
-    path('password-reset/', 
+    path('password-reset/',
         auth_views.PasswordResetView.as_view(
             template_name='accounts/password_reset.html',
             email_template_name='accounts/password_reset_email.html',
             subject_template_name='accounts/password_reset_subject.txt',
             success_url=reverse_lazy('accounts:password_reset_done')
-        ), 
+        ),
         name='password_reset'
     ),
 
-    path('password-reset/done/', 
+    path('password-reset/done/',
         auth_views.PasswordResetDoneView.as_view(
             template_name='accounts/password_reset_done.html'
-        ), 
+        ),
         name='password_reset_done'
     ),
 
-    path('password-reset-confirm/<uidb64>/<token>/', 
+    path('password-reset-confirm/<uidb64>/<token>/',
         auth_views.PasswordResetConfirmView.as_view(
             template_name='accounts/password_reset_confirm.html',
             success_url=reverse_lazy('accounts:password_reset_complete')
-        ), 
+        ),
         name='password_reset_confirm'
     ),
 
-    path('password-reset-complete/', 
+    path('password-reset-complete/',
         auth_views.PasswordResetCompleteView.as_view(
             template_name='accounts/password_reset_complete.html'
-        ), 
+        ),
         name='password_reset_complete'
     ),
 
@@ -61,6 +60,7 @@ urlpatterns = [
     path('customers/', views.customer_list, name='customer_list'),
     path('customers/search/', views.customer_search, name='customer_search'),
     path('customers/create/', views.add_customer, name='create_customer'),
+    path('customers/import/', views.import_customers_csv, name='import_customers_csv'),
     path('customers/<uuid:customer_id>/', views.get_customer_details, name='get_customer_details'),
     path('customers/<uuid:customer_id>/edit/', views.customer_edit, name='customer_edit'),
     path('customers/<uuid:customer_id>/delete/', views.delete_customer, name='delete_customer'),
@@ -71,21 +71,21 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════════════
     path('invoices/', views.invoices_list, name='invoices'),
     path('invoices/create/', views.create_invoice, name='create_invoice'),
-    path('invoices/<uuid:invoice_id>/', views.invoice_detail, name='invoice_detail'),
-    path('invoices/<uuid:invoice_id>/pdf/', views.generate_invoice_pdf, name='invoice_pdf'),
-    path('invoices/<uuid:invoice_id>/download/', views.generate_invoice_pdf, name='download_invoice'),
-    path('invoices/<uuid:invoice_id>/email/', views.email_invoice, name='email_invoice'),
-    path('invoices/<uuid:invoice_id>/update/', views.update_invoice, name='update_invoice'),
-    path('invoices/<uuid:invoice_id>/delete/', views.delete_invoice, name='delete_invoice'),
+    path('invoices/<uuid:pk>/', views.invoice_detail, name='invoice_detail'),
+    path('invoices/<uuid:pk>/pdf/', views.generate_invoice_pdf, name='invoice_pdf'),
+    path('invoices/<uuid:pk>/download/', views.generate_invoice_pdf, name='download_invoice'),
+    path('invoices/<uuid:pk>/email/', views.email_invoice, name='email_invoice'),
+    path('invoices/<uuid:pk>/update/', views.update_invoice, name='update_invoice'),
+    path('invoices/<uuid:pk>/delete/', views.delete_invoice, name='delete_invoice'),
+    path('invoices/<uuid:pk>/mark-paid/', views.mark_invoice_paid, name='mark_invoice_paid'),
 
     # ════════════════════════════════════════════════════════════════════
     # TICKETS
     # ════════════════════════════════════════════════════════════════════
     path('tickets/', views.tickets_list, name='tickets'),
-    path('create-ticket/', views.create_ticket, name='create_ticket'),
-    path('tickets/<uuid:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),
-    path('tickets/<uuid:ticket_id>/update/', views.update_ticket_status_view, name='update_ticket'),
-
+path('create-ticket/', views.create_ticket, name='create_ticket'),
+path('tickets/<uuid:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),
+path('tickets/<uuid:ticket_id>/update/', views.ticket_detail_view, name='update_ticket'),  # ✅ was update_ticket_status_view
     # ════════════════════════════════════════════════════════════════════
     # REPORTS & PLANS
     # ════════════════════════════════════════════════════════════════════
@@ -104,6 +104,7 @@ urlpatterns = [
     path('products/', views.product_list, name='product_list'),
     path('products/add/', views.product_add, name='product_add'),
     path('products/search/', views.product_search_api, name='product_search_api'),
+    path('products/import/', views.import_products_csv, name='import_products_csv'),
     path('products/<uuid:pk>/json/', views.product_detail_json, name='product_detail_json'),
     path('products/<uuid:pk>/', views.product_detail, name='product_detail'),
     path('products/<uuid:pk>/edit/', views.product_edit, name='product_edit'),
@@ -118,8 +119,7 @@ urlpatterns = [
     path('categories/<uuid:pk>/delete/', views.category_delete, name='category_delete'),
 
     # ════════════════════════════════════════════════════════════════════
-    # NOTIFICATIONS - PHASE 7 ✅ NEW
+    # NOTIFICATIONS - PHASE 7
     # ════════════════════════════════════════════════════════════════════
     path('', include(('accounts.urls_notifications', 'notifications'))),
 ]
-

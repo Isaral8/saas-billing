@@ -1,0 +1,4 @@
+name,email,phone,business_type,address,state,gst_number
+ABC Corporation,abc@company.com,9876543210,Manufacturing,123 Business St,KA,27AABCT1234H1Z0
+XYZ Services,contact@xyz.com,9876543211,Services,456 Service Ave,MH,27AAXYZ1234H1Z0
+Tech Startup,hello@tech.com,9876543212,Software,789 Tech Park,KA,27AATECH1234H1Z0

@@ -1,13 +1,16 @@
-"""
-renewals/services.py
---------------------
-All business logic for subscription renewals.
-"""
-
+import logging
 from decimal import Decimal
+from datetime import timedelta
+
 from django.utils import timezone
 from django.db import transaction
+from django.conf import settings
+
 from accounts.models import Subscription, RenewalHistory, Notification, Invoice, InvoiceItem, Customer
+from accounts.services import NotificationFactory
+from accounts.emails import send_mail
+
+logger = logging.getLogger(__name__)
 
 
 # ── Expiry detection ────────────────────────────────────────────────────
@@ -55,26 +58,24 @@ def get_expiry_buckets(user):
 
 def get_renewal_stats(user):
     """Summary stats for the renewal dashboard."""
-    from django.db.models import Sum, Count
-    from datetime import timedelta
+    from django.db.models import Sum
 
     now         = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    week_start  = today_start - timedelta(days=7)
     month_start = today_start.replace(day=1)
 
     subs = Subscription.objects.filter(user=user, customer__isnull=False)
     hist = RenewalHistory.objects.filter(user=user)
 
     return {
-        'total_active':      subs.filter(renewal_status='active').count(),
-        'expiring_today':    subs.filter(expires_at__date=now.date()).count(),
-        'expiring_week':     subs.filter(expires_at__date__range=[now.date(), (now + timedelta(days=7)).date()]).count(),
-        'expired':           subs.filter(renewal_status='expired').count(),
-        'renewed_today':     hist.filter(renewed_on__gte=today_start).count(),
-        'renewed_this_month':hist.filter(renewed_on__gte=month_start).count(),
-        'revenue_this_month':hist.filter(renewed_on__gte=month_start).aggregate(t=Sum('total_amount'))['t'] or Decimal('0'),
-        'revenue_all_time':  hist.aggregate(t=Sum('total_amount'))['t'] or Decimal('0'),
+        'total_active':       subs.filter(renewal_status='active').count(),
+        'expiring_today':     subs.filter(expires_at__date=now.date()).count(),
+        'expiring_week':      subs.filter(expires_at__date__range=[now.date(), (now + timedelta(days=7)).date()]).count(),
+        'expired':            subs.filter(renewal_status='expired').count(),
+        'renewed_today':      hist.filter(renewed_on__gte=today_start).count(),
+        'renewed_this_month': hist.filter(renewed_on__gte=month_start).count(),
+        'revenue_this_month': hist.filter(renewed_on__gte=month_start).aggregate(t=Sum('total_amount'))['t'] or Decimal('0'),
+        'revenue_all_time':   hist.aggregate(t=Sum('total_amount'))['t'] or Decimal('0'),
     }
 
 
@@ -110,6 +111,18 @@ def get_new_expiry(current_expiry, billing_cycle):
     return base + relativedelta(months=months)
 
 
+def _next_invoice_number(user, prefix):
+    """Shared helper for generating a zero-padded, per-user, per-prefix invoice number."""
+    last = Invoice.objects.filter(
+        user=user, invoice_number__startswith=prefix
+    ).order_by('-invoice_number').first()
+    try:
+        num = int(last.invoice_number.replace(prefix, '')) + 1 if last else 1
+    except Exception:
+        num = 1
+    return f"{prefix}{num:03d}"
+
+
 @transaction.atomic
 def renew_subscription(subscription, renewed_by, billing_cycle=None, plan=None, discount=Decimal('0'), notes=''):
     """
@@ -126,18 +139,9 @@ def renew_subscription(subscription, renewed_by, billing_cycle=None, plan=None, 
     base, gst, total = calculate_renewal_amount(plan, billing_cycle, discount)
     new_expiry       = get_new_expiry(subscription.expires_at, billing_cycle)
 
-    # ── Build invoice number ──────────────────────────────────
     from datetime import datetime
-    year   = datetime.now().year
-    prefix = f"RNW-{year}-"
-    last   = Invoice.objects.filter(
-        user=renewed_by, invoice_number__startswith=prefix
-    ).order_by('-invoice_number').first()
-    try:
-        num = int(last.invoice_number.replace(prefix, '')) + 1 if last else 1
-    except Exception:
-        num = 1
-    invoice_number = f"{prefix}{num:03d}"
+    year            = datetime.now().year
+    invoice_number  = _next_invoice_number(renewed_by, f"RNW-{year}-")
 
     # ── Create Invoice ────────────────────────────────────────
     invoice = Invoice.objects.create(
@@ -155,59 +159,59 @@ def renew_subscription(subscription, renewed_by, billing_cycle=None, plan=None, 
 
     # ── Create InvoiceItem ────────────────────────────────────
     InvoiceItem.objects.create(
-        invoice      = invoice,
-        product_name = f"{plan.title()} Plan ({billing_cycle.replace('_',' ').title()})",
-        description  = f"Subscription renewal for {billing_cycle.replace('_',' ')}",
-        quantity     = Decimal('1'),
-        unit_price   = base - discount,
-        gst_rate     = GST_RATE,
-        gst_amount   = gst,
-        subtotal     = base - discount,
-        line_total   = total,
+        invoice         = invoice,
+        product_name    = f"{plan.title()} Plan ({billing_cycle.replace('_',' ').title()})",
+        description     = f"Subscription renewal for {billing_cycle.replace('_',' ')}",
+        quantity        = Decimal('1'),
+        unit_price      = base - discount,
+        gst_rate        = GST_RATE,
+        gst_amount      = gst,
+        subtotal        = base - discount,
+        line_total      = total,
         discount_amount = discount,
     )
 
     # ── Update Subscription ───────────────────────────────────
-    old_expiry                = subscription.expires_at
-    subscription.plan         = plan
-    subscription.billing_cycle= billing_cycle
-    subscription.expires_at   = new_expiry
-    subscription.renewal_date = new_expiry
-    subscription.renewed_on   = timezone.now()
-    subscription.renewed_by   = renewed_by
+    old_expiry                  = subscription.expires_at
+    subscription.plan           = plan
+    subscription.billing_cycle  = billing_cycle
+    subscription.expires_at     = new_expiry
+    subscription.renewal_date   = new_expiry
+    subscription.renewed_on     = timezone.now()
+    subscription.renewed_by     = renewed_by
     subscription.renewal_status = 'active'
-    subscription.is_active    = True
+    subscription.is_active      = True
     subscription.payment_status = 'paid'
-    subscription.amount       = base
-    subscription.discount     = discount
-    subscription.invoice      = invoice
-    subscription.notes        = notes
+    subscription.amount         = base
+    subscription.discount       = discount
+    subscription.invoice        = invoice
+    subscription.notes          = notes
     subscription.save()
 
     # ── RenewalHistory ────────────────────────────────────────
     RenewalHistory.objects.create(
-        subscription   = subscription,
-        user           = renewed_by,
-        customer       = subscription.customer,
-        plan           = plan,
-        billing_cycle  = billing_cycle,
-        amount         = base,
-        discount       = discount,
-        gst_amount     = gst,
-        total_amount   = total,
-        renewal_type   = 'manual',
-        previous_expiry= old_expiry,
-        new_expiry     = new_expiry,
-        invoice        = invoice,
-        payment_status = 'paid',
-        notes          = notes,
+        subscription    = subscription,
+        user            = renewed_by,
+        customer        = subscription.customer,
+        plan            = plan,
+        billing_cycle   = billing_cycle,
+        amount          = base,
+        discount        = discount,
+        gst_amount      = gst,
+        total_amount    = total,
+        renewal_type    = 'manual',
+        previous_expiry = old_expiry,
+        new_expiry      = new_expiry,
+        invoice         = invoice,
+        payment_status  = 'paid',
+        notes           = notes,
     )
 
     # ── Notification ──────────────────────────────────────────
     Notification.objects.create(
         user    = renewed_by,
         type    = 'system',
-        title   = f'Subscription Renewed',
+        title   = 'Subscription Renewed',
         message = f'{subscription.customer.name if subscription.customer else "User"} — {plan.title()} plan renewed until {new_expiry.strftime("%d %b %Y")}.',
     )
 
@@ -234,9 +238,6 @@ def sync_renewal_statuses(user):
 
 def create_expiry_notifications(user):
     """Create notifications for subscriptions expiring in 30/15/7/1 days."""
-    from django.db.models import Q
-    from datetime import timedelta
-
     now  = timezone.now()
     subs = Subscription.objects.filter(
         user=user, customer__isnull=False, renewal_status='active'
@@ -252,10 +253,181 @@ def create_expiry_notifications(user):
         if days in milestones:
             title = f'Plan Expiring in {days} Day{"s" if days > 1 else ""}'
             msg   = f'{sub.customer.name if sub.customer else sub.user.email} — {sub.plan.title()} expires on {sub.expires_at.strftime("%d %b %Y")}.'
-            # Avoid duplicate notifications for same sub+days
             exists = Notification.objects.filter(user=user, title=title, message=msg).exists()
             if not exists:
                 Notification.objects.create(user=user, type='plan_expiry', title=title, message=msg)
                 created += 1
 
     return created
+
+
+# ── RenewalService: invoice generation + reminders for automated renewals ──
+
+class RenewalService:
+    """
+    Service for creating renewal invoices and sending reminder emails
+    for automated/scheduled renewals (distinct from the manual
+    `renew_subscription` workflow above).
+
+    NOTE: field names below (Invoice/InvoiceItem) are aligned with the
+    schema confirmed elsewhere in this codebase (renew_subscription,
+    accounts/tasks.py). The `Renewal` model referenced in
+    `send_renewal_reminders` has NOT been confirmed — verify its fields
+    (`status`, `renewal_date`, `reminder_7_days_sent`, `subscription`,
+    `invoice`, `invoice_created`, `processed_at`) against
+    renewals/models.py before relying on this method.
+    """
+
+    @staticmethod
+    @transaction.atomic
+    def create_renewal_invoice(renewal):
+        """Create an Invoice + InvoiceItem from a Renewal record."""
+        subscription = renewal.subscription
+
+        try:
+            base  = Decimal(str(subscription.amount))
+            gst   = (base * GST_RATE / 100).quantize(Decimal('0.01'))
+            total = (base + gst).quantize(Decimal('0.01'))
+
+            invoice_number = _next_invoice_number(subscription.user, "REN-")
+
+            invoice = Invoice.objects.create(
+                user           = subscription.user,
+                customer       = subscription.customer,
+                invoice_number = invoice_number,
+                issued_date    = timezone.now().date(),
+                due_date       = timezone.now().date() + timedelta(days=7),
+                subtotal       = base,
+                gst_rate       = GST_RATE,
+                gst_amount     = gst,
+                total          = total,
+                status         = 'sent',
+                notes          = f"Renewal for period {renewal.renewal_date}",
+            )
+
+            InvoiceItem.objects.create(
+                invoice     = invoice,
+                product_name= f"{subscription.plan.title()} Renewal",
+                description = f"Renewal for period {renewal.renewal_date}",
+                quantity    = Decimal('1'),
+                unit_price  = base,
+                gst_rate    = GST_RATE,
+                gst_amount  = gst,
+                subtotal    = base,
+                line_total  = total,
+            )
+
+            renewal.invoice         = invoice
+            renewal.invoice_created = True
+            renewal.status          = 'invoice_created'
+            renewal.processed_at    = timezone.now()
+            renewal.save(update_fields=['invoice', 'invoice_created', 'status', 'processed_at'])
+
+            NotificationFactory.renewal_invoice_created(
+                subscription.user,
+                renewal,
+                async_task=True,
+            )
+
+            RenewalService.send_renewal_invoice_email(invoice, subscription)
+
+            return invoice
+
+        except Exception as e:
+            logger.error(f"Error creating renewal invoice for renewal {renewal.id}: {e}")
+            renewal.status = 'failed'
+            renewal.save(update_fields=['status'])
+            return None
+
+    @staticmethod
+    def send_renewal_invoice_email(invoice, subscription):
+        """Send renewal invoice email."""
+        subject = f"Renewal Invoice - {invoice.invoice_number}"
+
+        html_message = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <div style="max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px;">
+                    <h2 style="color: #5cb85c;">Subscription Renewal</h2>
+                    <p>Dear {subscription.customer.name},</p>
+                    <p>Your subscription renewal invoice is ready.</p>
+                    <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0;">
+                        <p><strong>Plan:</strong> {subscription.plan}</p>
+                        <p><strong>Amount:</strong> ₹{invoice.total:,.2f}</p>
+                        <p><strong>Due Date:</strong> {invoice.due_date}</p>
+                    </div>
+                    <p>
+                        <a href="http://localhost:8000/accounts/invoices/{invoice.id}/"
+                           style="background-color: #5cb85c; color: white; padding: 10px 20px;
+                                  text-decoration: none; border-radius: 4px;">
+                            View Invoice
+                        </a>
+                    </p>
+                    <p>Thank you for your continued business!</p>
+                </div>
+            </body>
+        </html>
+        """
+
+        try:
+            send_mail(
+                subject=subject,
+                message=f"Your renewal invoice {invoice.invoice_number} is ready",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[subscription.customer.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+        except Exception as e:
+            logger.error(f"Error sending renewal email for invoice {invoice.invoice_number}: {e}")
+
+    @staticmethod
+    def send_renewal_reminders():
+        """
+        Send renewal reminders.
+        UNCONFIRMED: relies on renewals.models.Renewal with fields
+        status, renewal_date, reminder_7_days_sent, subscription.
+        Verify this model exists with these fields before relying on this.
+        """
+        from renewals.models import Renewal
+
+        today = timezone.now().date()
+
+        renewals_7_days = Renewal.objects.filter(
+            status='pending',
+            renewal_date__lte=today + timedelta(days=7),
+            renewal_date__gte=today,
+            reminder_7_days_sent=False,
+        ).select_related('subscription', 'subscription__customer')
+
+        sent_count = 0
+        for renewal in renewals_7_days:
+            subscription = renewal.subscription
+            subject = f"Subscription Renewal Reminder - {subscription.plan}"
+
+            html_message = f"""
+            <html>
+                <body style="font-family: Arial, sans-serif;">
+                    <p>Your subscription renewal is coming up in 7 days!</p>
+                    <p>Plan: {subscription.plan}</p>
+                    <p>Renewal Date: {renewal.renewal_date}</p>
+                </body>
+            </html>
+            """
+
+            try:
+                send_mail(
+                    subject=subject,
+                    message="Your subscription renewal reminder",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[subscription.customer.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                renewal.reminder_7_days_sent = True
+                renewal.save(update_fields=['reminder_7_days_sent'])
+                sent_count += 1
+            except Exception as e:
+                logger.error(f"Error sending renewal reminder for renewal {renewal.id}: {e}")
+
+        return {'sent': sent_count}

@@ -12,7 +12,7 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('Email is required')
         email = self.normalize_email(email)
-        user  = self.model(email=email, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -142,7 +142,15 @@ class Invoice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Payment Reminder Tracking ✅ ALREADY THERE - GOOD!
+    reminder_sent_count = models.IntegerField(default=0)
+    last_reminder_sent_at = models.DateTimeField(null=True, blank=True)
+    reminder_7_days_sent = models.BooleanField(default=False)
+    reminder_14_days_sent = models.BooleanField(default=False)
+    reminder_30_days_sent = models.BooleanField(default=False)
+
     def __str__(self):
+        """Return invoice string representation"""
         return f"Invoice {self.invoice_number}"
 
     def calculate_from_items(self):
@@ -174,9 +182,6 @@ class Invoice(models.Model):
             models.Index(fields=['invoice_number']),
             models.Index(fields=['status']),
         ]
-
-    def __str__(self):
-        return f"Invoice {self.invoice_number}"
         
 class ProductCategory(models.Model):
     """Product categories for organising the product catalog."""
