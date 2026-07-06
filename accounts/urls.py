@@ -82,10 +82,13 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════════════
     # TICKETS
     # ════════════════════════════════════════════════════════════════════
+   # ════════════════════════════════════════════════════════════════════
+    # TICKETS
+    # ════════════════════════════════════════════════════════════════════
     path('tickets/', views.tickets_list, name='tickets'),
-path('create-ticket/', views.create_ticket, name='create_ticket'),
-path('tickets/<uuid:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),
-path('tickets/<uuid:ticket_id>/update/', views.ticket_detail_view, name='update_ticket'),  # ✅ was update_ticket_status_view
+    path('create-ticket/', views.create_ticket, name='create_ticket'),  # ← Add 4 spaces
+    path('tickets/<uuid:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),  # ← Add 4 spaces
+    path('tickets/<uuid:ticket_id>/update/', views.ticket_detail_view, name='update_ticket'),  # ← Add 4 spaces
     # ════════════════════════════════════════════════════════════════════
     # REPORTS & PLANS
     # ════════════════════════════════════════════════════════════════════
